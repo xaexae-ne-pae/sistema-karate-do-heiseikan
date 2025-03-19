@@ -50,7 +50,7 @@ const Results = () => {
       tournament: "Copa Shotokan - 2ª Etapa",
       athlete1: { name: "João Silva", color: "red", score: 8 },
       athlete2: { name: "Carlos Eduardo", color: "blue", score: 6 },
-      winner: "athlete1"
+      winner: "athlete1" as "athlete1" | "athlete2"
     },
     { 
       id: 2, 
@@ -59,7 +59,7 @@ const Results = () => {
       tournament: "Copa Shotokan - 2ª Etapa",
       athlete1: { name: "Ana Pereira", color: "red", score: 26.5 },
       athlete2: { name: "Lúcia Fernandes", color: "blue", score: 25.8 },
-      winner: "athlete1"
+      winner: "athlete1" as "athlete1" | "athlete2"
     },
     { 
       id: 3, 
@@ -68,7 +68,7 @@ const Results = () => {
       tournament: "Copa Shotokan - 1ª Etapa",
       athlete1: { name: "Pedro Santos", color: "red", score: 5 },
       athlete2: { name: "Fernando Costa", color: "blue", score: 7 },
-      winner: "athlete2"
+      winner: "athlete2" as "athlete1" | "athlete2"
     },
     { 
       id: 4, 
@@ -77,7 +77,7 @@ const Results = () => {
       tournament: "Copa Shotokan - 1ª Etapa",
       athlete1: { name: "Mariana Alves", color: "red", score: 24.7 },
       athlete2: { name: "Carla Mendes", color: "blue", score: 25.2 },
-      winner: "athlete2"
+      winner: "athlete2" as "athlete1" | "athlete2"
     },
   ];
 

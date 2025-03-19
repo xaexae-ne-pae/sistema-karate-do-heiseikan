@@ -33,7 +33,7 @@ const Tournaments = () => {
       name: "Campeonato Regional de Karatê 2025",
       date: "15/05/2025",
       location: "Ginásio Municipal",
-      status: "upcoming",
+      status: "upcoming" as "upcoming" | "active" | "completed",
       categoriesCount: 12,
       athletesCount: 98
     },
@@ -42,7 +42,7 @@ const Tournaments = () => {
       name: "Copa Shotokan - 3ª Etapa",
       date: "28/06/2025",
       location: "Centro Esportivo Água Rasa",
-      status: "active",
+      status: "active" as "upcoming" | "active" | "completed",
       categoriesCount: 8,
       athletesCount: 64
     }
@@ -54,7 +54,7 @@ const Tournaments = () => {
       name: "Copa Shotokan - 2ª Etapa",
       date: "15/03/2025",
       location: "Centro Esportivo Água Rasa",
-      status: "completed",
+      status: "completed" as "upcoming" | "active" | "completed",
       categoriesCount: 8,
       athletesCount: 72
     },
@@ -63,7 +63,7 @@ const Tournaments = () => {
       name: "Campeonato Estadual 2024",
       date: "10/11/2024",
       location: "Ginásio do Ibirapuera",
-      status: "completed",
+      status: "completed" as "upcoming" | "active" | "completed",
       categoriesCount: 15,
       athletesCount: 120
     },
@@ -72,7 +72,7 @@ const Tournaments = () => {
       name: "Copa Shotokan - 1ª Etapa",
       date: "20/01/2025",
       location: "Centro Esportivo Água Rasa",
-      status: "completed",
+      status: "completed" as "upcoming" | "active" | "completed",
       categoriesCount: 8,
       athletesCount: 68
     }
