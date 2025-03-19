@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
-import { User, Lock, ChevronRight } from "lucide-react";
+import { User, Lock, ChevronRight, Eye, EyeOff } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 interface LoginFormProps {
@@ -17,6 +17,8 @@ const LoginForm: React.FC<LoginFormProps> = ({ className, style }) => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [focused, setFocused] = useState<string | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
   const [credentials, setCredentials] = useState({
     username: '',
     password: '',
@@ -98,7 +100,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ className, style }) => {
             Nome de usuário
           </Label>
           <div className="relative">
-            <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-karate-white/50">
+            <div className={`absolute left-3 top-1/2 transform -translate-y-1/2 transition-colors duration-300 ${focused === 'username' ? 'text-karate-red' : 'text-karate-white/50'}`}>
               <User size={18} />
             </div>
             <Input
@@ -108,8 +110,9 @@ const LoginForm: React.FC<LoginFormProps> = ({ className, style }) => {
               placeholder="Nome de usuário"
               value={credentials.username}
               onChange={handleChange}
-              className="bg-white/5 border-white/10 pl-10 h-12 text-karate-white placeholder:text-karate-white/30 focus:border-karate-red/70 transition-all duration-300"
-              autoComplete="username"
+              onFocus={() => setFocused('username')}
+              onBlur={() => setFocused(null)}
+              className="bg-white/5 border-white/10 pl-10 h-12 text-karate-white placeholder:text-karate-white/30 focus:bg-white/10 focus:border-karate-red transition-all duration-300"
               required
             />
           </div>
@@ -125,20 +128,30 @@ const LoginForm: React.FC<LoginFormProps> = ({ className, style }) => {
             </a>
           </div>
           <div className="relative">
-            <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-karate-white/50">
+            <div className={`absolute left-3 top-1/2 transform -translate-y-1/2 transition-colors duration-300 ${focused === 'password' ? 'text-karate-red' : 'text-karate-white/50'}`}>
               <Lock size={18} />
             </div>
             <Input
               id="password"
               name="password"
-              type="password"
+              type={showPassword ? "text" : "password"}
               placeholder="••••••••"
               value={credentials.password}
               onChange={handleChange}
-              className="bg-white/5 border-white/10 pl-10 h-12 text-karate-white placeholder:text-karate-white/30 focus:border-karate-red/70 transition-all duration-300"
-              autoComplete="current-password"
+              onFocus={() => setFocused('password')}
+              onBlur={() => setFocused(null)}
+              className="bg-white/5 border-white/10 pl-10 pr-10 h-12 text-karate-white placeholder:text-karate-white/30 focus:bg-white/10 focus:border-karate-red transition-all duration-300"
               required
             />
+            {credentials.password && (
+              <button 
+                type="button"
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-karate-white/50 hover:text-karate-red transition-colors duration-300"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+            )}
           </div>
         </div>
         
