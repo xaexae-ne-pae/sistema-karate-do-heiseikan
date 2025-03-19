@@ -100,7 +100,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ className, style }) => {
             Nome de usuário
           </Label>
           <div className="relative">
-            <div className={`absolute left-3 top-1/2 transform -translate-y-1/2 transition-colors duration-300 ${focused === 'username' ? 'text-karate-red' : 'text-karate-white/50'}`}>
+            <div className={`absolute left-3 top-1/2 -translate-y-1/2 transition-colors duration-300 ${focused === 'username' ? 'text-karate-red' : 'text-karate-white/50'}`}>
               <User size={18} />
             </div>
             <Input
@@ -112,7 +112,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ className, style }) => {
               onChange={handleChange}
               onFocus={() => setFocused('username')}
               onBlur={() => setFocused(null)}
-              className="bg-white/5 border-white/10 pl-10 h-12 text-karate-white placeholder:text-karate-white/30 focus:bg-white/10 focus:border-karate-red transition-all duration-300"
+              className="bg-white/5 border-white/10 pl-10 h-12 text-karate-white placeholder:text-karate-white/30 focus-visible:border-karate-red focus-visible:bg-white/10 transition-all duration-300"
               required
             />
           </div>
@@ -128,7 +128,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ className, style }) => {
             </a>
           </div>
           <div className="relative">
-            <div className={`absolute left-3 top-1/2 transform -translate-y-1/2 transition-colors duration-300 ${focused === 'password' ? 'text-karate-red' : 'text-karate-white/50'}`}>
+            <div className={`absolute left-3 top-1/2 -translate-y-1/2 transition-colors duration-300 ${focused === 'password' ? 'text-karate-red' : 'text-karate-white/50'}`}>
               <Lock size={18} />
             </div>
             <Input
@@ -140,18 +140,16 @@ const LoginForm: React.FC<LoginFormProps> = ({ className, style }) => {
               onChange={handleChange}
               onFocus={() => setFocused('password')}
               onBlur={() => setFocused(null)}
-              className="bg-white/5 border-white/10 pl-10 pr-10 h-12 text-karate-white placeholder:text-karate-white/30 focus:bg-white/10 focus:border-karate-red transition-all duration-300"
+              className="bg-white/5 border-white/10 pl-10 pr-10 h-12 text-karate-white placeholder:text-karate-white/30 focus-visible:border-karate-red focus-visible:bg-white/10 transition-all duration-300"
               required
             />
-            {credentials.password && (
-              <button 
-                type="button"
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-karate-white/50 hover:text-karate-red transition-colors duration-300"
-                onClick={() => setShowPassword(!showPassword)}
-              >
-                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-              </button>
-            )}
+            <button 
+              type="button"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-karate-white/50 hover:text-karate-red transition-colors duration-300"
+              onClick={() => setShowPassword(!showPassword)}
+            >
+              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+            </button>
           </div>
         </div>
         
