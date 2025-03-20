@@ -112,7 +112,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ className, style }) => {
               onChange={handleChange}
               onFocus={() => setFocused('username')}
               onBlur={() => setFocused(null)}
-              className="bg-white/5 border-white/10 pl-10 h-12 text-karate-white placeholder:text-karate-white/30 focus-visible:border-karate-red focus-visible:bg-white/10 transition-all duration-300"
+              className="bg-white/10 border-white/20 pl-10 h-12 text-karate-white placeholder:text-karate-white/40 focus-visible:border-karate-red focus-visible:bg-white/15 focus-visible:ring-1 focus-visible:ring-karate-red/30 transition-all duration-300"
               required
               autoComplete="username"
             />
@@ -141,7 +141,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ className, style }) => {
               onChange={handleChange}
               onFocus={() => setFocused('password')}
               onBlur={() => setFocused(null)}
-              className="bg-white/5 border-white/10 pl-10 pr-10 h-12 text-karate-white placeholder:text-karate-white/30 focus-visible:border-karate-red focus-visible:bg-white/10 transition-all duration-300"
+              className="bg-white/10 border-white/20 pl-10 pr-10 h-12 text-karate-white placeholder:text-karate-white/40 focus-visible:border-karate-red focus-visible:bg-white/15 focus-visible:ring-1 focus-visible:ring-karate-red/30 transition-all duration-300"
               required
               autoComplete="current-password"
             />
@@ -149,6 +149,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ className, style }) => {
               type="button"
               className="absolute right-3 top-1/2 -translate-y-1/2 text-karate-white/50 hover:text-karate-red transition-colors duration-300"
               onClick={() => setShowPassword(!showPassword)}
+              tabIndex={-1}
             >
               {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
             </button>
