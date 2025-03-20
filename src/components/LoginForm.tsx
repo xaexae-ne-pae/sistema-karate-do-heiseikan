@@ -88,7 +88,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ className, style }) => {
   };
 
   return (
-    <div className={`glass-morphism p-8 rounded-xl max-w-md w-full mx-auto animate-scale-in ${className}`} style={style}>
+    <div className={`glass-morphism p-8 rounded-xl max-w-md w-full mx-auto ${className}`} style={style}>
       <div className="mb-8 text-center">
         <h2 className="text-2xl font-bold text-karate-white mb-2 tracking-wide">Bem-vindo</h2>
         <p className="text-karate-white/60 text-sm">Entre para acessar sua conta</p>
@@ -112,7 +112,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ className, style }) => {
               onChange={handleChange}
               onFocus={() => setFocused('username')}
               onBlur={() => setFocused(null)}
-              className="bg-white/10 border-white/20 pl-10 h-12 text-karate-white placeholder:text-karate-white/40 focus-visible:border-karate-red focus-visible:bg-white/15 focus-visible:ring-1 focus-visible:ring-karate-red/30 transition-all duration-300"
+              className="bg-white/10 border-white/20 pl-10 h-12 text-karate-white placeholder:text-karate-white/40 focus-visible:border-karate-red focus-visible:bg-white/15 focus-visible:ring-1 focus-visible:ring-karate-red/30"
               required
               autoComplete="username"
             />
@@ -141,7 +141,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ className, style }) => {
               onChange={handleChange}
               onFocus={() => setFocused('password')}
               onBlur={() => setFocused(null)}
-              className="bg-white/10 border-white/20 pl-10 pr-10 h-12 text-karate-white placeholder:text-karate-white/40 focus-visible:border-karate-red focus-visible:bg-white/15 focus-visible:ring-1 focus-visible:ring-karate-red/30 transition-all duration-300"
+              className="bg-white/10 border-white/20 pl-10 pr-10 h-12 text-karate-white placeholder:text-karate-white/40 focus-visible:border-karate-red focus-visible:bg-white/15 focus-visible:ring-1 focus-visible:ring-karate-red/30"
               required
               autoComplete="current-password"
             />
