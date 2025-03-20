@@ -22,9 +22,13 @@ export function MatchCard({ category, time, mat, player1, player2 }: MatchCardPr
       </div>
       
       <div className="mb-3">
-        <h3 className="font-semibold text-base mb-0.5">{category}</h3>
+        <h3 className="font-semibold text-base mb-2">{category}</h3>
         <div className="flex items-center justify-between">
-          <h4 className="text-base font-medium">{player1} <span className="text-primary">vs</span> {player2}</h4>
+          <div className="flex items-center justify-between w-full">
+            <div className="text-base font-medium text-left flex-1">{player1}</div>
+            <div className="mx-2 font-bold text-primary text-lg">VS</div>
+            <div className="text-base font-medium text-right flex-1">{player2}</div>
+          </div>
         </div>
       </div>
       
