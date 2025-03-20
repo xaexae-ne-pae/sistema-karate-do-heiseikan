@@ -41,7 +41,7 @@ const Dashboard = () => {
         </header>
         
         <main className="px-8 py-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             <StatCard 
               title="Total Atletas" 
               value="124" 
@@ -68,16 +68,16 @@ const Dashboard = () => {
             />
           </div>
           
-          <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
             <div className="lg:col-span-3">
-              <div className="flex items-center justify-between mb-5">
+              <div className="flex items-center justify-between mb-3">
                 <div>
-                  <h2 className="text-xl font-semibold">Lutas de hoje</h2>
-                  <p className="text-sm text-muted-foreground">Próximas lutas e eventos</p>
+                  <h2 className="text-lg font-semibold">Lutas de hoje</h2>
+                  <p className="text-xs text-muted-foreground">Próximas lutas e eventos</p>
                 </div>
-                <Button variant="outline" size="sm" className="gap-1">
+                <Button variant="outline" size="sm" className="gap-1 h-8 text-xs">
                   <span>Ver todas</span>
-                  <ChevronRight className="h-4 w-4" />
+                  <ChevronRight className="h-3.5 w-3.5" />
                 </Button>
               </div>
               
@@ -107,9 +107,9 @@ const Dashboard = () => {
             </div>
             
             <div className="lg:col-span-2">
-              <div className="mb-5">
-                <h2 className="text-xl font-semibold">Ações Rápidas</h2>
-                <p className="text-sm text-muted-foreground">Funções mais usadas</p>
+              <div className="mb-3">
+                <h2 className="text-lg font-semibold">Ações Rápidas</h2>
+                <p className="text-xs text-muted-foreground">Funções mais usadas</p>
               </div>
               
               <div>
