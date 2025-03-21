@@ -1,14 +1,21 @@
 
-import { BarChart2, Calendar, Home, LogOut, Settings, Shield, Users } from "lucide-react";
+import { BarChart2, Calendar, Home, LogOut, Medal, Settings, Shield, Users } from "lucide-react";
 import { DashboardLogo } from "./DashboardLogo";
 import { SidebarLink } from "./SidebarLink";
 import { ThemeToggle } from "./ThemeToggle";
 import { Separator } from "./ui/separator";
 import { Avatar, AvatarFallback } from "./ui/avatar";
 import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 
 export function Sidebar() {
   const navigate = useNavigate();
+  const [username, setUsername] = useState("");
+  
+  useEffect(() => {
+    const savedUsername = localStorage.getItem('karate_username') || '';
+    setUsername(savedUsername);
+  }, []);
   
   const handleLogout = () => {
     // Clear any saved credentials
@@ -19,6 +26,9 @@ export function Sidebar() {
     // Redirect to login page
     navigate('/');
   };
+
+  // Get first letter of username for avatar
+  const avatarInitial = username ? username.charAt(0).toUpperCase() : '';
 
   return (
     <div className="fixed inset-y-0 left-0 z-50 flex w-64 flex-col border-r bg-sidebar border-border">
@@ -32,7 +42,7 @@ export function Sidebar() {
         <SidebarLink icon={Shield} label="Categorias" to="/categorias" />
         <SidebarLink icon={Calendar} label="Torneios" to="/torneios" />
         <SidebarLink icon={BarChart2} label="Pontuação" to="/pontuacao" />
-        <SidebarLink icon={BarChart2} label="Resultados" to="/resultados" />
+        <SidebarLink icon={Medal} label="Resultados" to="/resultados" />
         <SidebarLink icon={Settings} label="Configurações" to="/configuracoes" />
       </div>
 
@@ -40,11 +50,13 @@ export function Sidebar() {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Avatar className="h-9 w-9 shrink-0">
-              <AvatarFallback className="bg-primary/10 text-foreground">A</AvatarFallback>
+              <AvatarFallback className="bg-primary/10 text-foreground">{avatarInitial}</AvatarFallback>
             </Avatar>
             <div className="flex flex-col">
-              <span className="text-sm font-medium">admin</span>
-              <span className="text-xs text-muted-foreground">Administrador</span>
+              <span className="text-sm font-medium">{username}</span>
+              <span className="text-xs text-muted-foreground">
+                {username === 'Francivaldo' ? 'Administrador' : 'Jurado'}
+              </span>
             </div>
           </div>
           <ThemeToggle iconOnly />

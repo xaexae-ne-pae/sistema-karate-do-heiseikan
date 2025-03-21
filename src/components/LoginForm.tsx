@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,6 +12,12 @@ interface LoginFormProps {
   className?: string;
   style?: React.CSSProperties;
 }
+
+// Valid user credentials
+const VALID_CREDENTIALS = [
+  { username: 'Francivaldo', password: 'karate2025', role: 'admin' },
+  { username: 'Jurado', password: 'jurado2025', role: 'juror' }
+];
 
 const LoginForm: React.FC<LoginFormProps> = ({ className, style }) => {
   const navigate = useNavigate();
@@ -66,10 +73,16 @@ const LoginForm: React.FC<LoginFormProps> = ({ className, style }) => {
     setLoading(true);
     setError('');
     
-    if (credentials.username === 'Francivaldo' && credentials.password === 'karate2025') {
+    // Find matching user in credentials list
+    const validUser = VALID_CREDENTIALS.find(
+      user => user.username === credentials.username && user.password === credentials.password
+    );
+    
+    if (validUser) {
       await new Promise(resolve => setTimeout(resolve, 1500));
       
-      localStorage.setItem('karate_username', credentials.username);
+      localStorage.setItem('karate_username', validUser.username);
+      localStorage.setItem('karate_role', validUser.role);
       
       if (credentials.remember) {
         localStorage.setItem('karate_password', credentials.password);
