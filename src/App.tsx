@@ -11,6 +11,7 @@ import Categories from "./pages/Categories";
 import Tournaments from "./pages/Tournaments";
 import Scoring from "./pages/Scoring";
 import Results from "./pages/Results";
+import Inscriptions from "./pages/Inscriptions";
 import NotFound from "./pages/NotFound";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 
@@ -34,6 +35,11 @@ const App = () => (
           <Route path="/atletas" element={
             <ProtectedRoute>
               <Athletes />
+            </ProtectedRoute>
+          } />
+          <Route path="/inscricoes" element={
+            <ProtectedRoute>
+              <Inscriptions />
             </ProtectedRoute>
           } />
           <Route path="/categorias" element={

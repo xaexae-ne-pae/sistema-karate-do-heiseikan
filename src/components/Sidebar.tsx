@@ -1,5 +1,5 @@
 
-import { BarChart2, Calendar, Home, LogOut, Medal, Settings, Shield, Users } from "lucide-react";
+import { BarChart2, Calendar, Home, LogOut, Medal, Settings, Shield, Users, Clipboard } from "lucide-react";
 import { DashboardLogo } from "./DashboardLogo";
 import { SidebarLink } from "./SidebarLink";
 import { ThemeToggle } from "./ThemeToggle";
@@ -22,6 +22,7 @@ export function Sidebar() {
     localStorage.removeItem('karate_username');
     localStorage.removeItem('karate_password');
     localStorage.removeItem('karate_remember');
+    localStorage.removeItem('karate_role');
     
     // Redirect to login page
     navigate('/');
@@ -39,6 +40,7 @@ export function Sidebar() {
       <div className="flex flex-1 flex-col px-4 py-4 gap-1">
         <SidebarLink icon={Home} label="Visão Geral" to="/dashboard" />
         <SidebarLink icon={Users} label="Atletas" to="/atletas" />
+        <SidebarLink icon={Clipboard} label="Inscrições" to="/inscricoes" />
         <SidebarLink icon={Shield} label="Categorias" to="/categorias" />
         <SidebarLink icon={Calendar} label="Torneios" to="/torneios" />
         <SidebarLink icon={BarChart2} label="Pontuação" to="/pontuacao" />
@@ -49,8 +51,8 @@ export function Sidebar() {
       <div className="border-t border-border p-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Avatar className="h-9 w-9 shrink-0">
-              <AvatarFallback className="bg-primary/10 text-foreground">{avatarInitial}</AvatarFallback>
+            <Avatar className="h-9 w-9 shrink-0 transition-opacity duration-200 hover:opacity-90">
+              <AvatarFallback className="bg-primary/10 text-foreground transition-colors duration-200 hover:bg-primary/20">{avatarInitial}</AvatarFallback>
             </Avatar>
             <div className="flex flex-col">
               <span className="text-sm font-medium">{username}</span>
@@ -65,10 +67,10 @@ export function Sidebar() {
         <Separator className="my-4" />
         
         <button 
-          className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-foreground/80 transition-colors hover:bg-muted"
+          className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-foreground/80 transition-all duration-200 hover:bg-muted hover:text-foreground hover:translate-x-0.5"
           onClick={handleLogout}
         >
-          <LogOut className="h-4 w-4 text-foreground/70" />
+          <LogOut className="h-4 w-4 text-foreground/70 transition-transform duration-200 group-hover:scale-105" />
           <span>Logout</span>
         </button>
       </div>
