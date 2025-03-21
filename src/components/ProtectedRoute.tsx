@@ -1,5 +1,5 @@
 
-import { ReactNode, useEffect } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 interface ProtectedRouteProps {
@@ -8,17 +8,28 @@ interface ProtectedRouteProps {
 
 export function ProtectedRoute({ children }: ProtectedRouteProps) {
   const navigate = useNavigate();
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isChecking, setIsChecking] = useState(true);
   
   useEffect(() => {
     // Check if user is authenticated by looking for saved credentials
-    // This is a simple implementation. In a real app, you would validate the token on the server
-    const isAuthenticated = localStorage.getItem('karate_username') !== null;
+    const username = localStorage.getItem('karate_username');
     
-    if (!isAuthenticated) {
+    if (!username) {
       // Redirect to login page if not authenticated
       navigate('/', { replace: true });
+    } else {
+      setIsAuthenticated(true);
     }
+    
+    setIsChecking(false);
   }, [navigate]);
 
-  return <>{children}</>;
+  // While checking authentication, return null (don't render anything)
+  if (isChecking) {
+    return null;
+  }
+  
+  // If authenticated, render children
+  return isAuthenticated ? <>{children}</> : null;
 }
