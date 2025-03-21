@@ -1,16 +1,24 @@
-
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import BackgroundImage from '@/components/BackgroundImage';
 import LoginForm from '@/components/LoginForm';
 import Logo from '@/components/Logo';
 
 const Index = () => {
   const [mounted, setMounted] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     setMounted(true);
+    
+    // Check if user is logged in
+    const username = localStorage.getItem('karate_username');
+    if (username) {
+      navigate('/dashboard', { replace: true });
+    }
+    
     return () => setMounted(false);
-  }, []);
+  }, [navigate]);
 
   return (
     <div className="h-screen flex flex-col overflow-hidden">

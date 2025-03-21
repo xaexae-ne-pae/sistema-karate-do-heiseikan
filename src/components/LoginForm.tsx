@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -28,6 +27,12 @@ const LoginForm: React.FC<LoginFormProps> = ({ className, style }) => {
 
   useEffect(() => {
     const savedUsername = localStorage.getItem('karate_username');
+    
+    if (savedUsername) {
+      navigate('/dashboard', { replace: true });
+      return;
+    }
+    
     const savedPassword = localStorage.getItem('karate_password');
     const savedRemember = localStorage.getItem('karate_remember') === 'true';
     
@@ -38,7 +43,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ className, style }) => {
         remember: savedRemember
       });
     }
-  }, []);
+  }, [navigate]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -64,12 +69,12 @@ const LoginForm: React.FC<LoginFormProps> = ({ className, style }) => {
     if (credentials.username === 'Francivaldo' && credentials.password === 'karate2025') {
       await new Promise(resolve => setTimeout(resolve, 1500));
       
+      localStorage.setItem('karate_username', credentials.username);
+      
       if (credentials.remember) {
-        localStorage.setItem('karate_username', credentials.username);
         localStorage.setItem('karate_password', credentials.password);
         localStorage.setItem('karate_remember', 'true');
       } else {
-        localStorage.removeItem('karate_username');
         localStorage.removeItem('karate_password');
         localStorage.removeItem('karate_remember');
       }
@@ -79,7 +84,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ className, style }) => {
         description: "Bem-vindo de volta ao Karate Shotokan"
       });
       
-      navigate('/dashboard');
+      navigate('/dashboard', { replace: true });
     } else {
       setError('Nome de usuário ou senha incorretos');
     }
