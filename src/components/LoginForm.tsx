@@ -132,7 +132,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ className, style }) => {
               onBlur={() => setFocused(null)}
               className="bg-white/10 border-white/20 pl-10 h-12 text-karate-white placeholder:text-karate-white/40 focus-visible:border-karate-red focus-visible:bg-white/15 focus-visible:ring-1 focus-visible:ring-karate-red/30"
               required
-              autoComplete="username"
+              autoComplete="off"
             />
           </div>
         </div>

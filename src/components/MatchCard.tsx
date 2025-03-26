@@ -12,16 +12,16 @@ interface MatchCardProps {
 
 export function MatchCard({ category, time, mat, player1, player2 }: MatchCardProps) {
   return (
-    <div className="glass-card rounded-lg p-3 mb-3 animate-scale-in hover-scale hover-glow transition-all duration-300">
+    <div className="glass-card hover:mr-5 rounded-lg p-4 mb-4 transition-all duration-700 ease hover:scale-105 hover:outline hover:outline-primary/50 hover:translate-x-1">
       <div className="flex items-center gap-2 mb-2 text-muted-foreground">
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-3">
           <Clock className="h-3.5 w-3.5 text-primary/80" />
           <span className="text-xs">{time}</span>
         </div>
         <div className="text-xs px-1.5 py-0.5 rounded-full bg-muted">{mat}</div>
       </div>
       
-      <div className="mb-2">
+      <div className="mb-3">
         <h3 className="font-semibold text-sm mb-1.5">{category}</h3>
         <div className="flex items-center justify-between">
           <div className="flex items-center justify-between w-full">

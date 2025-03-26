@@ -12,11 +12,12 @@ const Logo: React.FC<LogoProps> = ({ className, style }) => {
     <div className={cn("flex items-center gap-2", className)} style={style}>
       <div className="relative w-10 h-10 flex items-center justify-center">
         <div className="absolute inset-0 bg-karate-red rounded-full opacity-80 animate-pulse-slow"></div>
-        <div className="relative z-10 text-karate-white font-bold text-xl">松</div>
+        <div className="relative z-10 text-karate-white font-bold text-xl">
+          <img src="./public/Logo-Dojo-sem-fundo-hd.png" alt="" />
+        </div>
       </div>
       <div className="flex flex-col items-start">
-        <span className="font-bold text-lg tracking-wider text-karate-white">KARATE</span>
-        <span className="text-xs tracking-widest text-karate-white/70">SHOTOKAN</span>
+        <span className="font-light text-lg tracking-wider text-karate-white">道平成館</span>
       </div>
     </div>
   );
