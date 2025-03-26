@@ -20,7 +20,7 @@ export function DashboardLogo({ className, size = "md" }: LogoProps) {
         <img
           src="/Logo-Dojo-sem-fundo-hd.png"
           alt="Logo Dó-Heiseikan"
-          className={cn("relative z-10 w-12 h-12 object-contain transition-all duration-300 hover:scale-105", sizeClasses[size])}
+          className={cn("relative z-10 w-16 h-16 object-contain transition-all duration-300 hover:scale-105", sizeClasses[size])}
         />
       </div>
       <div className="flex flex-col">

@@ -12,7 +12,7 @@ const Logo: React.FC<LogoProps> = ({ className, style }) => {
     <div className={cn("flex items-center gap-3", className)} style={style}>
       <div className="relative overflow-hidden">
         <div className="absolute -inset-1 bg-karate-red/30 rounded-full blur-sm animate-pulse-slow"></div>
-        <div className="relative z-10 w-12 h-12">
+        <div className="relative z-10 w-16 h-16">
           <img 
             src="/Logo-Dojo-sem-fundo-hd.png" 
             alt="Logo Dó-Heiseikan" 
