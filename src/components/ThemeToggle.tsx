@@ -48,12 +48,12 @@ export function ThemeToggle({ className, iconOnly = false }: ThemeToggleProps) {
       {theme === "light" ? (
         <>
           <Moon className="h-[1.15rem] w-[1.15rem] rotate-90 transition-all duration-300 dark:rotate-0" />
-          {!iconOnly && <span className="ml-2">Dark Mode</span>}
+          {!iconOnly && <span className="ml-2">Modo Escuro</span>}
         </>
       ) : (
         <>
           <Sun className="h-[1.15rem] w-[1.15rem] rotate-0 transition-all duration-300 dark:-rotate-90" />
-          {!iconOnly && <span className="ml-2">Light Mode</span>}
+          {!iconOnly && <span className="ml-2">Modo Claro</span>}
         </>
       )}
     </Button>
