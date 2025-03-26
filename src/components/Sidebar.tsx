@@ -32,8 +32,8 @@ export function Sidebar() {
   const avatarInitial = username ? username.charAt(0).toUpperCase() : '';
 
   return (
-    <div className="fixed inset-y-0 left-0 z-50 flex w-64 flex-col border-r bg-sidebar border-border">
-      <div className="flex shrink-0 items-center gap-2 px-6 py-5">
+    <div className="fixed inset-y-0 left-0 z-50 flex w-64 flex-col border-r bg-sidebar-background border-border">
+      <div className="flex shrink-0 items-center p-5 border-b border-border/30">
         <DashboardLogo />
       </div>
       
@@ -48,7 +48,7 @@ export function Sidebar() {
         <SidebarLink icon={Settings} label="Configurações" to="/configuracoes" />
       </div>
 
-      <div className="border-t border-border p-4">
+      <div className="border-t border-border/30 p-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Avatar className="h-9 w-9 shrink-0 transition-opacity duration-200 hover:opacity-90">
@@ -67,7 +67,7 @@ export function Sidebar() {
         <Separator className="my-4" />
         
         <button 
-          className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-foreground/80 transition-all duration-200 hover:bg-muted hover:text-foreground hover:translate-x-0.5"
+          className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-foreground/80 transition-all duration-200 hover:bg-sidebar-accent hover:text-foreground hover:translate-x-0.5"
           onClick={handleLogout}
         >
           <LogOut className="h-4 w-4 text-foreground/70 transition-transform duration-200 group-hover:scale-105" />
