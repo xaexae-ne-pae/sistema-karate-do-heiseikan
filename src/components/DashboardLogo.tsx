@@ -1,3 +1,4 @@
+
 import { cn } from "@/lib/utils";
 
 interface LogoProps {
@@ -16,9 +17,9 @@ export function DashboardLogo({ className, size = "md" }: LogoProps) {
     <div className={cn("flex items-center gap-2", className)}>
       <div className="text-primary relative">
         <img
-          src="./public/Logo-Dojo-sem-fundo-hd.png"
-          alt=""
-          className="w-11" // Tamanho da largura ajustado para 4rem (64px)
+          src="/Logo-Dojo-sem-fundo-hd.png"
+          alt="Logo Dó-Heiseikan"
+          className="w-11"
         />
       </div>
       <span className="font-nomal tracking-tight text-xl">DÓ-HEISEIKAN</span>

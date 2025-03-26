@@ -13,7 +13,7 @@ interface StatCardProps {
 export function StatCard({ title, value, icon: Icon, iconColor, className }: StatCardProps) {
   return (
     <div className={cn(
-      "glass-card rounded-lg p-5 mb-3 transition-all duration-700 ease hover:scale-105  hover:ring-1 hover:ring-primary/30 hover:outline hover:outline-2 hover:outline-primary/50",
+      "glass-card rounded-lg p-5 mb-3 transition-all duration-700 ease hover:scale-105 hover:ring-1 hover:ring-primary/30 hover:outline hover:outline-2 hover:outline-primary/50",
       className
     )}>
       <div className="flex items-center justify-between">
