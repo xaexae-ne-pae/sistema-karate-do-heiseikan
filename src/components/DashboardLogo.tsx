@@ -16,11 +16,11 @@ export function DashboardLogo({ className, size = "md" }: LogoProps) {
   return (
     <div className={cn("flex items-center gap-3", className)}>
       <div className="relative overflow-hidden">
-        <div className="absolute -inset-1 bg-primary/20 rounded-full blur-sm animate-pulse-slow"></div>
+        <div className="absolute rounded-full blur-sm animate-pulse-slow"></div>
         <img
           src="/Logo-Dojo-sem-fundo-hd.png"
           alt="Logo Dó-Heiseikan"
-          className={cn("relative z-10 w-16 h-16 object-contain transition-all duration-300 hover:scale-105", sizeClasses[size])}
+          className={cn("relative z-10 w-12 h-16 object-contain")}
         />
       </div>
       <div className="flex flex-col">

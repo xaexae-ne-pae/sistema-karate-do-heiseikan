@@ -85,10 +85,10 @@ const Index = () => {
       
       <footer className="py-4 px-6">
         <div 
-          className={`text-center text-sm text-karate-white/40 opacity-0 ${mounted ? 'animate-fade-in' : ''}`}
+          className={`text-center text-sm text-karate-white/50 opacity-0 ${mounted ? 'animate-fade-in' : ''}`}
           style={{ animationDelay: '1000ms' }}
         >
-          &copy; {new Date().getFullYear()} Associação de Karate Shotokan. Todos os direitos reservados.
+          &copy; {new Date().getFullYear()} Associação de Karate Shotokan. Todos os direitos reservados. Desenvolvido por <a href="https://alevirdev.vercel.app" target="_blank" rel="noopener noreferrer" style={{ color: '#CCCCCC', textDecoration: 'underline' }}>Alevir Coelho Neto</a>.
         </div>
       </footer>
     </div>
