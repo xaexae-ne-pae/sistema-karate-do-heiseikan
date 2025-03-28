@@ -32,6 +32,14 @@ const Dashboard = () => {
     navigate("/atletas?newAthlete=true");
   };
 
+  const handleViewAllMatches = () => {
+    navigate("/pontuacao");
+  };
+
+  const handleTournamentClick = () => {
+    navigate("/torneios");
+  };
+
   return (
     <div className="flex min-h-screen bg-background">
       <Sidebar />
@@ -44,7 +52,7 @@ const Dashboard = () => {
           </div>
           
           <div className="flex items-center gap-3">
-            <Button variant="outline" className="gap-2">
+            <Button variant="outline" className="gap-2" onClick={handleTournamentClick}>
               <Trophy className="h-4 w-4" />
               <span>Torneio</span>
             </Button>
@@ -77,7 +85,12 @@ const Dashboard = () => {
                   <h2 className="text-lg font-semibold">Lutas de hoje</h2>
                   <p className="text-xs text-muted-foreground">Próximas lutas e eventos</p>
                 </div>
-                <Button variant="outline" size="sm" className="gap-1 h-8 text-xs">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="gap-1 h-8 text-xs"
+                  onClick={handleViewAllMatches}
+                >
                   <span>Ver todas</span>
                   <ChevronRight className="h-3.5 w-3.5" />
                 </Button>
@@ -116,7 +129,7 @@ const Dashboard = () => {
                 <p className="text-xs text-muted-foreground">Funções mais usadas</p>
               </div>
               
-              <div>
+              <div className="space-y-4">
                 <ActionCard 
                   icon={Award} 
                   title="Iniciar Pontuação" 
