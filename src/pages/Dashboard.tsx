@@ -33,7 +33,7 @@ const Dashboard = () => {
   };
 
   const handleViewAllMatches = () => {
-    navigate("/pontuacao");
+    navigate("/todas-lutas");
   };
 
   const handleTournamentClick = () => {

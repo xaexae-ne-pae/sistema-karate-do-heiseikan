@@ -12,6 +12,7 @@ import Tournaments from "./pages/Tournaments";
 import Scoring from "./pages/Scoring";
 import Results from "./pages/Results";
 import Inscriptions from "./pages/Inscriptions";
+import AllMatches from "./pages/AllMatches";
 import NotFound from "./pages/NotFound";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 
@@ -68,6 +69,11 @@ const App = () => (
           <Route path="/resultados" element={
             <ProtectedRoute>
               <Results />
+            </ProtectedRoute>
+          } />
+          <Route path="/todas-lutas" element={
+            <ProtectedRoute>
+              <AllMatches />
             </ProtectedRoute>
           } />
           
