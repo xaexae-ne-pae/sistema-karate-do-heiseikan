@@ -1,3 +1,4 @@
+
 import { Award, Calendar, ChevronRight, List, Trophy, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { StatCard } from "@/components/StatCard";
@@ -5,6 +6,7 @@ import { MatchCard } from "@/components/MatchCard";
 import { ActionCard } from "@/components/ActionCard";
 import { Sidebar } from "@/components/Sidebar";
 import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 // Constantes para os títulos e valores
 const STAT_CARDS = [
@@ -15,6 +17,8 @@ const STAT_CARDS = [
 ];
 
 const Dashboard = () => {
+  const navigate = useNavigate();
+  
   // Add body class for dashboard-specific styling
   useEffect(() => {
     document.body.classList.add("dashboard-active");
@@ -23,6 +27,10 @@ const Dashboard = () => {
       document.body.classList.remove("dashboard-active");
     };
   }, []);
+
+  const handleNewAthleteClick = () => {
+    navigate("/atletas?newAthlete=true");
+  };
 
   return (
     <div className="flex min-h-screen bg-background">
@@ -40,7 +48,7 @@ const Dashboard = () => {
               <Trophy className="h-4 w-4" />
               <span>Torneio</span>
             </Button>
-            <Button className="gap-2">
+            <Button className="gap-2" onClick={handleNewAthleteClick}>
               <span>Novo Atleta</span>
               <span className="text-lg">+</span>
             </Button>

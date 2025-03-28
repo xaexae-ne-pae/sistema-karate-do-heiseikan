@@ -1,42 +1,50 @@
-import { useState } from "react";
+
+import { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import { Sidebar } from "@/components/Sidebar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Separator } from "@/components/ui/separator";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow
-} from "@/components/ui/table";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
-import { Plus, Pencil, Trash2, Search, Filter, UserPlus, X } from "lucide-react";
+import { UserPlus, Search, Filter, X } from "lucide-react";
 import { AthleteForm } from "@/components/AthleteForm";
 import { AthletesList } from "@/components/AthletesList";
 
-// Definindo o tipo do Atleta
+// Interface para tipar corretamente o Atleta
 interface Athlete {
   id: number;
   name: string;
   age: number;
+  weight: number;
   category: string;
+  belt: string;
+  status: boolean;
+  notes?: string;
+  height?: number;
 }
 
 const Athletes = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [editingAthlete, setEditingAthlete] = useState<Athlete | null>(null); // Usando o tipo 'Athlete'
+  const [editingAthlete, setEditingAthlete] = useState<Athlete | null>(null);
+  const location = useLocation();
+
+  // Verificar se há um parâmetro na URL para abrir o diálogo
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    if (searchParams.get("newAthlete") === "true") {
+      handleOpenDialog();
+      
+      // Opcional: Limpar o parâmetro da URL para evitar que o diálogo abra novamente 
+      // após fechar e recarregar a página
+      window.history.replaceState({}, document.title, location.pathname);
+    }
+  }, [location]);
 
   const handleOpenDialog = (athlete: Athlete | null = null) => {
     setEditingAthlete(athlete);
