@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Sidebar } from "@/components/Sidebar";
 import { Button } from "@/components/ui/button";
@@ -14,12 +13,19 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 
+// Definindo a interface da Categoria
+interface Category {
+  id: number;
+  name: string;
+  description: string;
+}
+
 const Categories = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [editingCategory, setEditingCategory] = useState<any | null>(null);
+  const [editingCategory, setEditingCategory] = useState<Category | null>(null); // Usando o tipo 'Category'
 
-  const handleOpenDialog = (category = null) => {
+  const handleOpenDialog = (category: Category | null = null) => {
     setEditingCategory(category);
     setIsDialogOpen(true);
   };
@@ -81,7 +87,7 @@ const Categories = () => {
             <DialogTitle>{editingCategory ? 'Editar Categoria' : 'Nova Categoria'}</DialogTitle>
             <DialogDescription>
               {editingCategory 
-                ? 'Edite as informações da categoria nos campos abaixo.'
+                ? 'Edite as informações da categoria nos campos abaixo.' 
                 : 'Defina os critérios para a nova categoria nos campos abaixo.'}
             </DialogDescription>
           </DialogHeader>

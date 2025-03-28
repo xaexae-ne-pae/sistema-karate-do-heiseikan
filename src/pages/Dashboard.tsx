@@ -1,4 +1,3 @@
-
 import { Award, Calendar, ChevronRight, List, Trophy, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { StatCard } from "@/components/StatCard";
@@ -7,13 +6,21 @@ import { ActionCard } from "@/components/ActionCard";
 import { Sidebar } from "@/components/Sidebar";
 import { useEffect } from "react";
 
+// Constantes para os títulos e valores
+const STAT_CARDS = [
+  { title: "Total Atletas", value: "124", icon: Users, iconColor: "bg-primary/10 text-primary" },
+  { title: "Eventos Ativos", value: "3", icon: Calendar, iconColor: "bg-green-500/10 text-green-500" },
+  { title: "Categorias", value: "15", icon: List, iconColor: "bg-yellow-500/10 text-yellow-500" },
+  { title: "Lutas Concluídas", value: "48", icon: Award, iconColor: "bg-purple-500/10 text-purple-500" }
+];
+
 const Dashboard = () => {
   // Add body class for dashboard-specific styling
   useEffect(() => {
-    document.body.classList.add('dashboard-active');
+    document.body.classList.add("dashboard-active");
     
     return () => {
-      document.body.classList.remove('dashboard-active');
+      document.body.classList.remove("dashboard-active");
     };
   }, []);
 
@@ -41,33 +48,20 @@ const Dashboard = () => {
         </header>
         
         <main className="px-8 py-6">
+          {/* Estatísticas */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <StatCard 
-              title="Total Atletas" 
-              value="124" 
-              icon={Users} 
-              iconColor="bg-primary/10 text-primary"
-            />
-            <StatCard 
-              title="Eventos Ativos" 
-              value="3" 
-              icon={Calendar} 
-              iconColor="bg-green-500/10 text-green-500"
-            />
-            <StatCard 
-              title="Categorias" 
-              value="15" 
-              icon={List} 
-              iconColor="bg-yellow-500/10 text-yellow-500"
-            />
-            <StatCard 
-              title="Lutas Concluídas" 
-              value="48" 
-              icon={Award} 
-              iconColor="bg-purple-500/10 text-purple-500"
-            />
+            {STAT_CARDS.map(({ title, value, icon, iconColor }) => (
+              <StatCard 
+                key={title}
+                title={title} 
+                value={value} 
+                icon={icon} 
+                iconColor={iconColor} 
+              />
+            ))}
           </div>
           
+          {/* Lutas e Ações Rápidas */}
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
             <div className="lg:col-span-3">
               <div className="flex items-center justify-between mb-3">
@@ -81,6 +75,7 @@ const Dashboard = () => {
                 </Button>
               </div>
               
+              {/* Lutas */}
               <div>
                 <MatchCard 
                   category="Male Kumite -75kg" 
@@ -106,6 +101,7 @@ const Dashboard = () => {
               </div>
             </div>
             
+            {/* Ações Rápidas */}
             <div className="lg:col-span-2">
               <div className="mb-3">
                 <h2 className="text-lg font-semibold">Ações Rápidas</h2>

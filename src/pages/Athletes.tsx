@@ -1,17 +1,16 @@
-
 import { useState } from "react";
 import { Sidebar } from "@/components/Sidebar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow
 } from "@/components/ui/table";
 import {
   Dialog,
@@ -26,12 +25,20 @@ import { Plus, Pencil, Trash2, Search, Filter, UserPlus, X } from "lucide-react"
 import { AthleteForm } from "@/components/AthleteForm";
 import { AthletesList } from "@/components/AthletesList";
 
+// Definindo o tipo do Atleta
+interface Athlete {
+  id: number;
+  name: string;
+  age: number;
+  category: string;
+}
+
 const Athletes = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [editingAthlete, setEditingAthlete] = useState<any | null>(null);
+  const [editingAthlete, setEditingAthlete] = useState<Athlete | null>(null); // Usando o tipo 'Athlete'
 
-  const handleOpenDialog = (athlete = null) => {
+  const handleOpenDialog = (athlete: Athlete | null = null) => {
     setEditingAthlete(athlete);
     setIsDialogOpen(true);
   };
@@ -97,14 +104,14 @@ const Athletes = () => {
             <DialogTitle>{editingAthlete ? 'Editar Atleta' : 'Novo Atleta'}</DialogTitle>
             <DialogDescription>
               {editingAthlete 
-                ? 'Edite as informações do atleta nos campos abaixo.'
+                ? 'Edite as informações do atleta nos campos abaixo.' 
                 : 'Preencha as informações do novo atleta nos campos abaixo.'}
             </DialogDescription>
           </DialogHeader>
           
           <AthleteForm 
             initialData={editingAthlete} 
-            onSuccess={handleCloseDialog}
+            onSuccess={handleCloseDialog} 
           />
         </DialogContent>
       </Dialog>
