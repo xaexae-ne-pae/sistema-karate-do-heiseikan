@@ -38,9 +38,13 @@ const MOCK_ATHLETES = [
 interface AthletesListProps {
   onEdit: (athlete: any) => void;
   searchQuery: string;
+  activeFilters?: {
+    belts: string[];
+    status: string[];
+  };
 }
 
-export function AthletesList({ onEdit, searchQuery }: AthletesListProps) {
+export function AthletesList({ onEdit, searchQuery, activeFilters = { belts: [], status: [] } }: AthletesListProps) {
   const { toast } = useToast();
   const [athletes, setAthletes] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -59,10 +63,24 @@ export function AthletesList({ onEdit, searchQuery }: AthletesListProps) {
     loadData();
   }, []);
 
-  const filteredAthletes = athletes.filter(athlete => 
-    athlete.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    athlete.category.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  // Aplicar filtros
+  const filteredAthletes = athletes.filter(athlete => {
+    // Filtro por texto de busca
+    const matchesSearch = 
+      athlete.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      athlete.category.toLowerCase().includes(searchQuery.toLowerCase());
+    
+    // Filtro por faixa
+    const matchesBelt = activeFilters.belts.length === 0 || 
+      activeFilters.belts.includes(athlete.belt);
+    
+    // Filtro por status
+    const matchesStatus = activeFilters.status.length === 0 || 
+      (activeFilters.status.includes("active") && athlete.status) ||
+      (activeFilters.status.includes("inactive") && !athlete.status);
+    
+    return matchesSearch && matchesBelt && matchesStatus;
+  });
 
   const getBeltStyle = (belt: string) => {
     const styles = {
@@ -170,8 +188,8 @@ export function AthletesList({ onEdit, searchQuery }: AthletesListProps) {
             ) : (
               <TableRow>
                 <TableCell colSpan={7} className="text-center py-6 text-muted-foreground">
-                  {searchQuery 
-                    ? `Nenhum atleta encontrado para "${searchQuery}"`
+                  {searchQuery || activeFilters.belts.length > 0 || activeFilters.status.length > 0
+                    ? "Nenhum atleta encontrado com os filtros aplicados"
                     : "Nenhum atleta cadastrado"}
                 </TableCell>
               </TableRow>

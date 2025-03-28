@@ -140,8 +140,7 @@ const AllMatches = () => {
               <TableHeader>
                 <TableRow>
                   <TableHead className="w-[250px]">Categoria</TableHead>
-                  <TableHead>Atleta 1</TableHead>
-                  <TableHead>Atleta 2</TableHead>
+                  <TableHead className="text-center">Confronto</TableHead>
                   <TableHead className="w-[120px]">Hora</TableHead>
                   <TableHead className="w-[120px]">Tatame</TableHead>
                 </TableRow>
@@ -152,15 +151,18 @@ const AllMatches = () => {
                     <TableRow key={match.id} className="hover:bg-muted/80">
                       <TableCell className="font-medium">{match.category}</TableCell>
                       <TableCell>
-                        <div className="flex items-center gap-2">
-                          <div className="w-3 h-3 rounded-full bg-red-500"></div>
-                          {match.athlete1.name}
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-2">
-                          <div className="w-3 h-3 rounded-full bg-blue-500"></div>
-                          {match.athlete2.name}
+                        <div className="flex items-center justify-center gap-3 text-base">
+                          <div className="flex items-center gap-2">
+                            <div className="w-3 h-3 rounded-full bg-red-500"></div>
+                            <span className="font-medium">{match.athlete1.name}</span>
+                          </div>
+                          <div className="bg-primary/10 rounded-full h-7 w-7 flex items-center justify-center">
+                            <span className="font-bold text-primary text-sm">VS</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <div className="w-3 h-3 rounded-full bg-blue-500"></div>
+                            <span className="font-medium">{match.athlete2.name}</span>
+                          </div>
                         </div>
                       </TableCell>
                       <TableCell>{match.time}</TableCell>

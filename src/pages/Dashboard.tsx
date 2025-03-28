@@ -78,17 +78,17 @@ const Dashboard = () => {
           </div>
           
           {/* Lutas e Ações Rápidas */}
-          <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
             <div className="lg:col-span-3 space-y-4">
               <div className="flex items-center justify-between mb-2">
                 <div>
-                  <h2 className="text-lg font-semibold">Lutas de hoje</h2>
-                  <p className="text-xs text-muted-foreground">Próximas lutas e eventos</p>
+                  <h2 className="text-xl font-semibold">Lutas de hoje</h2>
+                  <p className="text-sm text-muted-foreground">Próximas lutas e eventos</p>
                 </div>
                 <Button 
                   variant="outline" 
                   size="sm" 
-                  className="gap-1 h-8 text-xs"
+                  className="gap-1 h-9 text-sm"
                   onClick={handleViewAllMatches}
                 >
                   <span>Ver todas</span>
@@ -97,7 +97,7 @@ const Dashboard = () => {
               </div>
               
               {/* Lutas com o design atualizado */}
-              <div className="space-y-4">
+              <div className="space-y-5 pr-2">
                 <MatchCard 
                   category="Male Kumite -75kg" 
                   time="10:30 AM" 
@@ -125,8 +125,8 @@ const Dashboard = () => {
             {/* Ações Rápidas */}
             <div className="lg:col-span-2">
               <div className="mb-3">
-                <h2 className="text-lg font-semibold">Ações Rápidas</h2>
-                <p className="text-xs text-muted-foreground">Funções mais usadas</p>
+                <h2 className="text-xl font-semibold">Ações Rápidas</h2>
+                <p className="text-sm text-muted-foreground">Funções mais usadas</p>
               </div>
               
               <div className="space-y-4">

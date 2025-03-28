@@ -1,6 +1,8 @@
-import { useState } from "react";
+
+import { useState, useEffect, useRef } from "react";
 import { Sidebar } from "@/components/Sidebar";
 import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
 import {
   Activity,
   Trophy,
@@ -31,6 +33,8 @@ const Scoring = () => {
   const [matchPaused, setMatchPaused] = useState(false);
   const [time, setTime] = useState(120); // 2 minutes in seconds
   const [selectedMatch, setSelectedMatch] = useState<Match | null>(null);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const { toast } = useToast();
 
   // Dados fictícios para demonstração
   const upcomingMatches: Match[] = [
@@ -59,6 +63,40 @@ const Scoring = () => {
     resetMatch();
   };
 
+  // Configurar o efeito para o timer
+  useEffect(() => {
+    if (matchStarted && !matchPaused) {
+      timerRef.current = setInterval(() => {
+        setTime(prevTime => {
+          if (prevTime <= 1) {
+            // Tempo acabou
+            clearInterval(timerRef.current as NodeJS.Timeout);
+            setMatchStarted(false);
+            setMatchPaused(false);
+            
+            toast({
+              title: "Tempo Finalizado",
+              description: "O tempo da luta acabou!",
+              variant: "default",
+            });
+            
+            return 0;
+          }
+          return prevTime - 1;
+        });
+      }, 1000);
+    } else if (timerRef.current) {
+      clearInterval(timerRef.current);
+    }
+
+    // Cleanup na desmontagem
+    return () => {
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+      }
+    };
+  }, [matchStarted, matchPaused, toast]);
+
   const startMatch = () => {
     setMatchStarted(true);
     setMatchPaused(false);
@@ -73,6 +111,9 @@ const Scoring = () => {
   };
 
   const resetMatch = () => {
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+    }
     setMatchStarted(false);
     setMatchPaused(false);
     setTime(120);
@@ -105,8 +146,11 @@ const Scoring = () => {
                   </div>
                 </div>
 
-                <div className="flex items-center justify-center gap-1.5 px-4 py-2 bg-muted rounded-lg font-mono text-lg w-20">
-                  <Timer className="h-4 w-4 text-muted-foreground" />
+                <div className={`flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg font-mono text-lg w-20 
+                  ${time <= 10 ? "bg-red-500/10 text-red-500" : "bg-muted"}
+                  ${time === 0 ? "animate-pulse" : ""}
+                `}>
+                  <Timer className={`h-4 w-4 ${time <= 10 ? "text-red-500" : "text-muted-foreground"}`} />
                   <span>{formatTime(time)}</span>
                 </div>
 

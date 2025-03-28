@@ -1,8 +1,6 @@
 
 import { LucideIcon } from "lucide-react";
-import { Link } from "react-router-dom";
-import { Button } from "./ui/button";
-import { Card } from "./ui/card";
+import { useNavigate } from "react-router-dom";
 
 interface ActionCardProps {
   icon: LucideIcon;
@@ -12,27 +10,25 @@ interface ActionCardProps {
 }
 
 export function ActionCard({ icon: Icon, title, description, to }: ActionCardProps) {
+  const navigate = useNavigate();
+
   return (
-    <Card className="mb-4 transition-all duration-300 hover:translate-x-1 hover:shadow-md hover:shadow-primary/10 dark:bg-card/90">
-      <div className="p-4">
-        <div className="flex items-start gap-3">
-          <div className="bg-primary/10 rounded-full p-2 text-primary">
-            <Icon className="h-4 w-4" />
+    <button
+      onClick={() => navigate(to)}
+      className="w-full rounded-lg border bg-card text-left overflow-hidden shadow-sm transition-all duration-300 hover:translate-x-1 hover:shadow-md hover:shadow-primary/10 dark:bg-card/90"
+    >
+      <div className="p-5">
+        <div className="flex items-start gap-4">
+          <div className="rounded-full p-3 bg-primary/10 text-primary">
+            <Icon className="h-6 w-6" />
           </div>
-          
           <div className="flex-1">
-            <h3 className="font-medium text-sm mb-1">{title}</h3>
-            <p className="text-xs text-muted-foreground mb-3">{description}</p>
-            
-            <Link to={to}>
-              <Button variant="ghost" className="px-0 h-6 hover:bg-transparent hover:text-primary text-muted-foreground text-xs">
-                <span>Acessar</span>
-                <span className="ml-1 text-base leading-none">→</span>
-              </Button>
-            </Link>
+            <h3 className="text-lg font-medium mb-1">{title}</h3>
+            <p className="text-sm text-muted-foreground">{description}</p>
           </div>
+          <div className="text-2xl font-light opacity-20 mt-0.5">→</div>
         </div>
       </div>
-    </Card>
+    </button>
   );
 }

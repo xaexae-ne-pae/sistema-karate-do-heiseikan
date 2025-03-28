@@ -11,7 +11,15 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { UserPlus, Search, Filter, X } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuCheckboxItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { UserPlus, Search, Filter, X, Check } from "lucide-react";
 import { AthleteForm } from "@/components/AthleteForm";
 import { AthletesList } from "@/components/AthletesList";
 
@@ -32,6 +40,13 @@ const Athletes = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [editingAthlete, setEditingAthlete] = useState<Athlete | null>(null);
+  const [activeFilters, setActiveFilters] = useState<{
+    belts: string[];
+    status: string[];
+  }>({
+    belts: [],
+    status: [],
+  });
   const location = useLocation();
 
   // Verificar se há um parâmetro na URL para abrir o diálogo
@@ -54,6 +69,32 @@ const Athletes = () => {
   const handleCloseDialog = () => {
     setIsDialogOpen(false);
     setEditingAthlete(null);
+  };
+
+  const toggleBeltFilter = (belt: string) => {
+    setActiveFilters(prev => {
+      const belts = prev.belts.includes(belt)
+        ? prev.belts.filter(b => b !== belt)
+        : [...prev.belts, belt];
+      return { ...prev, belts };
+    });
+  };
+
+  const toggleStatusFilter = (status: string) => {
+    setActiveFilters(prev => {
+      const statuses = prev.status.includes(status)
+        ? prev.status.filter(s => s !== status)
+        : [...prev.status, status];
+      return { ...prev, status: statuses };
+    });
+  };
+
+  const clearFilters = () => {
+    setActiveFilters({ belts: [], status: [] });
+  };
+
+  const getActiveFiltersCount = () => {
+    return activeFilters.belts.length + activeFilters.status.length;
   };
 
   return (
@@ -95,14 +136,96 @@ const Athletes = () => {
             </div>
             
             <div className="flex gap-2">
-              <Button variant="outline" size="sm" className="gap-1.5">
-                <Filter className="h-3.5 w-3.5" />
-                <span>Filtrar</span>
-              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" size="sm" className="gap-1.5 relative">
+                    <Filter className="h-3.5 w-3.5" />
+                    <span>Filtrar</span>
+                    {getActiveFiltersCount() > 0 && (
+                      <span className="absolute -top-1 -right-1 bg-primary text-primary-foreground text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                        {getActiveFiltersCount()}
+                      </span>
+                    )}
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-56">
+                  <DropdownMenuLabel>Filtrar por Faixa</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  {["white", "yellow", "orange", "green", "blue", "brown", "black"].map((belt) => (
+                    <DropdownMenuCheckboxItem
+                      key={belt}
+                      checked={activeFilters.belts.includes(belt)}
+                      onSelect={(e) => {
+                        e.preventDefault();
+                        toggleBeltFilter(belt);
+                      }}
+                    >
+                      <div className="flex items-center gap-2">
+                        <div className={`w-3 h-3 rounded-full 
+                          ${belt === "white" ? "bg-slate-100" : ""}
+                          ${belt === "yellow" ? "bg-yellow-400" : ""}
+                          ${belt === "orange" ? "bg-orange-500" : ""}
+                          ${belt === "green" ? "bg-green-500" : ""}
+                          ${belt === "blue" ? "bg-blue-500" : ""}
+                          ${belt === "brown" ? "bg-amber-800" : ""}
+                          ${belt === "black" ? "bg-black" : ""}
+                        `}></div>
+                        <span>
+                          {belt === "white" && "Branca"}
+                          {belt === "yellow" && "Amarela"}
+                          {belt === "orange" && "Laranja"}
+                          {belt === "green" && "Verde"}
+                          {belt === "blue" && "Azul"}
+                          {belt === "brown" && "Marrom"}
+                          {belt === "black" && "Preta"}
+                        </span>
+                      </div>
+                    </DropdownMenuCheckboxItem>
+                  ))}
+                  
+                  <DropdownMenuSeparator />
+                  <DropdownMenuLabel>Status</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  
+                  <DropdownMenuCheckboxItem
+                    checked={activeFilters.status.includes("active")}
+                    onSelect={(e) => {
+                      e.preventDefault();
+                      toggleStatusFilter("active");
+                    }}
+                  >
+                    Ativo
+                  </DropdownMenuCheckboxItem>
+                  
+                  <DropdownMenuCheckboxItem
+                    checked={activeFilters.status.includes("inactive")}
+                    onSelect={(e) => {
+                      e.preventDefault();
+                      toggleStatusFilter("inactive");
+                    }}
+                  >
+                    Inativo
+                  </DropdownMenuCheckboxItem>
+                  
+                  <DropdownMenuSeparator />
+                  <Button 
+                    variant="ghost" 
+                    className="w-full text-xs h-8 justify-start pl-2" 
+                    onClick={clearFilters}
+                    disabled={getActiveFiltersCount() === 0}
+                  >
+                    Limpar filtros
+                  </Button>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </div>
           
-          <AthletesList onEdit={handleOpenDialog} searchQuery={searchQuery} />
+          <AthletesList 
+            onEdit={handleOpenDialog} 
+            searchQuery={searchQuery}
+            activeFilters={activeFilters}
+          />
         </main>
       </div>
       
