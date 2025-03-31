@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -36,54 +35,74 @@ const MOCK_ATHLETES = [
   { id: 8, name: "Mariana Alves", age: 22, weight: 56.3, height: 168, category: "Kata Individual", status: true, belt: "orange", dojo: "do-heiseikan" },
 ];
 
+interface Athlete {
+  id: number;
+  name: string;
+  age: number;
+  weight: number;
+  height?: number;
+  category: string;
+  status: boolean;
+  belt: string;
+  dojo?: string;
+  notes?: string;
+}
+
 interface AthletesListProps {
-  onEdit: (athlete: any) => void;
+  onEdit: (athlete: Athlete) => void;
   searchQuery: string;
   activeFilters?: {
     belts: string[];
     status: string[];
   };
+  onAthleteUpdated?: () => void;
 }
 
-export function AthletesList({ onEdit, searchQuery, activeFilters = { belts: [], status: [] } }: AthletesListProps) {
+export function AthletesList({ onEdit, searchQuery, activeFilters = { belts: [], status: [] }, onAthleteUpdated }: AthletesListProps) {
   const { toast } = useToast();
-  const [athletes, setAthletes] = useState<any[]>([]);
+  const [athletes, setAthletes] = useState<Athlete[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [athleteToDelete, setAthleteToDelete] = useState<any | null>(null);
+  const [athleteToDelete, setAthleteToDelete] = useState<Athlete | null>(null);
   const [detailsOpen, setDetailsOpen] = useState(false);
-  const [selectedAthlete, setSelectedAthlete] = useState<any | null>(null);
+  const [selectedAthlete, setSelectedAthlete] = useState<Athlete | null>(null);
 
-  // Simulando carregamento de dados
   useEffect(() => {
+    const storedAthletes = localStorage.getItem('karate_athletes');
+    
     const loadData = async () => {
       setIsLoading(true);
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      setAthletes(MOCK_ATHLETES);
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      if (storedAthletes) {
+        setAthletes(JSON.parse(storedAthletes));
+      } else {
+        setAthletes(MOCK_ATHLETES);
+        localStorage.setItem('karate_athletes', JSON.stringify(MOCK_ATHLETES));
+      }
+      
       setIsLoading(false);
     };
     
     loadData();
-  }, []);
+  }, [onAthleteUpdated]);
 
-  // Aplicar filtros
-  const filteredAthletes = athletes.filter(athlete => {
-    // Filtro por texto de busca
-    const matchesSearch = 
-      athlete.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      athlete.category.toLowerCase().includes(searchQuery.toLowerCase());
-    
-    // Filtro por faixa
-    const matchesBelt = activeFilters.belts.length === 0 || 
-      activeFilters.belts.includes(athlete.belt);
-    
-    // Filtro por status
-    const matchesStatus = activeFilters.status.length === 0 || 
-      (activeFilters.status.includes("active") && athlete.status) ||
-      (activeFilters.status.includes("inactive") && !athlete.status);
-    
-    return matchesSearch && matchesBelt && matchesStatus;
-  });
+  const filteredAthletes = athletes
+    .filter(athlete => {
+      const matchesSearch = 
+        athlete.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        athlete.category.toLowerCase().includes(searchQuery.toLowerCase());
+      
+      const matchesBelt = activeFilters.belts.length === 0 || 
+        activeFilters.belts.includes(athlete.belt);
+      
+      const matchesStatus = activeFilters.status.length === 0 || 
+        (activeFilters.status.includes("active") && athlete.status) ||
+        (activeFilters.status.includes("inactive") && !athlete.status);
+      
+      return matchesSearch && matchesBelt && matchesStatus;
+    })
+    .sort((a, b) => a.name.localeCompare(b.name));
 
   const getBeltStyle = (belt: string) => {
     const styles = {
@@ -99,7 +118,7 @@ export function AthletesList({ onEdit, searchQuery, activeFilters = { belts: [],
     return styles[belt as keyof typeof styles] || "bg-slate-100 text-slate-800";
   };
 
-  const handleDeleteClick = (athlete: any) => {
+  const handleDeleteClick = (athlete: Athlete) => {
     setAthleteToDelete(athlete);
     setDeleteDialogOpen(true);
   };
@@ -107,10 +126,12 @@ export function AthletesList({ onEdit, searchQuery, activeFilters = { belts: [],
   const handleDeleteConfirm = async () => {
     if (!athleteToDelete) return;
     
-    // Simulando chamada à API para excluir atleta
     await new Promise(resolve => setTimeout(resolve, 500));
     
-    setAthletes(athletes.filter(a => a.id !== athleteToDelete.id));
+    const updatedAthletes = athletes.filter(a => a.id !== athleteToDelete.id);
+    setAthletes(updatedAthletes);
+    
+    localStorage.setItem('karate_athletes', JSON.stringify(updatedAthletes));
     
     toast({
       title: "Atleta excluído",
@@ -121,7 +142,7 @@ export function AthletesList({ onEdit, searchQuery, activeFilters = { belts: [],
     setDeleteDialogOpen(false);
   };
 
-  const handleViewDetails = (athlete: any) => {
+  const handleViewDetails = (athlete: Athlete) => {
     setSelectedAthlete(athlete);
     setDetailsOpen(true);
   };

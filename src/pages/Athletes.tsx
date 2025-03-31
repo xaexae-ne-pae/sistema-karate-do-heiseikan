@@ -19,7 +19,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { UserPlus, Search, Filter, X, Check } from "lucide-react";
+import { UserPlus, Search, Filter, X } from "lucide-react";
 import { AthleteForm } from "@/components/AthleteForm";
 import { AthletesList } from "@/components/AthletesList";
 
@@ -29,11 +29,12 @@ interface Athlete {
   name: string;
   age: number;
   weight: number;
-  category: string;
-  belt: string;
-  status: boolean;
-  notes?: string;
   height?: number;
+  category: string;
+  status: boolean;
+  belt: string;
+  dojo?: string;
+  notes?: string;
 }
 
 const Athletes = () => {
@@ -47,6 +48,7 @@ const Athletes = () => {
     belts: [],
     status: [],
   });
+  const [athletesUpdated, setAthletesUpdated] = useState(0);
   const location = useLocation();
 
   // Verificar se há um parâmetro na URL para abrir o diálogo
@@ -69,6 +71,11 @@ const Athletes = () => {
   const handleCloseDialog = () => {
     setIsDialogOpen(false);
     setEditingAthlete(null);
+  };
+
+  const handleAthleteUpdated = () => {
+    // Incrementar contador para forçar atualização da lista
+    setAthletesUpdated(prev => prev + 1);
   };
 
   const toggleBeltFilter = (belt: string) => {
@@ -225,6 +232,7 @@ const Athletes = () => {
             onEdit={handleOpenDialog} 
             searchQuery={searchQuery}
             activeFilters={activeFilters}
+            onAthleteUpdated={athletesUpdated}
           />
         </main>
       </div>
@@ -242,7 +250,8 @@ const Athletes = () => {
           
           <AthleteForm 
             initialData={editingAthlete} 
-            onSuccess={handleCloseDialog} 
+            onSuccess={handleCloseDialog}
+            onAthleteUpdated={handleAthleteUpdated}
           />
         </DialogContent>
       </Dialog>

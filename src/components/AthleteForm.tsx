@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -16,12 +16,26 @@ import { DialogFooter } from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
 
-interface AthleteFormProps {
-  initialData?: any;
-  onSuccess: () => void;
+interface Athlete {
+  id: number;
+  name: string;
+  age: number;
+  weight: number;
+  height?: number;
+  category: string;
+  status: boolean;
+  belt: string;
+  dojo?: string;
+  notes?: string;
 }
 
-export function AthleteForm({ initialData, onSuccess }: AthleteFormProps) {
+interface AthleteFormProps {
+  initialData?: Athlete | null;
+  onSuccess: () => void;
+  onAthleteUpdated?: () => void;
+}
+
+export function AthleteForm({ initialData, onSuccess, onAthleteUpdated }: AthleteFormProps) {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
   
@@ -64,9 +78,38 @@ export function AthleteForm({ initialData, onSuccess }: AthleteFormProps) {
     setIsSubmitting(true);
     
     try {
-      // Simulating API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Carregar atletas existentes
+      const storedAthletes = localStorage.getItem('karate_athletes');
+      let athletes = storedAthletes ? JSON.parse(storedAthletes) : [];
       
+      // Converter valores para números onde necessário
+      const athleteData = {
+        id: initialData?.id || Date.now(),
+        name: formData.name,
+        age: Number(formData.age),
+        weight: Number(formData.weight),
+        height: Number(formData.height),
+        category: formData.category,
+        status: formData.status,
+        belt: formData.belt,
+        dojo: formData.dojo,
+        notes: formData.notes,
+      };
+      
+      if (initialData) {
+        // Editar atleta existente
+        athletes = athletes.map((athlete: Athlete) => 
+          athlete.id === initialData.id ? athleteData : athlete
+        );
+      } else {
+        // Adicionar novo atleta
+        athletes.push(athleteData);
+      }
+      
+      // Atualizar localStorage
+      localStorage.setItem('karate_athletes', JSON.stringify(athletes));
+      
+      // Notificar através do toast
       toast({
         title: initialData ? "Atleta atualizado" : "Atleta cadastrado",
         description: initialData 
@@ -74,6 +117,12 @@ export function AthleteForm({ initialData, onSuccess }: AthleteFormProps) {
           : `${formData.name} foi adicionado à lista de atletas.`
       });
       
+      // Notificar componente pai que houve atualização
+      if (onAthleteUpdated) {
+        onAthleteUpdated();
+      }
+      
+      // Fechar o formulário
       onSuccess();
     } catch (error) {
       toast({
@@ -81,6 +130,7 @@ export function AthleteForm({ initialData, onSuccess }: AthleteFormProps) {
         description: "Ocorreu um erro ao salvar as informações do atleta.",
         variant: "destructive"
       });
+      console.error("Erro ao salvar atleta:", error);
     } finally {
       setIsSubmitting(false);
     }
@@ -147,6 +197,7 @@ export function AthleteForm({ initialData, onSuccess }: AthleteFormProps) {
             <Select
               value={formData.belt}
               onValueChange={(value) => handleSelectChange("belt", value)}
+              required
             >
               <SelectTrigger id="belt">
                 <SelectValue placeholder="Selecione a faixa" />
@@ -176,13 +227,13 @@ export function AthleteForm({ initialData, onSuccess }: AthleteFormProps) {
                 <SelectValue placeholder="Selecione a categoria" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="kata-individual">Kata Individual</SelectItem>
-                <SelectItem value="kata-team">Kata Equipe</SelectItem>
-                <SelectItem value="kumite-under-60">Kumite -60kg</SelectItem>
-                <SelectItem value="kumite-under-67">Kumite -67kg</SelectItem>
-                <SelectItem value="kumite-under-75">Kumite -75kg</SelectItem>
-                <SelectItem value="kumite-under-84">Kumite -84kg</SelectItem>
-                <SelectItem value="kumite-above-84">Kumite +84kg</SelectItem>
+                <SelectItem value="Kata Individual">Kata Individual</SelectItem>
+                <SelectItem value="Kata Equipe">Kata Equipe</SelectItem>
+                <SelectItem value="Kumite -60kg">Kumite -60kg</SelectItem>
+                <SelectItem value="Kumite -67kg">Kumite -67kg</SelectItem>
+                <SelectItem value="Kumite -75kg">Kumite -75kg</SelectItem>
+                <SelectItem value="Kumite -84kg">Kumite -84kg</SelectItem>
+                <SelectItem value="Kumite +84kg">Kumite +84kg</SelectItem>
               </SelectContent>
             </Select>
           </div>
