@@ -34,6 +34,7 @@ export function AthleteForm({ initialData, onSuccess }: AthleteFormProps) {
     status: initialData?.status !== false,
     belt: initialData?.belt || "",
     notes: initialData?.notes || "",
+    dojo: initialData?.dojo || "",
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -137,6 +138,7 @@ export function AthleteForm({ initialData, onSuccess }: AthleteFormProps) {
               type="number"
               value={formData.height}
               onChange={handleChange}
+              required
             />
           </div>
           
@@ -185,14 +187,35 @@ export function AthleteForm({ initialData, onSuccess }: AthleteFormProps) {
             </Select>
           </div>
           
-          <div className="flex items-center justify-start gap-4 pt-6">
-            <Switch
-              id="status"
-              checked={formData.status}
-              onCheckedChange={handleSwitchChange}
-            />
-            <Label htmlFor="status">Atleta Ativo</Label>
+          <div className="space-y-2">
+            <Label htmlFor="dojo">Dojo</Label>
+            <Select
+              value={formData.dojo}
+              onValueChange={(value) => handleSelectChange("dojo", value)}
+              required
+            >
+              <SelectTrigger id="dojo">
+                <SelectValue placeholder="Selecione o dojo" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="do-heiseikan">DÓ-HEISEIKAN</SelectItem>
+                <SelectItem value="shotokan">Shotokan Karate</SelectItem>
+                <SelectItem value="goju-ryu">Goju-Ryu</SelectItem>
+                <SelectItem value="wado-ryu">Wado-Ryu</SelectItem>
+                <SelectItem value="shito-ryu">Shito-Ryu</SelectItem>
+                <SelectItem value="kyokushin">Kyokushin</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
+        </div>
+        
+        <div className="flex items-center justify-start gap-4">
+          <Switch
+            id="status"
+            checked={formData.status}
+            onCheckedChange={handleSwitchChange}
+          />
+          <Label htmlFor="status">Atleta Ativo</Label>
         </div>
         
         <Separator className="my-1" />

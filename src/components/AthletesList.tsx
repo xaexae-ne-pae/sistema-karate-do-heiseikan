@@ -21,18 +21,19 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Pencil, Trash2 } from "lucide-react";
+import { Pencil, Trash2, Eye } from "lucide-react";
+import { AthleteDetails } from "./AthleteDetails";
 
 // Dados fictícios para demonstração
 const MOCK_ATHLETES = [
-  { id: 1, name: "João Silva", age: 25, weight: 72.5, category: "Kumite -75kg", status: true, belt: "black" },
-  { id: 2, name: "Carla Mendes", age: 23, weight: 58.2, category: "Kata Individual", status: true, belt: "brown" },
-  { id: 3, name: "Pedro Santos", age: 19, weight: 65.8, category: "Kumite -67kg", status: true, belt: "green" },
-  { id: 4, name: "Ana Pereira", age: 21, weight: 55.1, category: "Kata Individual", status: false, belt: "blue" },
-  { id: 5, name: "Carlos Eduardo", age: 28, weight: 83.4, category: "Kumite -84kg", status: true, belt: "black" },
-  { id: 6, name: "Lúcia Fernandes", age: 20, weight: 54.7, category: "Kata Individual", status: true, belt: "brown" },
-  { id: 7, name: "Fernando Costa", age: 24, weight: 71.2, category: "Kumite -75kg", status: false, belt: "blue" },
-  { id: 8, name: "Mariana Alves", age: 22, weight: 56.3, category: "Kata Individual", status: true, belt: "orange" },
+  { id: 1, name: "João Silva", age: 25, weight: 72.5, height: 178, category: "Kumite -75kg", status: true, belt: "black", dojo: "do-heiseikan", notes: "Campeão estadual 2022. Excelente em técnicas de chute." },
+  { id: 2, name: "Carla Mendes", age: 23, weight: 58.2, height: 165, category: "Kata Individual", status: true, belt: "brown", dojo: "shotokan", notes: "Competidora nacional. Especialista em kata Kanku Dai." },
+  { id: 3, name: "Pedro Santos", age: 19, weight: 65.8, height: 172, category: "Kumite -67kg", status: true, belt: "green", dojo: "goju-ryu" },
+  { id: 4, name: "Ana Pereira", age: 21, weight: 55.1, height: 162, category: "Kata Individual", status: false, belt: "blue", dojo: "wado-ryu" },
+  { id: 5, name: "Carlos Eduardo", age: 28, weight: 83.4, height: 185, category: "Kumite -84kg", status: true, belt: "black", dojo: "do-heiseikan", notes: "Instrutor assistente. Foco em kumite tradicional." },
+  { id: 6, name: "Lúcia Fernandes", age: 20, weight: 54.7, height: 160, category: "Kata Individual", status: true, belt: "brown", dojo: "shito-ryu" },
+  { id: 7, name: "Fernando Costa", age: 24, weight: 71.2, height: 175, category: "Kumite -75kg", status: false, belt: "blue", dojo: "kyokushin" },
+  { id: 8, name: "Mariana Alves", age: 22, weight: 56.3, height: 168, category: "Kata Individual", status: true, belt: "orange", dojo: "do-heiseikan" },
 ];
 
 interface AthletesListProps {
@@ -50,6 +51,8 @@ export function AthletesList({ onEdit, searchQuery, activeFilters = { belts: [],
   const [isLoading, setIsLoading] = useState(true);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [athleteToDelete, setAthleteToDelete] = useState<any | null>(null);
+  const [detailsOpen, setDetailsOpen] = useState(false);
+  const [selectedAthlete, setSelectedAthlete] = useState<any | null>(null);
 
   // Simulando carregamento de dados
   useEffect(() => {
@@ -118,6 +121,11 @@ export function AthletesList({ onEdit, searchQuery, activeFilters = { belts: [],
     setDeleteDialogOpen(false);
   };
 
+  const handleViewDetails = (athlete: any) => {
+    setSelectedAthlete(athlete);
+    setDetailsOpen(true);
+  };
+
   if (isLoading) {
     return <div className="flex justify-center py-12">Carregando atletas...</div>;
   }
@@ -129,12 +137,13 @@ export function AthletesList({ onEdit, searchQuery, activeFilters = { belts: [],
           <TableHeader>
             <TableRow>
               <TableHead>Nome</TableHead>
-              <TableHead className="w-[100px]">Idade</TableHead>
-              <TableHead className="w-[100px]">Peso</TableHead>
+              <TableHead className="w-[80px]">Idade</TableHead>
+              <TableHead className="w-[80px]">Peso</TableHead>
+              <TableHead className="w-[80px]">Altura</TableHead>
               <TableHead className="w-[180px]">Categoria</TableHead>
               <TableHead className="w-[100px]">Faixa</TableHead>
               <TableHead className="w-[100px]">Status</TableHead>
-              <TableHead className="w-[100px] text-right">Ações</TableHead>
+              <TableHead className="w-[120px] text-right">Ações</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -144,6 +153,7 @@ export function AthletesList({ onEdit, searchQuery, activeFilters = { belts: [],
                   <TableCell className="font-medium">{athlete.name}</TableCell>
                   <TableCell>{athlete.age} anos</TableCell>
                   <TableCell>{athlete.weight} kg</TableCell>
+                  <TableCell>{athlete.height ? `${athlete.height} cm` : "-"}</TableCell>
                   <TableCell>{athlete.category}</TableCell>
                   <TableCell>
                     <Badge className={getBeltStyle(athlete.belt)}>
@@ -163,6 +173,15 @@ export function AthletesList({ onEdit, searchQuery, activeFilters = { belts: [],
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end gap-2">
+                      <Button 
+                        size="icon" 
+                        variant="ghost"
+                        onClick={() => handleViewDetails(athlete)}
+                      >
+                        <Eye className="h-4 w-4" />
+                        <span className="sr-only">Ver detalhes</span>
+                      </Button>
+                      
                       <Button 
                         size="icon" 
                         variant="ghost" 
@@ -187,7 +206,7 @@ export function AthletesList({ onEdit, searchQuery, activeFilters = { belts: [],
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={7} className="text-center py-6 text-muted-foreground">
+                <TableCell colSpan={8} className="text-center py-6 text-muted-foreground">
                   {searchQuery || activeFilters.belts.length > 0 || activeFilters.status.length > 0
                     ? "Nenhum atleta encontrado com os filtros aplicados"
                     : "Nenhum atleta cadastrado"}
@@ -219,6 +238,14 @@ export function AthletesList({ onEdit, searchQuery, activeFilters = { belts: [],
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+      
+      {selectedAthlete && (
+        <AthleteDetails 
+          isOpen={detailsOpen}
+          onClose={() => setDetailsOpen(false)}
+          athlete={selectedAthlete}
+        />
+      )}
     </>
   );
 }

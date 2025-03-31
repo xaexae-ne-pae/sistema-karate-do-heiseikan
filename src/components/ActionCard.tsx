@@ -7,14 +7,23 @@ interface ActionCardProps {
   title: string;
   description: string;
   to: string;
+  onClick?: () => void;
 }
 
-export function ActionCard({ icon: Icon, title, description, to }: ActionCardProps) {
+export function ActionCard({ icon: Icon, title, description, to, onClick }: ActionCardProps) {
   const navigate = useNavigate();
+
+  const handleClick = () => {
+    if (onClick) {
+      onClick();
+    } else {
+      navigate(to);
+    }
+  };
 
   return (
     <button
-      onClick={() => navigate(to)}
+      onClick={handleClick}
       className="w-full rounded-lg border bg-card text-left overflow-hidden shadow-sm transition-all duration-300 hover:translate-x-1 hover:shadow-md hover:shadow-primary/10 dark:bg-card/90"
     >
       <div className="p-6">
