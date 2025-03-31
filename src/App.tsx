@@ -13,6 +13,7 @@ import Scoring from "./pages/Scoring";
 import Results from "./pages/Results";
 import Inscriptions from "./pages/Inscriptions";
 import AllMatches from "./pages/AllMatches";
+import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 
@@ -74,6 +75,11 @@ const App = () => (
           <Route path="/todas-lutas" element={
             <ProtectedRoute>
               <AllMatches />
+            </ProtectedRoute>
+          } />
+          <Route path="/configuracoes" element={
+            <ProtectedRoute>
+              <Settings />
             </ProtectedRoute>
           } />
           

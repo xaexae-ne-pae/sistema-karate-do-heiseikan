@@ -1,6 +1,6 @@
 
 import { BarChart2, Calendar, Home, LogOut, Medal, Settings, Shield, Users, Clipboard } from "lucide-react";
-import { DashboardLogo } from "./DashboardLogo";
+import Logo from "./Logo";
 import { SidebarLink } from "./SidebarLink";
 import { ThemeToggle } from "./ThemeToggle";
 import { Separator } from "./ui/separator";
@@ -34,7 +34,7 @@ export function Sidebar() {
   return (
     <div className="fixed inset-y-0 left-0 z-50 flex w-64 flex-col border-r bg-sidebar-background border-border">
       <div className="flex shrink-0 items-center p-5 border-b border-border/30">
-        <DashboardLogo />
+        <Logo variant="dashboard" />
       </div>
       
       <div className="flex flex-1 flex-col px-4 py-4 gap-1">
@@ -45,7 +45,6 @@ export function Sidebar() {
         <SidebarLink icon={Calendar} label="Torneios" to="/torneios" />
         <SidebarLink icon={BarChart2} label="Pontuação" to="/pontuacao" />
         <SidebarLink icon={Medal} label="Resultados" to="/resultados" />
-        <SidebarLink icon={Settings} label="Configurações" to="/configuracoes" />
       </div>
 
       <div className="border-t border-border/30 p-4">
