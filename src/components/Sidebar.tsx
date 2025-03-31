@@ -45,6 +45,7 @@ export function Sidebar() {
         <SidebarLink icon={Calendar} label="Torneios" to="/torneios" />
         <SidebarLink icon={BarChart2} label="Pontuação" to="/pontuacao" />
         <SidebarLink icon={Medal} label="Resultados" to="/resultados" />
+        <SidebarLink icon={Settings} label="Configurações" to="/configuracoes" />
       </div>
 
       <div className="border-t border-border/30 p-4">
