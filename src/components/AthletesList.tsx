@@ -1,5 +1,7 @@
+
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
+import { useIsMobile } from "@/hooks/use-mobile";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -55,11 +57,12 @@ interface AthletesListProps {
     belts: string[];
     status: string[];
   };
-  onAthleteUpdated?: () => void;
+  onAthleteUpdated?: number;
 }
 
 export function AthletesList({ onEdit, searchQuery, activeFilters = { belts: [], status: [] }, onAthleteUpdated }: AthletesListProps) {
   const { toast } = useToast();
+  const isMobile = useIsMobile();
   const [athletes, setAthletes] = useState<Athlete[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -151,16 +154,108 @@ export function AthletesList({ onEdit, searchQuery, activeFilters = { belts: [],
     return <div className="flex justify-center py-12">Carregando atletas...</div>;
   }
 
-  return (
-    <>
+  // Mobile-optimized table rendering
+  const renderMobileTable = () => {
+    return (
+      <div className="space-y-4">
+        {filteredAthletes.length > 0 ? (
+          filteredAthletes.map((athlete) => (
+            <div key={athlete.id} className="p-4 border rounded-lg bg-card">
+              <div className="flex justify-between items-start mb-2">
+                <h3 className="font-medium text-base">{athlete.name}</h3>
+                <Badge variant={athlete.status ? "default" : "secondary"}>
+                  {athlete.status ? "Ativo" : "Inativo"}
+                </Badge>
+              </div>
+              
+              <div className="grid grid-cols-2 gap-2 mb-3 text-sm">
+                <div>
+                  <span className="text-muted-foreground">Idade:</span>{" "}
+                  <span className="font-medium">{athlete.age}</span>{" "}
+                  <span className="text-muted-foreground text-xs">anos</span>
+                </div>
+                <div>
+                  <span className="text-muted-foreground">Peso:</span>{" "}
+                  <span className="font-medium">{athlete.weight}</span>{" "}
+                  <span className="text-muted-foreground text-xs">kg</span>
+                </div>
+                <div>
+                  <span className="text-muted-foreground">Altura:</span>{" "}
+                  <span className="font-medium">{athlete.height || "-"}</span>
+                  {athlete.height && <span className="text-muted-foreground text-xs"> cm</span>}
+                </div>
+                <div>
+                  <span className="text-muted-foreground">Faixa:</span>{" "}
+                  <Badge className={`ml-1 ${getBeltStyle(athlete.belt)}`}>
+                    {athlete.belt === "white" && "Branca"}
+                    {athlete.belt === "yellow" && "Amarela"}
+                    {athlete.belt === "orange" && "Laranja"}
+                    {athlete.belt === "green" && "Verde"}
+                    {athlete.belt === "blue" && "Azul"}
+                    {athlete.belt === "brown" && "Marrom"}
+                    {athlete.belt === "black" && "Preta"}
+                  </Badge>
+                </div>
+              </div>
+              
+              <div className="mb-3">
+                <span className="text-muted-foreground text-sm">Categoria:</span>{" "}
+                <span className="text-sm">{athlete.category}</span>
+              </div>
+              
+              <div className="flex justify-end gap-2 mt-2">
+                <Button 
+                  size="sm" 
+                  variant="ghost"
+                  onClick={() => handleViewDetails(athlete)}
+                >
+                  <Eye className="h-4 w-4 mr-1" />
+                  <span>Detalhes</span>
+                </Button>
+                
+                <Button 
+                  size="sm" 
+                  variant="ghost" 
+                  onClick={() => onEdit(athlete)}
+                >
+                  <Pencil className="h-4 w-4 mr-1" />
+                  <span>Editar</span>
+                </Button>
+                
+                <Button 
+                  size="sm" 
+                  variant="ghost" 
+                  className="text-destructive hover:text-destructive/90"
+                  onClick={() => handleDeleteClick(athlete)}
+                >
+                  <Trash2 className="h-4 w-4 mr-1" />
+                  <span>Excluir</span>
+                </Button>
+              </div>
+            </div>
+          ))
+        ) : (
+          <div className="text-center py-6 border rounded-lg bg-card text-muted-foreground">
+            {searchQuery || activeFilters.belts.length > 0 || activeFilters.status.length > 0
+              ? "Nenhum atleta encontrado com os filtros aplicados"
+              : "Nenhum atleta cadastrado"}
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  // Desktop table rendering
+  const renderDesktopTable = () => {
+    return (
       <div className="rounded-md border">
         <Table>
           <TableHeader>
             <TableRow>
               <TableHead>Nome</TableHead>
-              <TableHead className="w-[80px]">Idade</TableHead>
-              <TableHead className="w-[80px]">Peso</TableHead>
-              <TableHead className="w-[80px]">Altura</TableHead>
+              <TableHead className="w-[100px]">Idade</TableHead>
+              <TableHead className="w-[100px]">Peso</TableHead>
+              <TableHead className="w-[100px]">Altura</TableHead>
               <TableHead className="w-[180px]">Categoria</TableHead>
               <TableHead className="w-[100px]">Faixa</TableHead>
               <TableHead className="w-[100px]">Status</TableHead>
@@ -172,9 +267,28 @@ export function AthletesList({ onEdit, searchQuery, activeFilters = { belts: [],
               filteredAthletes.map((athlete) => (
                 <TableRow key={athlete.id}>
                   <TableCell className="font-medium">{athlete.name}</TableCell>
-                  <TableCell>{athlete.age} anos</TableCell>
-                  <TableCell>{athlete.weight} kg</TableCell>
-                  <TableCell>{athlete.height ? `${athlete.height} cm` : "-"}</TableCell>
+                  <TableCell>
+                    <div className="flex items-center">
+                      <span className="font-medium">{athlete.age}</span>
+                      <span className="text-muted-foreground text-xs ml-1">anos</span>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center">
+                      <span className="font-medium">{athlete.weight}</span>
+                      <span className="text-muted-foreground text-xs ml-1">kg</span>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    {athlete.height ? (
+                      <div className="flex items-center">
+                        <span className="font-medium">{athlete.height}</span>
+                        <span className="text-muted-foreground text-xs ml-1">cm</span>
+                      </div>
+                    ) : (
+                      <span>-</span>
+                    )}
+                  </TableCell>
                   <TableCell>{athlete.category}</TableCell>
                   <TableCell>
                     <Badge className={getBeltStyle(athlete.belt)}>
@@ -237,6 +351,12 @@ export function AthletesList({ onEdit, searchQuery, activeFilters = { belts: [],
           </TableBody>
         </Table>
       </div>
+    );
+  };
+
+  return (
+    <>
+      {isMobile ? renderMobileTable() : renderDesktopTable()}
       
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
