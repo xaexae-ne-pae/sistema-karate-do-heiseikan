@@ -109,16 +109,32 @@ export function AthletesList({ onEdit, searchQuery, activeFilters = { belts: [],
 
   const getBeltStyle = (belt: string) => {
     const styles = {
-      white: "bg-slate-100 text-slate-700",
-      yellow: "bg-yellow-100 text-yellow-800",
-      orange: "bg-orange-100 text-orange-800",
-      green: "bg-green-100 text-green-800",
-      blue: "bg-blue-100 text-blue-800",
-      brown: "bg-amber-800 text-white",
-      black: "bg-black text-white"
+      white: "bg-slate-100 text-slate-800 border-slate-200",
+      yellow: "bg-yellow-400 text-yellow-950 border-yellow-500",
+      red: "bg-red-600 text-white border-red-700",
+      orange: "bg-orange-500 text-white border-orange-600",
+      green: "bg-green-500 text-white border-green-600",
+      purple: "bg-purple-600 text-white border-purple-700",
+      brown: "bg-amber-700 text-white border-amber-800",
+      black: "bg-black text-white border-gray-700"
     };
     
     return styles[belt as keyof typeof styles] || "bg-slate-100 text-slate-800";
+  };
+
+  const getBeltName = (belt: string) => {
+    const names = {
+      white: "Branca",
+      yellow: "Amarela",
+      red: "Vermelha",
+      orange: "Laranja",
+      green: "Verde",
+      purple: "Roxa",
+      brown: "Marrom",
+      black: "Preta"
+    };
+    
+    return names[belt as keyof typeof names] || belt;
   };
 
   const handleDeleteClick = (athlete: Athlete) => {
@@ -187,13 +203,7 @@ export function AthletesList({ onEdit, searchQuery, activeFilters = { belts: [],
                 <div>
                   <span className="text-muted-foreground">Faixa:</span>{" "}
                   <Badge className={`ml-1 ${getBeltStyle(athlete.belt)}`}>
-                    {athlete.belt === "white" && "Branca"}
-                    {athlete.belt === "yellow" && "Amarela"}
-                    {athlete.belt === "orange" && "Laranja"}
-                    {athlete.belt === "green" && "Verde"}
-                    {athlete.belt === "blue" && "Azul"}
-                    {athlete.belt === "brown" && "Marrom"}
-                    {athlete.belt === "black" && "Preta"}
+                    {getBeltName(athlete.belt)}
                   </Badge>
                 </div>
               </div>
@@ -292,13 +302,7 @@ export function AthletesList({ onEdit, searchQuery, activeFilters = { belts: [],
                   <TableCell>{athlete.category}</TableCell>
                   <TableCell>
                     <Badge className={getBeltStyle(athlete.belt)}>
-                      {athlete.belt === "white" && "Branca"}
-                      {athlete.belt === "yellow" && "Amarela"}
-                      {athlete.belt === "orange" && "Laranja"}
-                      {athlete.belt === "green" && "Verde"}
-                      {athlete.belt === "blue" && "Azul"}
-                      {athlete.belt === "brown" && "Marrom"}
-                      {athlete.belt === "black" && "Preta"}
+                      {getBeltName(athlete.belt)}
                     </Badge>
                   </TableCell>
                   <TableCell>

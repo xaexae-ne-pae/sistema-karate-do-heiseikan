@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { Sidebar } from "@/components/Sidebar";
@@ -23,7 +22,6 @@ import { UserPlus, Search, Filter, X } from "lucide-react";
 import { AthleteForm } from "@/components/AthleteForm";
 import { AthletesList } from "@/components/AthletesList";
 
-// Interface para tipar corretamente o Atleta
 interface Athlete {
   id: number;
   name: string;
@@ -51,14 +49,10 @@ const Athletes = () => {
   const [athletesUpdated, setAthletesUpdated] = useState(0);
   const location = useLocation();
 
-  // Verificar se há um parâmetro na URL para abrir o diálogo
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
     if (searchParams.get("newAthlete") === "true") {
       handleOpenDialog();
-      
-      // Opcional: Limpar o parâmetro da URL para evitar que o diálogo abra novamente 
-      // após fechar e recarregar a página
       window.history.replaceState({}, document.title, location.pathname);
     }
   }, [location]);
@@ -74,7 +68,6 @@ const Athletes = () => {
   };
 
   const handleAthleteUpdated = () => {
-    // Incrementar contador para forçar atualização da lista
     setAthletesUpdated(prev => prev + 1);
   };
 
@@ -103,6 +96,17 @@ const Athletes = () => {
   const getActiveFiltersCount = () => {
     return activeFilters.belts.length + activeFilters.status.length;
   };
+
+  const beltDefinitions = [
+    { value: "white", color: "bg-slate-100", name: "Branca" },
+    { value: "yellow", color: "bg-yellow-400", name: "Amarela" },
+    { value: "red", color: "bg-red-600", name: "Vermelha" },
+    { value: "orange", color: "bg-orange-500", name: "Laranja" },
+    { value: "green", color: "bg-green-500", name: "Verde" },
+    { value: "purple", color: "bg-purple-600", name: "Roxa" },
+    { value: "brown", color: "bg-amber-700", name: "Marrom" },
+    { value: "black", color: "bg-black", name: "Preta" },
+  ];
 
   return (
     <div className="flex min-h-screen bg-background">
@@ -158,34 +162,18 @@ const Athletes = () => {
                 <DropdownMenuContent className="w-56">
                   <DropdownMenuLabel>Filtrar por Faixa</DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  {["white", "yellow", "orange", "green", "blue", "brown", "black"].map((belt) => (
+                  {beltDefinitions.map((belt) => (
                     <DropdownMenuCheckboxItem
-                      key={belt}
-                      checked={activeFilters.belts.includes(belt)}
+                      key={belt.value}
+                      checked={activeFilters.belts.includes(belt.value)}
                       onSelect={(e) => {
                         e.preventDefault();
-                        toggleBeltFilter(belt);
+                        toggleBeltFilter(belt.value);
                       }}
                     >
                       <div className="flex items-center gap-2">
-                        <div className={`w-3 h-3 rounded-full 
-                          ${belt === "white" ? "bg-slate-100" : ""}
-                          ${belt === "yellow" ? "bg-yellow-400" : ""}
-                          ${belt === "orange" ? "bg-orange-500" : ""}
-                          ${belt === "green" ? "bg-green-500" : ""}
-                          ${belt === "blue" ? "bg-blue-500" : ""}
-                          ${belt === "brown" ? "bg-amber-800" : ""}
-                          ${belt === "black" ? "bg-black" : ""}
-                        `}></div>
-                        <span>
-                          {belt === "white" && "Branca"}
-                          {belt === "yellow" && "Amarela"}
-                          {belt === "orange" && "Laranja"}
-                          {belt === "green" && "Verde"}
-                          {belt === "blue" && "Azul"}
-                          {belt === "brown" && "Marrom"}
-                          {belt === "black" && "Preta"}
-                        </span>
+                        <div className={`w-3 h-3 rounded-full ${belt.color}`}></div>
+                        <span>{belt.name}</span>
                       </div>
                     </DropdownMenuCheckboxItem>
                   ))}

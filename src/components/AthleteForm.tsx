@@ -205,9 +205,10 @@ export function AthleteForm({ initialData, onSuccess, onAthleteUpdated }: Athlet
               <SelectContent>
                 <SelectItem value="white">Branca</SelectItem>
                 <SelectItem value="yellow">Amarela</SelectItem>
+                <SelectItem value="red">Vermelha</SelectItem>
                 <SelectItem value="orange">Laranja</SelectItem>
                 <SelectItem value="green">Verde</SelectItem>
-                <SelectItem value="blue">Azul</SelectItem>
+                <SelectItem value="purple">Roxa</SelectItem>
                 <SelectItem value="brown">Marrom</SelectItem>
                 <SelectItem value="black">Preta</SelectItem>
               </SelectContent>
