@@ -11,10 +11,13 @@ import { useEffect, useState } from "react";
 export function Sidebar() {
   const navigate = useNavigate();
   const [username, setUsername] = useState("");
+  const [userRole, setUserRole] = useState("");
   
   useEffect(() => {
     const savedUsername = localStorage.getItem('karate_username') || '';
+    const savedRole = localStorage.getItem('karate_role') || 'user';
     setUsername(savedUsername);
+    setUserRole(savedRole);
   }, []);
   
   const handleLogout = () => {
@@ -30,6 +33,7 @@ export function Sidebar() {
 
   // Get first letter of username for avatar
   const avatarInitial = username ? username.charAt(0).toUpperCase() : '';
+  const isAdmin = userRole === 'admin' || username === 'Francivaldo';
 
   return (
     <div className="fixed inset-y-0 left-0 z-50 flex w-64 flex-col border-r bg-sidebar-background border-border">
@@ -42,7 +46,6 @@ export function Sidebar() {
         <SidebarLink icon={Users} label="Atletas" to="/atletas" />
         <SidebarLink icon={Clipboard} label="Inscrições" to="/inscricoes" />
         <SidebarLink icon={Shield} label="Categorias" to="/categorias" />
-        <SidebarLink icon={Calendar} label="Torneios" to="/torneios" />
         <SidebarLink icon={BarChart2} label="Pontuação" to="/pontuacao" />
         <SidebarLink icon={Medal} label="Resultados" to="/resultados" />
         <SidebarLink icon={Settings} label="Configurações" to="/configuracoes" />
@@ -57,7 +60,7 @@ export function Sidebar() {
             <div className="flex flex-col">
               <span className="text-sm font-medium">{username}</span>
               <span className="text-xs text-muted-foreground">
-                {username === 'Francivaldo' ? 'Administrador' : 'Jurado'}
+                {isAdmin ? 'Administrador' : 'Jurado'}
               </span>
             </div>
           </div>

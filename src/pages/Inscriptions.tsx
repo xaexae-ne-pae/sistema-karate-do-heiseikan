@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Sidebar } from "@/components/Sidebar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,9 +14,23 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Calendar, Trophy, Users, Clock, MapPin, Search, Filter, Flag, PlusCircle, ChevronRight, X } from "lucide-react";
+import { 
+  Calendar, 
+  Trophy, 
+  Users, 
+  Clock, 
+  MapPin, 
+  Search, 
+  Filter, 
+  Flag, 
+  PlusCircle, 
+  ChevronRight, 
+  X,
+  CheckCircle
+} from "lucide-react";
 import { TournamentForm } from "@/components/TournamentForm";
 import { TournamentCard } from "@/components/TournamentCard";
+import { useToast } from "@/hooks/use-toast";
 
 interface Event {
   id: string;
@@ -41,10 +55,69 @@ interface Tournament {
 }
 
 const Inscriptions = () => {
+  const { toast } = useToast();
   const [activeTab, setActiveTab] = useState("active");
   const [searchQuery, setSearchQuery] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
   const [activeSection, setActiveSection] = useState<"events" | "tournaments">("events");
+  const [username, setUsername] = useState("");
+  const [userRole, setUserRole] = useState("");
+  const [tournaments, setTournaments] = useState<Tournament[]>([
+    {
+      id: 1,
+      name: "Campeonato Regional de Karatê 2025",
+      date: "15/05/2025",
+      location: "Ginásio Municipal",
+      status: "upcoming",
+      categoriesCount: 12,
+      athletesCount: 98,
+    },
+    {
+      id: 2,
+      name: "Copa Shotokan - 3ª Etapa",
+      date: "28/06/2025",
+      location: "Centro Esportivo Água Rasa",
+      status: "active",
+      categoriesCount: 8,
+      athletesCount: 64,
+    },
+    {
+      id: 3,
+      name: "Copa Shotokan - 2ª Etapa",
+      date: "15/03/2025",
+      location: "Centro Esportivo Água Rasa",
+      status: "completed",
+      categoriesCount: 8,
+      athletesCount: 72,
+    },
+    {
+      id: 4,
+      name: "Campeonato Estadual 2024",
+      date: "10/11/2024",
+      location: "Ginásio do Ibirapuera",
+      status: "completed",
+      categoriesCount: 15,
+      athletesCount: 120,
+    },
+    {
+      id: 5,
+      name: "Copa Shotokan - 1ª Etapa",
+      date: "20/01/2025",
+      location: "Centro Esportivo Água Rasa",
+      status: "completed",
+      categoriesCount: 8,
+      athletesCount: 68,
+    },
+  ]);
+  
+  useEffect(() => {
+    const savedUsername = localStorage.getItem('karate_username') || '';
+    const savedRole = localStorage.getItem('karate_role') || 'user';
+    setUsername(savedUsername);
+    setUserRole(savedRole);
+  }, []);
+
+  const isAdmin = userRole === 'admin' || username === 'Francivaldo';
   
   // Dados de exemplo para os eventos
   const events: Event[] = [
@@ -95,55 +168,6 @@ const Inscriptions = () => {
     }
   ];
 
-  // Dados de exemplo para os torneios
-  const tournaments: Tournament[] = [
-    {
-      id: 1,
-      name: "Campeonato Regional de Karatê 2025",
-      date: "15/05/2025",
-      location: "Ginásio Municipal",
-      status: "upcoming",
-      categoriesCount: 12,
-      athletesCount: 98,
-    },
-    {
-      id: 2,
-      name: "Copa Shotokan - 3ª Etapa",
-      date: "28/06/2025",
-      location: "Centro Esportivo Água Rasa",
-      status: "active",
-      categoriesCount: 8,
-      athletesCount: 64,
-    },
-    {
-      id: 3,
-      name: "Copa Shotokan - 2ª Etapa",
-      date: "15/03/2025",
-      location: "Centro Esportivo Água Rasa",
-      status: "completed",
-      categoriesCount: 8,
-      athletesCount: 72,
-    },
-    {
-      id: 4,
-      name: "Campeonato Estadual 2024",
-      date: "10/11/2024",
-      location: "Ginásio do Ibirapuera",
-      status: "completed",
-      categoriesCount: 15,
-      athletesCount: 120,
-    },
-    {
-      id: 5,
-      name: "Copa Shotokan - 1ª Etapa",
-      date: "20/01/2025",
-      location: "Centro Esportivo Água Rasa",
-      status: "completed",
-      categoriesCount: 8,
-      athletesCount: 68,
-    },
-  ];
-
   const filteredEvents = events.filter(event => {
     if (activeTab === "active") return event.status === "active";
     if (activeTab === "upcoming") return event.status === "upcoming";
@@ -175,6 +199,43 @@ const Inscriptions = () => {
     setActiveSection(section);
   };
 
+  const handleFinishTournament = (id: number) => {
+    // Update the status of the tournament to completed
+    setTournaments(prevTournaments => 
+      prevTournaments.map(tournament => 
+        tournament.id === id ? {...tournament, status: 'completed'} : tournament
+      )
+    );
+
+    toast({
+      title: "Torneio finalizado",
+      description: "O torneio foi finalizado com sucesso e movido para a seção de encerrados.",
+    });
+  };
+
+  const handleTournamentSuccess = () => {
+    setIsDialogOpen(false);
+    const highestId = Math.max(...tournaments.map(t => t.id), 0);
+    
+    // Add new tournament with dummy data
+    const newTournament: Tournament = {
+      id: highestId + 1,
+      name: "Novo Torneio",
+      date: new Date().toLocaleDateString('pt-BR'),
+      location: "Local a definir",
+      status: "upcoming",
+      categoriesCount: 0,
+      athletesCount: 0
+    };
+    
+    setTournaments(prev => [newTournament, ...prev]);
+    
+    toast({
+      title: "Torneio criado",
+      description: "O novo torneio foi criado com sucesso.",
+    });
+  };
+
   return (
     <div className="flex min-h-screen bg-background">
       <Sidebar />
@@ -201,10 +262,12 @@ const Inscriptions = () => {
             >
               Torneios
             </Button>
-            <Button className="gap-2" onClick={() => setIsDialogOpen(true)}>
-              <Trophy className="h-4 w-4" />
-              <span>{activeSection === "events" ? "Novo Evento" : "Novo Torneio"}</span>
-            </Button>
+            {isAdmin && (
+              <Button className="gap-2" onClick={() => setIsDialogOpen(true)}>
+                <Trophy className="h-4 w-4" />
+                <span>{activeSection === "events" ? "Novo Evento" : "Novo Torneio"}</span>
+              </Button>
+            )}
           </div>
         </header>
         
@@ -300,17 +363,20 @@ const Inscriptions = () => {
                 title="Torneios Ativos"
                 description="Próximos eventos e competições em andamento"
                 tournaments={activeTournaments}
-                onAddTournament={() => setIsDialogOpen(true)}
+                onAddTournament={isAdmin ? () => setIsDialogOpen(true) : undefined}
                 searchQuery={searchQuery}
                 showCalendar
+                onFinishTournament={isAdmin ? handleFinishTournament : undefined}
+                isAdmin={isAdmin}
               />
 
               <TournamentSection
-                title="Torneios Anteriores"
+                title="Torneios Encerrados"
                 description="Histórico de competições realizadas"
                 tournaments={pastTournaments}
                 searchQuery={searchQuery}
                 showCalendar={false}
+                isAdmin={isAdmin}
               />
 
               <TournamentSection
@@ -319,6 +385,7 @@ const Inscriptions = () => {
                 tournaments={upcomingTournaments}
                 searchQuery={searchQuery}
                 showCalendar={false}
+                isAdmin={isAdmin}
               />
             </>
           )}
@@ -335,7 +402,7 @@ const Inscriptions = () => {
           </DialogHeader>
 
           {activeSection === "tournaments" && (
-            <TournamentForm onSuccess={() => setIsDialogOpen(false)} />
+            <TournamentForm onSuccess={handleTournamentSuccess} />
           )}
           {/* We would add an EventForm component here if it existed */}
           {activeSection === "events" && (
@@ -357,7 +424,7 @@ function EventCard({ event }: EventCardProps) {
   const isActive = event.status === "active";
   
   return (
-    <Card className="overflow-hidden transition-all duration-300 hover:translate-y-[-3px] hover:shadow-md">
+    <Card className="overflow-hidden transition-all duration-300 hover:translate-y-[-3px] hover:shadow-md border-border/30 bg-gradient-to-br from-card to-card/80">
       <CardHeader className="pb-3">
         <div className="flex justify-between items-start">
           <CardTitle className="text-lg">{event.title}</CardTitle>
@@ -410,6 +477,8 @@ const TournamentSection = ({
   onAddTournament,
   searchQuery,
   showCalendar,
+  onFinishTournament,
+  isAdmin = false,
 }: {
   title: string;
   description: string;
@@ -417,6 +486,8 @@ const TournamentSection = ({
   onAddTournament?: () => void;
   searchQuery: string;
   showCalendar: boolean;
+  onFinishTournament?: (id: number) => void;
+  isAdmin?: boolean;
 }) => (
   <div className="mb-10">
     <div className="flex items-center justify-between mb-5">
@@ -438,9 +509,14 @@ const TournamentSection = ({
     {tournaments.length > 0 ? (
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
         {tournaments.map((tournament) => (
-          <TournamentCard key={tournament.id} tournament={tournament} />
+          <TournamentCard 
+            key={tournament.id} 
+            tournament={tournament} 
+            onFinishTournament={onFinishTournament}
+            isAdmin={isAdmin}
+          />
         ))}
-        {onAddTournament && (
+        {onAddTournament && isAdmin && (
           <Button
             variant="outline"
             className="h-[220px] border-dashed flex flex-col gap-4 hover:border-primary hover:bg-primary/5"

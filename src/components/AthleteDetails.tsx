@@ -1,5 +1,5 @@
 
-import { X, User, Medal, Info } from "lucide-react";
+import { User, Medal, Info } from "lucide-react";
 import {
   Dialog,
   DialogContent,
