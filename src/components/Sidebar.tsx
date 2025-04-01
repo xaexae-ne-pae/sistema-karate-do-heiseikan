@@ -1,5 +1,5 @@
 
-import { BarChart2, Calendar, Home, LogOut, Medal, Settings, Shield, Users, Clipboard } from "lucide-react";
+import { BarChart2, Calendar, Home, LogOut, Medal, Settings, Shield, Users, Clipboard, Trophy } from "lucide-react";
 import Logo from "./Logo";
 import { SidebarLink } from "./SidebarLink";
 import { ThemeToggle } from "./ThemeToggle";
@@ -17,7 +17,7 @@ export function Sidebar() {
     const savedUsername = localStorage.getItem('karate_username') || '';
     const savedRole = localStorage.getItem('karate_role') || 'user';
     setUsername(savedUsername);
-    setUserRole(savedRole);
+    setUserRole(setUserRole);
   }, []);
   
   const handleLogout = () => {
@@ -44,6 +44,7 @@ export function Sidebar() {
       <div className="flex flex-1 flex-col px-4 py-4 gap-1">
         <SidebarLink icon={Home} label="Visão Geral" to="/dashboard" />
         <SidebarLink icon={Users} label="Atletas" to="/atletas" />
+        <SidebarLink icon={Trophy} label="Torneios" to="/torneios" />
         <SidebarLink icon={Clipboard} label="Inscrições" to="/inscricoes" />
         <SidebarLink icon={Shield} label="Categorias" to="/categorias" />
         <SidebarLink icon={BarChart2} label="Pontuação" to="/pontuacao" />

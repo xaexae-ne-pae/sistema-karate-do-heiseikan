@@ -55,7 +55,7 @@ export function TournamentCard({ tournament, onFinishTournament, isAdmin }: Tour
   };
 
   return (
-    <div className="glass-card rounded-xl p-5 shadow-lg bg-gradient-to-br from-card to-card/80 border border-border/30 hover:shadow-xl transition-all duration-300 relative overflow-hidden h-[260px] flex flex-col">
+    <div className="glass-card rounded-xl p-5 shadow-lg bg-gradient-to-br from-card to-card/80 border border-border/30 hover:shadow-xl transition-all duration-300 relative overflow-hidden flex flex-col min-h-[280px]">
       <div className="absolute top-0 right-0 w-24 h-24 bg-primary/5 rounded-full -mr-12 -mt-12 z-0"></div>
       
       <div className="flex justify-between items-start mb-2 relative z-10">
@@ -101,7 +101,7 @@ export function TournamentCard({ tournament, onFinishTournament, isAdmin }: Tour
         </div>
       </div>
 
-      <div className="flex-grow">
+      <div className="flex-1">
         <div className="flex flex-wrap gap-2 mb-3 relative z-10">
           {tournament.categoriesCount > 0 && (
             <Badge variant="outline" className="bg-primary/5">
@@ -133,8 +133,8 @@ export function TournamentCard({ tournament, onFinishTournament, isAdmin }: Tour
         </div>
       </div>
       
-      <div className="relative z-10">
-        <Link to={`/inscricoes?tournament=${tournament.id}`}>
+      <div className="relative z-10 mt-auto">
+        <Link to={`/torneios/${tournament.id}`}>
           <Button variant="default" className="w-full justify-between bg-primary hover:bg-primary/90">
             <span>{tournament.status === 'active' ? 'Inscrever-se' : tournament.status === 'completed' ? 'Ver Resultados' : 'Detalhes'}</span>
             <ChevronRight className="h-4 w-4" />

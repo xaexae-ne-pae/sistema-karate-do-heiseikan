@@ -11,6 +11,7 @@ import Categories from "./pages/Categories";
 import Scoring from "./pages/Scoring";
 import Results from "./pages/Results";
 import Inscriptions from "./pages/Inscriptions";
+import Tournaments from "./pages/Tournaments";
 import AllMatches from "./pages/AllMatches";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
@@ -51,6 +52,11 @@ const App = () => (
               <Inscriptions />
             </ProtectedRoute>
           } />
+          <Route path="/torneios" element={
+            <ProtectedRoute>
+              <Tournaments />
+            </ProtectedRoute>
+          } />
           <Route path="/categorias" element={
             <ProtectedRoute>
               <Categories />
@@ -76,9 +82,6 @@ const App = () => (
               <Settings />
             </ProtectedRoute>
           } />
-          
-          {/* Redirect old tournament path to inscriptions */}
-          <Route path="/torneios" element={<Navigate to="/inscricoes" replace />} />
           
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
