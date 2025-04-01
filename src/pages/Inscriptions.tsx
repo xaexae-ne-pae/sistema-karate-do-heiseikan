@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Sidebar } from "@/components/Sidebar";
 import { Button } from "@/components/ui/button";
@@ -119,7 +118,6 @@ const Inscriptions = () => {
 
   const isAdmin = userRole === 'admin' || username === 'Francivaldo';
   
-  // Dados de exemplo para os eventos
   const events: Event[] = [
     {
       id: "evt1",
@@ -175,7 +173,6 @@ const Inscriptions = () => {
     return true;
   });
 
-  // Filtra torneios de acordo com o status e a busca
   const filterTournaments = (status: TournamentStatus) =>
     tournaments.filter(
       (tournament) =>
@@ -200,7 +197,6 @@ const Inscriptions = () => {
   };
 
   const handleFinishTournament = (id: number) => {
-    // Update the status of the tournament to completed
     setTournaments(prevTournaments => 
       prevTournaments.map(tournament => 
         tournament.id === id ? {...tournament, status: 'completed'} : tournament
@@ -217,7 +213,6 @@ const Inscriptions = () => {
     setIsDialogOpen(false);
     const highestId = Math.max(...tournaments.map(t => t.id), 0);
     
-    // Add new tournament with dummy data
     const newTournament: Tournament = {
       id: highestId + 1,
       name: "Novo Torneio",
@@ -404,7 +399,6 @@ const Inscriptions = () => {
           {activeSection === "tournaments" && (
             <TournamentForm onSuccess={handleTournamentSuccess} />
           )}
-          {/* We would add an EventForm component here if it existed */}
           {activeSection === "events" && (
             <div className="py-4 text-center text-muted-foreground">
               Formulário de criação de eventos em desenvolvimento.
@@ -421,18 +415,22 @@ interface EventCardProps {
 }
 
 function EventCard({ event }: EventCardProps) {
-  const isActive = event.status === "active";
-  
   return (
-    <Card className="overflow-hidden transition-all duration-300 hover:translate-y-[-3px] hover:shadow-md border-border/30 bg-gradient-to-br from-card to-card/80">
-      <CardHeader className="pb-3">
+    <Card className="overflow-hidden transition-all duration-300 hover:translate-y-[-3px] hover:shadow-md border-border/30 bg-gradient-to-br from-card to-card/80 h-[260px] flex flex-col">
+      <CardHeader className="pb-2">
         <div className="flex justify-between items-start">
           <CardTitle className="text-lg">{event.title}</CardTitle>
-          {getStatusBadge(event.status)}
+          {event.status === "active" ? (
+            <Badge className="bg-green-500">Inscrições Abertas</Badge>
+          ) : event.status === "upcoming" ? (
+            <Badge className="bg-blue-500">Em Breve</Badge>
+          ) : (
+            <Badge variant="secondary">Encerrado</Badge>
+          )}
         </div>
         <CardDescription>
           <div className="flex items-center mt-1 gap-1">
-            <Calendar className="h-3.5 w-3.5 text-muted-foreground" />
+            <Calendar className="h-3.5 w-3.5 text-primary" />
             <span>{event.date}</span>
           </div>
           <div className="flex items-center mt-1 gap-1">
@@ -441,9 +439,10 @@ function EventCard({ event }: EventCardProps) {
           </div>
         </CardDescription>
       </CardHeader>
-      <CardContent className="pb-3">
+      
+      <CardContent className="pb-2 flex-grow">
         <div>
-          <h4 className="text-sm font-medium mb-2">Categorias:</h4>
+          <h4 className="text-sm font-medium mb-1">Categorias:</h4>
           <div className="flex flex-wrap gap-1">
             {event.categories.map((category, index) => (
               <Badge key={index} variant="outline" className="bg-primary/5">
@@ -457,13 +456,14 @@ function EventCard({ event }: EventCardProps) {
           <span className="text-sm text-muted-foreground">{event.participants} participantes</span>
         </div>
       </CardContent>
+      
       <CardFooter>
         <Button 
           className="w-full"
-          variant={isActive ? "default" : "secondary"}
-          disabled={!isActive}
+          variant={event.status === "active" ? "default" : "secondary"}
+          disabled={event.status !== "active"}
         >
-          {isActive ? "Inscrever-se" : event.status === "upcoming" ? "Aguardando abertura" : "Inscrições encerradas"}
+          {event.status === "active" ? "Inscrever-se" : event.status === "upcoming" ? "Aguardando abertura" : "Inscrições encerradas"}
         </Button>
       </CardFooter>
     </Card>
@@ -519,7 +519,7 @@ const TournamentSection = ({
         {onAddTournament && isAdmin && (
           <Button
             variant="outline"
-            className="h-[220px] border-dashed flex flex-col gap-4 hover:border-primary hover:bg-primary/5"
+            className="h-[260px] border-dashed flex flex-col gap-4 hover:border-primary hover:bg-primary/5"
             onClick={onAddTournament}
           >
             <PlusCircle className="h-10 w-10 text-muted-foreground" />
@@ -538,12 +538,5 @@ const TournamentSection = ({
     )}
   </div>
 );
-
-function getStatusBadge(status: "active" | "upcoming" | "closed") {
-  if (status === "active") return <Badge className="bg-green-500">Inscrições Abertas</Badge>;
-  if (status === "upcoming") return <Badge className="bg-blue-500">Em Breve</Badge>;
-  if (status === "closed") return <Badge variant="secondary">Encerrado</Badge>;
-  return null;
-}
 
 export default Inscriptions;

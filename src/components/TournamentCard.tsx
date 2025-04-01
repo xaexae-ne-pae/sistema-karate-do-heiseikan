@@ -55,14 +55,25 @@ export function TournamentCard({ tournament, onFinishTournament, isAdmin }: Tour
   };
 
   return (
-    <div className="glass-card rounded-xl p-5 shadow-lg bg-gradient-to-br from-card to-card/80 border border-border/30 hover:shadow-xl transition-all duration-300 relative overflow-hidden">
+    <div className="glass-card rounded-xl p-5 shadow-lg bg-gradient-to-br from-card to-card/80 border border-border/30 hover:shadow-xl transition-all duration-300 relative overflow-hidden h-[260px] flex flex-col">
       <div className="absolute top-0 right-0 w-24 h-24 bg-primary/5 rounded-full -mr-12 -mt-12 z-0"></div>
       
-      <div className="flex justify-between items-start mb-4 relative z-10">
-        <Badge variant={statusDetails.variant as any} className="capitalize flex items-center px-3 py-1">
-          {statusDetails.icon}
-          <span>{statusDetails.label}</span>
-        </Badge>
+      <div className="flex justify-between items-start mb-2 relative z-10">
+        {tournament.status === 'active' ? (
+          <Badge className="bg-green-500 px-3 py-1 text-white capitalize flex items-center">
+            Inscrições Abertas
+          </Badge>
+        ) : tournament.status === 'upcoming' ? (
+          <Badge variant="outline" className="px-3 py-1 capitalize flex items-center">
+            <Timer className="h-4 w-4 mr-1" />
+            <span>Próximo</span>
+          </Badge>
+        ) : (
+          <Badge variant="secondary" className="px-3 py-1 capitalize flex items-center">
+            <CheckCircle className="h-4 w-4 mr-1" />
+            <span>Concluído</span>
+          </Badge>
+        )}
         
         {isAdmin && tournament.status === 'active' && (
           <Button 
@@ -76,11 +87,11 @@ export function TournamentCard({ tournament, onFinishTournament, isAdmin }: Tour
         )}
       </div>
       
-      <h3 className="font-semibold text-lg mb-4 line-clamp-2 relative z-10">{tournament.name}</h3>
+      <h3 className="font-semibold text-lg mb-2 line-clamp-2 relative z-10">{tournament.name}</h3>
       
-      <div className="space-y-3 mb-5 relative z-10">
+      <div className="space-y-2 mb-4 relative z-10">
         <div className="flex items-center gap-2 text-sm">
-          <Calendar className={`h-4 w-4 ${statusDetails.color}`} />
+          <Calendar className="h-4 w-4 text-primary" />
           <span>{tournament.date}</span>
         </div>
         
@@ -89,23 +100,43 @@ export function TournamentCard({ tournament, onFinishTournament, isAdmin }: Tour
           <span className="text-muted-foreground">{tournament.location}</span>
         </div>
       </div>
+
+      <div className="flex-grow">
+        <div className="flex flex-wrap gap-2 mb-3 relative z-10">
+          {tournament.categoriesCount > 0 && (
+            <Badge variant="outline" className="bg-primary/5">
+              Kata
+            </Badge>
+          )}
+          {tournament.categoriesCount > 1 && (
+            <Badge variant="outline" className="bg-primary/5">
+              Kumite
+            </Badge>
+          )}
+          {tournament.categoriesCount > 2 && (
+            <Badge variant="outline" className="bg-primary/5">
+              Equipes
+            </Badge>
+          )}
+        </div>
+      </div>
       
-      <div className="flex items-center justify-between text-sm mb-5 relative z-10 bg-muted/30 p-2 rounded-lg">
-        <div className="flex items-center gap-2">
-          <Tag className="h-4 w-4 text-muted-foreground" />
-          <span className="text-muted-foreground">{tournament.categoriesCount} categorias</span>
+      <div className="flex items-center justify-between text-sm mb-4 relative z-10 bg-muted/30 p-2 rounded-lg">
+        <div className="flex items-center gap-1">
+          <Tag className="h-3 w-3 text-muted-foreground" />
+          <span className="text-muted-foreground text-xs">{tournament.categoriesCount} categorias</span>
         </div>
         
-        <div className="flex items-center gap-2">
-          <Users className="h-4 w-4 text-muted-foreground" />
-          <span className="text-muted-foreground">{tournament.athletesCount} atletas</span>
+        <div className="flex items-center gap-1">
+          <Users className="h-3 w-3 text-muted-foreground" />
+          <span className="text-muted-foreground text-xs">{tournament.athletesCount} atletas</span>
         </div>
       </div>
       
       <div className="relative z-10">
         <Link to={`/inscricoes?tournament=${tournament.id}`}>
-          <Button variant="ghost" className="w-full justify-between hover:bg-primary/10">
-            <span>{tournament.status === 'completed' ? 'Ver Resultados' : 'Gerenciar'}</span>
+          <Button variant="default" className="w-full justify-between bg-primary hover:bg-primary/90">
+            <span>{tournament.status === 'active' ? 'Inscrever-se' : tournament.status === 'completed' ? 'Ver Resultados' : 'Detalhes'}</span>
             <ChevronRight className="h-4 w-4" />
           </Button>
         </Link>
