@@ -113,7 +113,7 @@ const Tournaments = () => {
       
       const savedTournament = await saveTournament({
         ...formData,
-        status: "upcoming",
+        status: formData.status || "upcoming", // Use provided status or default to upcoming
         categoriesCount: 0,
         athletesCount: 0
       });
@@ -191,18 +191,18 @@ const Tournaments = () => {
           />
 
           <TournamentSection
-            title="Torneios Encerrados"
-            description="Histórico de competições realizadas"
-            tournaments={pastTournaments}
+            title="Torneios Futuros"
+            description="Próximos torneios agendados"
+            tournaments={upcomingTournaments}
             searchQuery={searchQuery}
             isAdmin={isAdmin}
             isJudge={isJudge}
           />
 
           <TournamentSection
-            title="Torneios Futuros"
-            description="Próximos torneios agendados"
-            tournaments={upcomingTournaments}
+            title="Torneios Encerrados"
+            description="Histórico de competições realizadas"
+            tournaments={pastTournaments}
             searchQuery={searchQuery}
             isAdmin={isAdmin}
             isJudge={isJudge}

@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { DialogFooter } from "@/components/ui/dialog";
 import { CalendarIcon } from "lucide-react";
@@ -16,18 +17,18 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
-import { Tournament, TournamentFormData } from "@/types/tournament";
+import { Tournament, TournamentFormData, TournamentStatus } from "@/types/tournament";
 import { saveTournament } from "@/services/tournamentService";
 
 interface TournamentFormProps {
   initialData?: Partial<Tournament>;
-  onSuccess: () => void;
+  onSuccess: (formData: Tournament) => void;
 }
 
 // Extracted form handler functions
 const useFormHandlers = (
   initialData: Partial<Tournament> | undefined,
-  onSuccess: () => void
+  onSuccess: (formData: Tournament) => void
 ) => {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -35,10 +36,11 @@ const useFormHandlers = (
     initialData?.date ? new Date(initialData.date) : undefined
   );
   
-  const [formData, setFormData] = useState<TournamentFormData>({
+  const [formData, setFormData] = useState<TournamentFormData & { status?: TournamentStatus }>({
     name: initialData?.name || "",
     location: initialData?.location || "",
     description: initialData?.description || "",
+    status: initialData?.status || "upcoming",
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -46,6 +48,13 @@ const useFormHandlers = (
     setFormData(prev => ({
       ...prev,
       [name]: value
+    }));
+  };
+  
+  const handleStatusChange = (value: TournamentStatus) => {
+    setFormData(prev => ({
+      ...prev,
+      status: value
     }));
   };
 
@@ -65,11 +74,13 @@ const useFormHandlers = (
     
     try {
       // Using our mock API service
-      await saveTournament({
+      const savedTournament = await saveTournament({
         ...formData,
-        date: date.toISOString(),
-        id: initialData?.id,
-        status: initialData?.status || "upcoming",
+        date: format(date, "dd/MM/yyyy"),
+        id: initialData?.id || Math.floor(Math.random() * 10000),
+        status: formData.status || "upcoming",
+        categoriesCount: initialData?.categoriesCount || 0,
+        athletesCount: initialData?.athletesCount || 0,
       });
       
       toast({
@@ -79,7 +90,7 @@ const useFormHandlers = (
           : `O torneio ${formData.name} foi criado com sucesso.`
       });
       
-      onSuccess();
+      onSuccess(savedTournament);
     } catch (error) {
       toast({
         title: "Erro",
@@ -97,6 +108,7 @@ const useFormHandlers = (
     formData,
     isSubmitting,
     handleChange,
+    handleStatusChange,
     handleSubmit
   };
 };
@@ -108,6 +120,7 @@ export function TournamentForm({ initialData, onSuccess }: TournamentFormProps) 
     formData,
     isSubmitting,
     handleChange,
+    handleStatusChange,
     handleSubmit
   } = useFormHandlers(initialData, onSuccess);
 
@@ -166,6 +179,23 @@ export function TournamentForm({ initialData, onSuccess }: TournamentFormProps) 
               required
             />
           </div>
+        </div>
+        
+        <div className="space-y-2">
+          <Label htmlFor="status">Status</Label>
+          <Select 
+            value={formData.status} 
+            onValueChange={(value) => handleStatusChange(value as TournamentStatus)}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Selecione um status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="upcoming">Próximo</SelectItem>
+              <SelectItem value="active">Em Andamento</SelectItem>
+              <SelectItem value="completed">Concluído</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
         
         <div className="space-y-2">

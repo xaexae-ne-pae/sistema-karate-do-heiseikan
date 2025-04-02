@@ -1,8 +1,10 @@
 
+import { useState } from "react";
 import { Calendar, MapPin, Users, Tag, ChevronRight, CheckCircle, Timer } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
+import { ConfirmationDialog } from "@/components/ConfirmationDialog";
 
 interface TournamentCardProps {
   tournament: {
@@ -20,6 +22,8 @@ interface TournamentCardProps {
 }
 
 export function TournamentCard({ tournament, onFinishTournament, isAdmin, isJudge }: TournamentCardProps) {
+  const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
+  
   const getStatusDetails = (status: string) => {
     const statusMap = {
       'upcoming': { 
@@ -45,14 +49,17 @@ export function TournamentCard({ tournament, onFinishTournament, isAdmin, isJudg
     return statusMap[status as keyof typeof statusMap] || { label: status, variant: 'outline', color: '', icon: null };
   };
   
-  const statusDetails = getStatusDetails(tournament.status);
-
-  const handleFinishTournament = (e: React.MouseEvent) => {
+  const handleFinishTournamentClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    setIsConfirmDialogOpen(true);
+  };
+
+  const handleConfirmFinish = () => {
     if (onFinishTournament) {
       onFinishTournament(tournament.id);
     }
+    setIsConfirmDialogOpen(false);
   };
 
   // Check if user can finish tournaments (admin or judge)
@@ -83,7 +90,7 @@ export function TournamentCard({ tournament, onFinishTournament, isAdmin, isJudg
           <Button 
             variant="outline" 
             size="sm" 
-            onClick={handleFinishTournament}
+            onClick={handleFinishTournamentClick}
             className="text-xs bg-background/80 hover:bg-background"
           >
             Finalizar
@@ -145,6 +152,14 @@ export function TournamentCard({ tournament, onFinishTournament, isAdmin, isJudg
           </Button>
         </Link>
       </div>
+
+      <ConfirmationDialog 
+        isOpen={isConfirmDialogOpen}
+        onClose={() => setIsConfirmDialogOpen(false)}
+        onConfirm={handleConfirmFinish}
+        title="Finalizar Torneio"
+        description={`Tem certeza que deseja finalizar o torneio "${tournament.name}"? Esta ação não pode ser desfeita.`}
+      />
     </div>
   );
 }

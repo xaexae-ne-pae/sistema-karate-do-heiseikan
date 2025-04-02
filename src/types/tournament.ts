@@ -17,4 +17,5 @@ export interface TournamentFormData {
   location: string;
   description: string;
   date?: Date;
+  status?: TournamentStatus;
 }
