@@ -1,69 +1,33 @@
-# Welcome to your Lovable project
+# 🥋 Sistema de Campeonato de Karatê
 
-## Project info
+O **Sistema de Campeonato de Karatê** é uma plataforma desenvolvida para simplificar a organização de torneios, proporcionando uma experiência intuitiva tanto para organizadores quanto para participantes. Este sistema foi desenvolvido especialmente para o **Dojo Dó-heiseikan**, visando aprimorar a gestão e participação em competições.
 
-**URL**: https://lovable.dev/projects/cc2d9de7-0b4d-4cfe-b9d5-59c83857e23e
+## 🎯 Objetivo
 
-## How can I edit this code?
+Este sistema foi criado para facilitar a gestão de torneios de Karatê, permitindo o cadastro e gerenciamento de eventos, além de oferecer uma interface prática para os atletas que desejam se inscrever e participar das competições.
 
-There are several ways of editing your application.
+## 🚀 Funcionalidades
 
-**Use Lovable**
+✅ Cadastro de torneios com nome, local, data e descrição.  
+✅ Inscrição de atletas nos torneios.  
+✅ Interface intuitiva e responsiva.  
+✅ Notificações interativas para sucesso e erro.  
+✅ Diferenciação de layout entre organizadores e participantes.  
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/cc2d9de7-0b4d-4cfe-b9d5-59c83857e23e) and start prompting.
+## 🛠️ Tecnologias Utilizadas
 
-Changes made via Lovable will be committed automatically to this repo.
+- **React.js** com TypeScript para a interface.  
+- **Vercel** para hospedagem do projeto.  
+- **ShadCN/UI** para componentes estilizados.  
+- **date-fns** para manipulação de datas.  
+- **Lucide-react** para ícones.  
 
-**Use your preferred IDE**
+## 📌 Sobre o Desenvolvimento
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+Este projeto foi desenvolvido com foco na usabilidade e eficiência, garantindo uma navegação fluida para todos os usuários. O design moderno e funcional permite que tanto organizadores quanto atletas tenham uma experiência otimizada no gerenciamento e participação dos torneios.
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+---
 
-Follow these steps:
+🔗 **Deploy Online:** [Acesse Aqui]([https://seu-site.vercel.app](https://do-heiseikan-karate1.vercel.app))  
+📧 **Contato:** [[Alevir Coelho Neto](https://www.linkedin.com/in/alevir-coelho-neto/)]
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
-
-**Edit a file directly in GitHub**
-
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
-
-**Use GitHub Codespaces**
-
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with .
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/cc2d9de7-0b4d-4cfe-b9d5-59c83857e23e) and click on Share -> Publish.
-
-## I want to use a custom domain - is that possible?
-
-We don't support custom domains (yet). If you want to deploy your project under your own domain then we recommend using Netlify. Visit our docs for more details: [Custom domains](https://docs.lovable.dev/tips-tricks/custom-domain/)
