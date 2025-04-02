@@ -1,15 +1,16 @@
 
-import { Home, BarChart2, Medal, Settings, Shield, Users, Trophy, LogOut } from "lucide-react";
+import { Home, BarChart2, Medal, Shield, Users, Trophy, LogOut } from "lucide-react";
 import Logo from "./Logo";
 import { SidebarLink } from "./SidebarLink";
 import { ThemeToggle } from "./ThemeToggle";
 import { Separator } from "./ui/separator";
 import { Avatar, AvatarFallback } from "./ui/avatar";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 
 export function TournamentSidebar() {
   const navigate = useNavigate();
+  const { id: tournamentId } = useParams<{ id: string }>();
   const [username, setUsername] = useState("");
   const [userRole, setUserRole] = useState("");
   
@@ -42,12 +43,12 @@ export function TournamentSidebar() {
       </div>
       
       <div className="flex flex-1 flex-col px-4 py-4 gap-1">
-        <SidebarLink icon={Home} label="Visão Geral" to="/dashboard" />
-        <SidebarLink icon={Users} label="Atletas" to="/atletas" />
+        <SidebarLink icon={Home} label="Visão Geral" to={`/torneios/${tournamentId}`} />
+        <SidebarLink icon={Users} label="Atletas" to={`/torneios/${tournamentId}/atletas`} />
         <SidebarLink icon={Trophy} label="Voltar para Torneios" to="/torneios" />
-        <SidebarLink icon={Shield} label="Categorias" to="/categorias" />
-        <SidebarLink icon={BarChart2} label="Pontuação" to="/pontuacao" />
-        <SidebarLink icon={Medal} label="Resultados" to="/resultados" />
+        <SidebarLink icon={Shield} label="Categorias" to={`/torneios/${tournamentId}/categorias`} />
+        <SidebarLink icon={BarChart2} label="Pontuação" to={`/torneios/${tournamentId}/pontuacao`} />
+        <SidebarLink icon={Medal} label="Resultados" to={`/torneios/${tournamentId}/resultados`} />
       </div>
 
       <div className="border-t border-border/30 p-4">
