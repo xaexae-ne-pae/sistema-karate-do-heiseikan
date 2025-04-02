@@ -16,20 +16,26 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
+import { Tournament, TournamentFormData } from "@/types/tournament";
+import { saveTournament } from "@/services/tournamentService";
 
 interface TournamentFormProps {
-  initialData?: any;
+  initialData?: Partial<Tournament>;
   onSuccess: () => void;
 }
 
-export function TournamentForm({ initialData, onSuccess }: TournamentFormProps) {
+// Extracted form handler functions
+const useFormHandlers = (
+  initialData: Partial<Tournament> | undefined,
+  onSuccess: () => void
+) => {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [date, setDate] = useState<Date | undefined>(
     initialData?.date ? new Date(initialData.date) : undefined
   );
   
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<TournamentFormData>({
     name: initialData?.name || "",
     location: initialData?.location || "",
     description: initialData?.description || "",
@@ -58,12 +64,17 @@ export function TournamentForm({ initialData, onSuccess }: TournamentFormProps) 
     setIsSubmitting(true);
     
     try {
-      // Simulating API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Using our mock API service
+      await saveTournament({
+        ...formData,
+        date: date.toISOString(),
+        id: initialData?.id,
+        status: initialData?.status || "upcoming",
+      });
       
       toast({
-        title: initialData ? "Torneio atualizado" : "Torneio criado",
-        description: initialData 
+        title: initialData?.id ? "Torneio atualizado" : "Torneio criado",
+        description: initialData?.id 
           ? `As informações do torneio ${formData.name} foram atualizadas com sucesso.`
           : `O torneio ${formData.name} foi criado com sucesso.`
       });
@@ -79,6 +90,26 @@ export function TournamentForm({ initialData, onSuccess }: TournamentFormProps) 
       setIsSubmitting(false);
     }
   };
+
+  return {
+    date,
+    setDate,
+    formData,
+    isSubmitting,
+    handleChange,
+    handleSubmit
+  };
+};
+
+export function TournamentForm({ initialData, onSuccess }: TournamentFormProps) {
+  const {
+    date,
+    setDate,
+    formData,
+    isSubmitting,
+    handleChange,
+    handleSubmit
+  } = useFormHandlers(initialData, onSuccess);
 
   return (
     <form onSubmit={handleSubmit}>
@@ -154,7 +185,7 @@ export function TournamentForm({ initialData, onSuccess }: TournamentFormProps) 
         <Button type="submit" disabled={isSubmitting}>
           {isSubmitting 
             ? 'Salvando...' 
-            : initialData ? 'Salvar alterações' : 'Criar torneio'}
+            : initialData?.id ? 'Salvar alterações' : 'Criar torneio'}
         </Button>
       </DialogFooter>
     </form>

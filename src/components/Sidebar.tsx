@@ -17,7 +17,7 @@ export function Sidebar() {
     const savedUsername = localStorage.getItem('karate_username') || '';
     const savedRole = localStorage.getItem('karate_role') || 'user';
     setUsername(savedUsername);
-    setUserRole(setUserRole);
+    setUserRole(savedRole); // Fixed: was passing setUserRole to itself
   }, []);
   
   const handleLogout = () => {
