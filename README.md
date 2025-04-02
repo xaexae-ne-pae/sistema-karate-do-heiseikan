@@ -28,6 +28,6 @@ Este projeto foi desenvolvido com foco na usabilidade e eficiência, garantindo 
 
 ---
 
-🔗 **Deploy Online:** [Acesse Aqui]([https://seu-site.vercel.app](https://do-heiseikan-karate1.vercel.app))  
+🔗 **Deploy Online:** [Acesse Aqui]([[https://seu-site.vercel.app](https://do-heiseikan-karate1.vercel.app)])  
 📧 **Contato:** [[Alevir Coelho Neto](https://www.linkedin.com/in/alevir-coelho-neto/)]
 
