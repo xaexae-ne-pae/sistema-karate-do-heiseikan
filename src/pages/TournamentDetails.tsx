@@ -1,13 +1,13 @@
 
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Sidebar } from "@/components/Sidebar";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Calendar, MapPin, CheckCircle, Timer, ArrowLeft } from "lucide-react";
 import { Tournament } from "@/types/tournament";
 import { ConfirmationDialog } from "@/components/ConfirmationDialog";
 import { useToast } from "@/hooks/use-toast";
+import { TournamentSidebar } from "@/components/TournamentSidebar";
 
 const TournamentDetails = () => {
   const { id } = useParams<{ id: string }>();
@@ -69,7 +69,7 @@ const TournamentDetails = () => {
   if (isLoading) {
     return (
       <div className="flex min-h-screen bg-background">
-        <Sidebar />
+        <TournamentSidebar />
         <div className="flex-1 ml-64 p-8 flex items-center justify-center">
           <div className="animate-pulse">Carregando...</div>
         </div>
@@ -80,7 +80,7 @@ const TournamentDetails = () => {
   if (!tournament) {
     return (
       <div className="flex min-h-screen bg-background">
-        <Sidebar />
+        <TournamentSidebar />
         <div className="flex-1 ml-64 p-8">
           <div className="text-center py-12">
             <h2 className="text-xl font-semibold">Torneio não encontrado</h2>
@@ -96,7 +96,7 @@ const TournamentDetails = () => {
 
   return (
     <div className="flex min-h-screen bg-background">
-      <Sidebar />
+      <TournamentSidebar />
       
       <div className="flex-1 ml-64">
         <header className="sticky top-0 z-40 flex items-center justify-between gap-4 border-b bg-background/95 px-8 py-4 backdrop-blur">

@@ -147,7 +147,7 @@ export function TournamentCard({ tournament, onFinishTournament, isAdmin, isJudg
       <div className="relative z-10 mt-auto">
         <Link to={`/torneios/${tournament.id}`}>
           <Button variant="default" className="w-full justify-between bg-primary hover:bg-primary/90">
-            <span>{tournament.status === 'active' ? 'Gerenciar Torneio' : tournament.status === 'completed' ? 'Ver Resultados' : 'Detalhes'}</span>
+            <span>{tournament.status === 'active' ? 'Entrar no Torneio' : tournament.status === 'completed' ? 'Ver Resultados' : 'Detalhes'}</span>
             <ChevronRight className="h-4 w-4" />
           </Button>
         </Link>
