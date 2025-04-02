@@ -16,9 +16,10 @@ interface TournamentCardProps {
   };
   onFinishTournament?: (id: number) => void;
   isAdmin: boolean;
+  isJudge?: boolean;
 }
 
-export function TournamentCard({ tournament, onFinishTournament, isAdmin }: TournamentCardProps) {
+export function TournamentCard({ tournament, onFinishTournament, isAdmin, isJudge }: TournamentCardProps) {
   const getStatusDetails = (status: string) => {
     const statusMap = {
       'upcoming': { 
@@ -54,6 +55,9 @@ export function TournamentCard({ tournament, onFinishTournament, isAdmin }: Tour
     }
   };
 
+  // Check if user can finish tournaments (admin or judge)
+  const canFinishTournament = isAdmin || isJudge;
+
   return (
     <div className="glass-card rounded-xl p-5 shadow-lg bg-gradient-to-br from-card to-card/80 border border-border/30 hover:shadow-xl transition-all duration-300 relative overflow-hidden flex flex-col min-h-[280px]">
       <div className="absolute top-0 right-0 w-24 h-24 bg-primary/5 rounded-full -mr-12 -mt-12 z-0"></div>
@@ -61,7 +65,7 @@ export function TournamentCard({ tournament, onFinishTournament, isAdmin }: Tour
       <div className="flex justify-between items-start mb-2 relative z-10">
         {tournament.status === 'active' ? (
           <Badge className="bg-green-500 px-3 py-1 text-white capitalize flex items-center">
-            Inscrições Abertas
+            Em Andamento
           </Badge>
         ) : tournament.status === 'upcoming' ? (
           <Badge variant="outline" className="px-3 py-1 capitalize flex items-center">
@@ -75,7 +79,7 @@ export function TournamentCard({ tournament, onFinishTournament, isAdmin }: Tour
           </Badge>
         )}
         
-        {isAdmin && tournament.status === 'active' && (
+        {canFinishTournament && tournament.status === 'active' && (
           <Button 
             variant="outline" 
             size="sm" 
@@ -136,7 +140,7 @@ export function TournamentCard({ tournament, onFinishTournament, isAdmin }: Tour
       <div className="relative z-10 mt-auto">
         <Link to={`/torneios/${tournament.id}`}>
           <Button variant="default" className="w-full justify-between bg-primary hover:bg-primary/90">
-            <span>{tournament.status === 'active' ? 'Inscrever-se' : tournament.status === 'completed' ? 'Ver Resultados' : 'Detalhes'}</span>
+            <span>{tournament.status === 'active' ? 'Gerenciar Torneio' : tournament.status === 'completed' ? 'Ver Resultados' : 'Detalhes'}</span>
             <ChevronRight className="h-4 w-4" />
           </Button>
         </Link>

@@ -15,18 +15,8 @@ import {
 import { TournamentForm } from "@/components/TournamentForm";
 import { TournamentCard } from "@/components/TournamentCard";
 import { useToast } from "@/hooks/use-toast";
-
-type TournamentStatus = "upcoming" | "active" | "completed";
-
-interface Tournament {
-  id: number;
-  name: string;
-  date: string;
-  location: string;
-  status: TournamentStatus;
-  categoriesCount: number;
-  athletesCount: number;
-}
+import { Tournament } from "@/types/tournament";
+import { saveTournament } from "@/services/tournamentService";
 
 const Tournaments = () => {
   const { toast } = useToast();
@@ -90,8 +80,9 @@ const Tournaments = () => {
   }, []);
 
   const isAdmin = userRole === 'admin' || username === 'Francivaldo';
+  const isJudge = userRole === 'judge';
   
-  const filterTournaments = (status: TournamentStatus) =>
+  const filterTournaments = (status: "upcoming" | "active" | "completed") =>
     tournaments.filter(
       (tournament) =>
         tournament.status === status &&
@@ -116,26 +107,30 @@ const Tournaments = () => {
     });
   };
 
-  const handleTournamentSuccess = () => {
-    setIsDialogOpen(false);
-    const highestId = Math.max(...tournaments.map(t => t.id), 0);
-    
-    const newTournament: Tournament = {
-      id: highestId + 1,
-      name: "Novo Torneio",
-      date: new Date().toLocaleDateString('pt-BR'),
-      location: "Local a definir",
-      status: "upcoming",
-      categoriesCount: 0,
-      athletesCount: 0
-    };
-    
-    setTournaments(prev => [newTournament, ...prev]);
-    
-    toast({
-      title: "Torneio criado",
-      description: "O novo torneio foi criado com sucesso.",
-    });
+  const handleTournamentSuccess = async (formData: Tournament) => {
+    try {
+      setIsDialogOpen(false);
+      
+      const savedTournament = await saveTournament({
+        ...formData,
+        status: "upcoming",
+        categoriesCount: 0,
+        athletesCount: 0
+      });
+      
+      setTournaments(prev => [savedTournament, ...prev]);
+      
+      toast({
+        title: "Torneio criado",
+        description: "O novo torneio foi criado com sucesso.",
+      });
+    } catch (error) {
+      toast({
+        title: "Erro",
+        description: "Ocorreu um erro ao criar o torneio.",
+        variant: "destructive"
+      });
+    }
   };
 
   return (
@@ -186,12 +181,13 @@ const Tournaments = () => {
 
           <TournamentSection
             title="Torneios Ativos"
-            description="Próximos eventos e competições em andamento"
+            description="Eventos em andamento que você pode gerenciar"
             tournaments={activeTournaments}
             onAddTournament={isAdmin ? () => setIsDialogOpen(true) : undefined}
             searchQuery={searchQuery}
-            onFinishTournament={isAdmin ? handleFinishTournament : undefined}
+            onFinishTournament={isAdmin || isJudge ? handleFinishTournament : undefined}
             isAdmin={isAdmin}
+            isJudge={isJudge}
           />
 
           <TournamentSection
@@ -200,6 +196,7 @@ const Tournaments = () => {
             tournaments={pastTournaments}
             searchQuery={searchQuery}
             isAdmin={isAdmin}
+            isJudge={isJudge}
           />
 
           <TournamentSection
@@ -208,6 +205,7 @@ const Tournaments = () => {
             tournaments={upcomingTournaments}
             searchQuery={searchQuery}
             isAdmin={isAdmin}
+            isJudge={isJudge}
           />
         </main>
       </div>
@@ -235,6 +233,7 @@ const TournamentSection = ({
   searchQuery,
   onFinishTournament,
   isAdmin = false,
+  isJudge = false,
 }: {
   title: string;
   description: string;
@@ -243,6 +242,7 @@ const TournamentSection = ({
   searchQuery: string;
   onFinishTournament?: (id: number) => void;
   isAdmin?: boolean;
+  isJudge?: boolean;
 }) => (
   <div className="mb-10">
     <div className="flex items-center justify-between mb-5">
@@ -263,6 +263,7 @@ const TournamentSection = ({
             tournament={tournament} 
             onFinishTournament={onFinishTournament}
             isAdmin={isAdmin}
+            isJudge={isJudge}
           />
         ))}
         {onAddTournament && (

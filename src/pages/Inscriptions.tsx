@@ -100,13 +100,6 @@ const Inscriptions = () => {
     return true;
   });
 
-  const getStatusBadge = (status: "active" | "upcoming" | "closed") => {
-    if (status === "active") return <Badge className="bg-green-500">Inscrições Abertas</Badge>;
-    if (status === "upcoming") return <Badge className="bg-blue-500">Em Breve</Badge>;
-    if (status === "closed") return <Badge variant="secondary">Encerrado</Badge>;
-    return null;
-  };
-
   return (
     <div className="flex min-h-screen bg-background">
       <Sidebar />
@@ -121,7 +114,7 @@ const Inscriptions = () => {
           <div className="flex items-center gap-3">
             {isAdmin && (
               <Button className="gap-2" onClick={() => setIsDialogOpen(true)}>
-                <span>Novo Evento</span>
+                <span>Nova Inscrição</span>
               </Button>
             )}
           </div>
@@ -197,13 +190,13 @@ const Inscriptions = () => {
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className="sm:max-w-[600px]">
           <DialogHeader>
-            <DialogTitle>Novo Evento</DialogTitle>
+            <DialogTitle>Nova Inscrição</DialogTitle>
             <DialogDescription>
-              Preencha as informações do evento para criar um novo.
+              Preencha as informações para se inscrever em um evento.
             </DialogDescription>
           </DialogHeader>
           <div className="py-4 text-center text-muted-foreground">
-            Formulário de criação de eventos em desenvolvimento.
+            Formulário de inscrições em desenvolvimento.
           </div>
         </DialogContent>
       </Dialog>
