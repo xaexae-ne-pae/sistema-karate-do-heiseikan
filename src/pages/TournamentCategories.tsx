@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { TournamentSidebar } from "@/components/TournamentSidebar";
@@ -200,7 +199,7 @@ const TournamentCategories = () => {
             </DialogDescription>
           </DialogHeader>
           
-          <CategoryForm onSuccess={(category) => handleAddCategory(category as Category)} />
+          <CategoryForm onSuccess={handleAddCategory} />
         </DialogContent>
       </Dialog>
     </div>

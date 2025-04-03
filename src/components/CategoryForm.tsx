@@ -17,9 +17,22 @@ import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
 import { Slider } from "@/components/ui/slider";
 
+interface Category {
+  id: number;
+  name: string;
+  type: string;
+  ageMin: number;
+  ageMax: number;
+  weightMin?: number;
+  weightMax?: number;
+  gender: string;
+  beltRangeMin: string;
+  beltRangeMax: string;
+}
+
 interface CategoryFormProps {
   initialData?: any;
-  onSuccess: () => void;
+  onSuccess: (category: Category) => void;
 }
 
 export function CategoryForm({ initialData, onSuccess }: CategoryFormProps) {
@@ -76,6 +89,20 @@ export function CategoryForm({ initialData, onSuccess }: CategoryFormProps) {
       // Simulating API call
       await new Promise(resolve => setTimeout(resolve, 1000));
       
+      // Create a proper Category object
+      const categoryData: Category = {
+        id: initialData?.id || Date.now(),
+        name: formData.name,
+        type: formData.type,
+        gender: formData.gender,
+        ageMin: formData.minAge,
+        ageMax: formData.maxAge,
+        weightMin: formData.type === "kumite" ? Number(formData.minWeight) || undefined : undefined,
+        weightMax: formData.type === "kumite" ? Number(formData.maxWeight) || undefined : undefined,
+        beltRangeMin: "white", // Default values since these weren't in the form
+        beltRangeMax: "black",
+      };
+      
       toast({
         title: initialData ? "Categoria atualizada" : "Categoria criada",
         description: initialData 
@@ -83,7 +110,7 @@ export function CategoryForm({ initialData, onSuccess }: CategoryFormProps) {
           : `A categoria ${formData.name} foi adicionada com sucesso.`
       });
       
-      onSuccess();
+      onSuccess(categoryData);
     } catch (error) {
       toast({
         title: "Erro",

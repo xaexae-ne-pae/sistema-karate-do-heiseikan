@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { TournamentSidebar } from "@/components/TournamentSidebar";
@@ -191,7 +190,7 @@ const TournamentAthletes = () => {
           </DialogHeader>
           
           <AthleteForm 
-            onSuccess={(athlete) => handleAddAthlete(athlete as Athlete)} 
+            onSuccess={handleAddAthlete}
             initialData={null}
             onAthleteUpdated={() => {}}
           />

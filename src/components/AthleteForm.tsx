@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -31,7 +31,7 @@ interface Athlete {
 
 interface AthleteFormProps {
   initialData?: Athlete | null;
-  onSuccess: () => void;
+  onSuccess: (athlete: Athlete) => void;
   onAthleteUpdated?: () => void;
 }
 
@@ -83,7 +83,7 @@ export function AthleteForm({ initialData, onSuccess, onAthleteUpdated }: Athlet
       let athletes = storedAthletes ? JSON.parse(storedAthletes) : [];
       
       // Converter valores para números onde necessário
-      const athleteData = {
+      const athleteData: Athlete = {
         id: initialData?.id || Date.now(),
         name: formData.name,
         age: Number(formData.age),
@@ -123,7 +123,7 @@ export function AthleteForm({ initialData, onSuccess, onAthleteUpdated }: Athlet
       }
       
       // Fechar o formulário
-      onSuccess();
+      onSuccess(athleteData);
     } catch (error) {
       toast({
         title: "Erro",
