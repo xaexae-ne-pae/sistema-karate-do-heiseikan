@@ -200,7 +200,7 @@ const TournamentCategories = () => {
             </DialogDescription>
           </DialogHeader>
           
-          <CategoryForm onSuccess={handleAddCategory} />
+          <CategoryForm onSuccess={(category) => handleAddCategory(category as Category)} />
         </DialogContent>
       </Dialog>
     </div>
