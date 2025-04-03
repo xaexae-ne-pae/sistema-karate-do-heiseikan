@@ -43,6 +43,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Badge } from "@/components/ui/badge";
 
 interface RegistrationData {
   name: string;
@@ -75,6 +76,22 @@ const dojoTypeMap: Record<string, string> = {
   "wado-ryu": "Wado-Ryu",
   "shito-ryu": "Shito-Ryu",
   "kyokushin": "Kyokushin"
+};
+
+// Belt color styles for badges
+const getBeltStyle = (belt: string) => {
+  const styles = {
+    white: "bg-slate-100 text-slate-800 border-slate-200",
+    yellow: "bg-yellow-400 text-yellow-950 border-yellow-500",
+    red: "bg-red-600 text-white border-red-700",
+    orange: "bg-orange-500 text-white border-orange-600",
+    green: "bg-green-500 text-white border-green-600",
+    purple: "bg-purple-600 text-white border-purple-700",
+    brown: "bg-amber-700 text-white border-amber-800",
+    black: "bg-black text-white border-gray-700"
+  };
+  
+  return styles[belt as keyof typeof styles] || "bg-slate-100 text-slate-800";
 };
 
 const creditCardSchema = z.object({
@@ -189,15 +206,85 @@ const PaymentPage = () => {
         
         <main className="px-8 py-6">
           <div className="grid gap-6 lg:grid-cols-3">
-            <div className="lg:col-span-2 space-y-6">
-              <Card>
-                <CardHeader>
+            {/* LEFT COLUMN - Registration Data Summary */}
+            <div>
+              <Card className="shadow-md hover:shadow-lg transition-shadow">
+                <CardHeader className="bg-primary/5 border-b">
+                  <CardTitle className="flex items-center">
+                    <FileText className="h-5 w-5 mr-2" />
+                    Resumo da Inscrição
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="p-6 space-y-6">
+                  <div className="space-y-3">
+                    <div className="bg-primary/5 rounded-lg p-3">
+                      <h3 className="font-semibold text-lg">{registrationData.name}</h3>
+                      <p className="text-sm text-muted-foreground mt-1">{registrationData.email}</p>
+                    </div>
+                    
+                    <div className="bg-primary/5 rounded-lg p-3">
+                      <div className="flex justify-between items-center mb-2">
+                        <h4 className="font-medium">Evento</h4>
+                        <Badge variant="outline" className="bg-blue-50 text-blue-800 border-blue-200">
+                          {registrationData.event}
+                        </Badge>
+                      </div>
+                      
+                      <div className="grid grid-cols-2 gap-y-3 gap-x-4 mt-3">
+                        <div>
+                          <h4 className="text-xs text-muted-foreground">Idade</h4>
+                          <p className="font-medium">{registrationData.age} anos</p>
+                        </div>
+                        <div>
+                          <h4 className="text-xs text-muted-foreground">Faixa</h4>
+                          <Badge className={`mt-1 ${getBeltStyle(registrationData.belt)}`}>
+                            {beltTypeMap[registrationData.belt] || registrationData.belt}
+                          </Badge>
+                        </div>
+                        <div>
+                          <h4 className="text-xs text-muted-foreground">Dojo</h4>
+                          <p className="font-medium">{dojoTypeMap[registrationData.dojo] || registrationData.dojo}</p>
+                        </div>
+                        <div>
+                          <h4 className="text-xs text-muted-foreground">Peso</h4>
+                          <p className="font-medium">{registrationData.weight} kg</p>
+                        </div>
+                        <div>
+                          <h4 className="text-xs text-muted-foreground">Altura</h4>
+                          <p className="font-medium">{registrationData.height} m</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="pt-4 border-t space-y-2">
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Taxa de inscrição</span>
+                      <span className="font-medium">R$ 80,00</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Taxa de processamento</span>
+                      <span className="font-medium">R$ 5,00</span>
+                    </div>
+                    <div className="flex justify-between font-semibold text-lg mt-3 pt-3 border-t">
+                      <span>Total</span>
+                      <span className="text-primary">R$ 85,00</span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+            
+            {/* RIGHT COLUMNS - Payment Methods */}
+            <div className="lg:col-span-2">
+              <Card className="shadow-md hover:shadow-lg transition-shadow">
+                <CardHeader className="bg-primary/5 border-b">
                   <CardTitle>Método de Pagamento</CardTitle>
                   <CardDescription>Escolha como deseja pagar por sua inscrição</CardDescription>
                 </CardHeader>
-                <CardContent>
-                  <Tabs defaultValue="card" onValueChange={setPaymentMethod}>
-                    <TabsList className="grid w-full grid-cols-3">
+                <CardContent className="p-6">
+                  <Tabs defaultValue="card" onValueChange={setPaymentMethod} className="mt-2">
+                    <TabsList className="grid w-full grid-cols-3 mb-6">
                       <TabsTrigger value="card" className="flex items-center gap-2">
                         <CreditCard className="h-4 w-4" />
                         <span>Cartão</span>
@@ -212,7 +299,7 @@ const PaymentPage = () => {
                       </TabsTrigger>
                     </TabsList>
                     
-                    <TabsContent value="card" className="mt-6">
+                    <TabsContent value="card">
                       <Form {...form}>
                         <form className="space-y-4">
                           <FormField
@@ -222,7 +309,11 @@ const PaymentPage = () => {
                               <FormItem>
                                 <FormLabel>Nome no cartão</FormLabel>
                                 <FormControl>
-                                  <Input placeholder="Nome impresso no cartão" {...field} />
+                                  <Input 
+                                    placeholder="Nome impresso no cartão" 
+                                    className="bg-white border-input/80 focus:border-primary"
+                                    {...field} 
+                                  />
                                 </FormControl>
                                 <FormMessage />
                               </FormItem>
@@ -238,6 +329,7 @@ const PaymentPage = () => {
                                 <FormControl>
                                   <Input 
                                     placeholder="0000 0000 0000 0000" 
+                                    className="bg-white border-input/80 focus:border-primary"
                                     {...field} 
                                     maxLength={19}
                                     onChange={(e) => {
@@ -265,6 +357,7 @@ const PaymentPage = () => {
                                   <FormControl>
                                     <Input 
                                       placeholder="MM/AA" 
+                                      className="bg-white border-input/80 focus:border-primary"
                                       {...field} 
                                       maxLength={5}
                                       onChange={(e) => {
@@ -290,6 +383,7 @@ const PaymentPage = () => {
                                   <FormControl>
                                     <Input 
                                       placeholder="123" 
+                                      className="bg-white border-input/80 focus:border-primary"
                                       {...field} 
                                       maxLength={4}
                                       onChange={(e) => {
@@ -307,36 +401,37 @@ const PaymentPage = () => {
                       </Form>
                     </TabsContent>
                     
-                    <TabsContent value="pix" className="mt-6">
-                      <div className="rounded-lg border p-8 text-center">
-                        <div className="mx-auto mb-4 h-32 w-32 bg-gray-200 flex items-center justify-center rounded">
-                          <p className="text-xs text-muted-foreground">QR Code PIX</p>
+                    <TabsContent value="pix">
+                      <div className="rounded-lg border border-input/50 p-8 text-center">
+                        <div className="mx-auto mb-6 h-40 w-40 bg-muted/50 flex items-center justify-center rounded-lg border border-input/30">
+                          <p className="text-muted-foreground">QR Code PIX</p>
                         </div>
                         <p className="text-sm text-muted-foreground">
                           Escaneie o QR Code acima ou copie a chave PIX abaixo
                         </p>
-                        <div className="mt-4 p-2 bg-muted rounded flex items-center justify-between">
-                          <span className="text-sm truncate">pix@doheiseikan.com.br</span>
-                          <Button variant="ghost" size="sm">Copiar</Button>
+                        <div className="mt-4 p-3 bg-muted/30 rounded-lg flex items-center justify-between border border-input/20">
+                          <span className="text-sm truncate font-mono">pix@doheiseikan.com.br</span>
+                          <Button variant="outline" size="sm" className="bg-white">Copiar</Button>
                         </div>
                       </div>
                     </TabsContent>
                     
-                    <TabsContent value="boleto" className="mt-6">
-                      <div className="rounded-lg border p-8 text-center">
-                        <FileText className="mx-auto mb-4 h-16 w-16 text-muted-foreground" />
-                        <p className="text-sm text-muted-foreground mb-4">
-                          Gere o boleto e realize o pagamento em qualquer banco ou casa lotérica
+                    <TabsContent value="boleto">
+                      <div className="rounded-lg border border-input/50 p-8 text-center">
+                        <FileText className="mx-auto mb-6 h-20 w-20 text-muted-foreground opacity-80" />
+                        <p className="text-sm text-muted-foreground mb-6">
+                          Gere o boleto e realize o pagamento em qualquer banco ou casa lotérica.
+                          <br />Vencimento em 3 dias úteis.
                         </p>
-                        <Button>Gerar Boleto</Button>
+                        <Button className="bg-primary hover:bg-primary/90">Gerar Boleto</Button>
                       </div>
                     </TabsContent>
                   </Tabs>
                 </CardContent>
-                <CardFooter>
+                <CardFooter className="bg-muted/20 p-6 border-t">
                   <Button 
                     onClick={handlePayment} 
-                    className="w-full gap-2"
+                    className="w-full gap-2 bg-primary hover:bg-primary/90 text-white py-6"
                   >
                     <span>Confirmar Pagamento</span>
                     <ArrowRight className="h-4 w-4" />
@@ -344,79 +439,27 @@ const PaymentPage = () => {
                 </CardFooter>
               </Card>
             </div>
-            
-            <div>
-              <Card>
-                <CardHeader>
-                  <CardTitle>Resumo da Inscrição</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="space-y-2">
-                    <h3 className="font-medium">Evento</h3>
-                    <p>{registrationData.event}</p>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <h3 className="font-medium">Participante</h3>
-                    <p>{registrationData.name}</p>
-                    <p className="text-sm text-muted-foreground">{registrationData.email}</p>
-                  </div>
-                  
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <h4 className="text-sm font-medium">Idade</h4>
-                      <p>{registrationData.age} anos</p>
-                    </div>
-                    <div>
-                      <h4 className="text-sm font-medium">Faixa</h4>
-                      <p>{beltTypeMap[registrationData.belt] || registrationData.belt}</p>
-                    </div>
-                    <div>
-                      <h4 className="text-sm font-medium">Dojo</h4>
-                      <p>{dojoTypeMap[registrationData.dojo] || registrationData.dojo}</p>
-                    </div>
-                    <div>
-                      <h4 className="text-sm font-medium">Peso</h4>
-                      <p>{registrationData.weight} kg</p>
-                    </div>
-                    <div>
-                      <h4 className="text-sm font-medium">Altura</h4>
-                      <p>{registrationData.height} m</p>
-                    </div>
-                  </div>
-                  
-                  <div className="pt-4 border-t">
-                    <div className="flex justify-between">
-                      <span>Taxa de inscrição</span>
-                      <span>R$ 80,00</span>
-                    </div>
-                    <div className="flex justify-between mt-1">
-                      <span>Taxa de processamento</span>
-                      <span>R$ 5,00</span>
-                    </div>
-                    <div className="flex justify-between font-semibold text-lg mt-3 pt-3 border-t">
-                      <span>Total</span>
-                      <span>R$ 85,00</span>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
           </div>
         </main>
       </div>
       
       <AlertDialog open={isConfirmationOpen} onOpenChange={setIsConfirmationOpen}>
-        <AlertDialogContent>
+        <AlertDialogContent className="max-w-md">
           <AlertDialogHeader>
-            <AlertDialogTitle>Pagamento confirmado!</AlertDialogTitle>
-            <AlertDialogDescription>
-              Sua inscrição para {registrationData.event} foi realizada com sucesso.
-              Você receberá um e-mail com os detalhes e instruções para o evento.
+            <AlertDialogTitle className="text-center text-xl flex items-center justify-center">
+              <CheckCircle className="h-6 w-6 text-green-500 mr-2" />
+              Pagamento confirmado!
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-center pt-2">
+              Sua inscrição para <span className="font-medium">{registrationData.event}</span> foi realizada com sucesso.
+              <br />Você receberá um e-mail com os detalhes e instruções para o evento.
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogAction onClick={handleConfirmationClose} className="gap-2">
+          <AlertDialogFooter className="sm:justify-center pt-2">
+            <AlertDialogAction 
+              onClick={handleConfirmationClose} 
+              className="gap-2 bg-primary hover:bg-primary/90 text-white"
+            >
               <CheckCircle className="h-4 w-4" />
               <span>Confirmar</span>
             </AlertDialogAction>
