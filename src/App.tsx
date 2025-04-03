@@ -11,6 +11,7 @@ import Categories from "./pages/Categories";
 import Scoring from "./pages/Scoring";
 import Results from "./pages/Results";
 import Inscriptions from "./pages/Inscriptions";
+import PaymentPage from "./pages/PaymentPage";
 import Tournaments from "./pages/Tournaments";
 import TournamentDetails from "./pages/TournamentDetails";
 import TournamentAthletes from "./pages/TournamentAthletes";
@@ -55,6 +56,11 @@ const App = () => (
           <Route path="/inscricoes" element={
             <ProtectedRoute>
               <Inscriptions />
+            </ProtectedRoute>
+          } />
+          <Route path="/inscricoes/pagamento" element={
+            <ProtectedRoute>
+              <PaymentPage />
             </ProtectedRoute>
           } />
           <Route path="/torneios" element={

@@ -19,6 +19,7 @@ import {
   Clock, 
   MapPin
 } from "lucide-react";
+import { RegistrationForm } from "@/components/registration/RegistrationForm";
 
 interface Event {
   id: string;
@@ -33,6 +34,7 @@ interface Event {
 const Inscriptions = () => {
   const [activeTab, setActiveTab] = useState("active");
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
+  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [username, setUsername] = useState("");
   const [userRole, setUserRole] = useState("");
   
@@ -100,6 +102,11 @@ const Inscriptions = () => {
     return true;
   });
 
+  const handleEventRegister = (event: Event) => {
+    setSelectedEvent(event);
+    setIsDialogOpen(true);
+  };
+
   return (
     <div className="flex min-h-screen bg-background">
       <Sidebar />
@@ -133,7 +140,11 @@ const Inscriptions = () => {
             <TabsContent value="active" className="space-y-0 mt-0">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {filteredEvents.map(event => (
-                  <EventCard key={event.id} event={event} />
+                  <EventCard 
+                    key={event.id} 
+                    event={event} 
+                    onRegister={handleEventRegister}
+                  />
                 ))}
                 
                 {filteredEvents.length === 0 && (
@@ -151,7 +162,11 @@ const Inscriptions = () => {
             <TabsContent value="upcoming" className="space-y-0 mt-0">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {filteredEvents.map(event => (
-                  <EventCard key={event.id} event={event} />
+                  <EventCard 
+                    key={event.id} 
+                    event={event} 
+                    onRegister={handleEventRegister}
+                  />
                 ))}
                 
                 {filteredEvents.length === 0 && (
@@ -169,7 +184,11 @@ const Inscriptions = () => {
             <TabsContent value="closed" className="space-y-0 mt-0">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {filteredEvents.map(event => (
-                  <EventCard key={event.id} event={event} />
+                  <EventCard 
+                    key={event.id} 
+                    event={event} 
+                    onRegister={handleEventRegister}
+                  />
                 ))}
                 
                 {filteredEvents.length === 0 && (
@@ -190,14 +209,17 @@ const Inscriptions = () => {
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className="sm:max-w-[600px]">
           <DialogHeader>
-            <DialogTitle>Nova Inscrição</DialogTitle>
+            <DialogTitle>Inscrição para Evento</DialogTitle>
             <DialogDescription>
-              Preencha as informações para se inscrever em um evento.
+              {selectedEvent 
+                ? `Preencha as informações para se inscrever em ${selectedEvent.title}` 
+                : 'Preencha as informações para se inscrever em um evento'}
             </DialogDescription>
           </DialogHeader>
-          <div className="py-4 text-center text-muted-foreground">
-            Formulário de inscrições em desenvolvimento.
-          </div>
+          <RegistrationForm 
+            event={selectedEvent} 
+            onClose={() => setIsDialogOpen(false)} 
+          />
         </DialogContent>
       </Dialog>
     </div>
@@ -206,20 +228,21 @@ const Inscriptions = () => {
 
 interface EventCardProps {
   event: Event;
+  onRegister: (event: Event) => void;
 }
 
-function EventCard({ event }: EventCardProps) {
+function EventCard({ event, onRegister }: EventCardProps) {
   return (
     <Card className="overflow-hidden transition-all duration-300 hover:translate-y-[-3px] hover:shadow-md border-border/30 bg-gradient-to-br from-card to-card/80 flex flex-col">
       <CardHeader className="pb-2">
         <div className="flex justify-between items-start">
           <CardTitle className="text-lg">{event.title}</CardTitle>
           {event.status === "active" ? (
-            <Badge className="bg-green-500">Inscrições Abertas</Badge>
+            <Badge className="bg-green-500 whitespace-nowrap">Inscrições Abertas</Badge>
           ) : event.status === "upcoming" ? (
-            <Badge className="bg-blue-500">Em Breve</Badge>
+            <Badge className="bg-blue-500 whitespace-nowrap">Em Breve</Badge>
           ) : (
-            <Badge variant="secondary">Encerrado</Badge>
+            <Badge variant="secondary" className="whitespace-nowrap">Encerrado</Badge>
           )}
         </div>
         <CardDescription>
@@ -256,6 +279,7 @@ function EventCard({ event }: EventCardProps) {
           className="w-full"
           variant={event.status === "active" ? "default" : "secondary"}
           disabled={event.status !== "active"}
+          onClick={() => event.status === "active" && onRegister(event)}
         >
           {event.status === "active" ? "Inscrever-se" : event.status === "upcoming" ? "Aguardando abertura" : "Inscrições encerradas"}
         </Button>
