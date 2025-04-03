@@ -13,20 +13,24 @@ interface AddAthleteDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSuccess: (athlete: Athlete) => void;
+  title?: string;
+  description?: string;
 }
 
 export const AddAthleteDialog = ({ 
   open, 
   onOpenChange, 
-  onSuccess 
+  onSuccess,
+  title = "Adicionar Atleta ao Torneio",
+  description = "Preencha os dados do atleta para adicionar a este torneio."
 }: AddAthleteDialogProps) => {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[600px]">
         <DialogHeader>
-          <DialogTitle>Adicionar Atleta ao Torneio</DialogTitle>
+          <DialogTitle>{title}</DialogTitle>
           <DialogDescription>
-            Selecione um atleta para adicionar a este torneio.
+            {description}
           </DialogDescription>
         </DialogHeader>
         
