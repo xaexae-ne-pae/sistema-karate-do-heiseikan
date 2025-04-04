@@ -18,6 +18,7 @@ import TournamentAthletes from "./pages/TournamentAthletes";
 import TournamentCategories from "./pages/TournamentCategories";
 import TournamentScoring from "./pages/TournamentScoring";
 import TournamentResults from "./pages/TournamentResults";
+import ScoringFullscreen from "./pages/ScoringFullscreen";
 import AllMatches from "./pages/AllMatches";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
@@ -121,6 +122,9 @@ const App = () => (
               <Settings />
             </ProtectedRoute>
           } />
+          
+          {/* Tela Cheia de Pontuação */}
+          <Route path="/scoring-fullscreen/:id" element={<ScoringFullscreen />} />
           
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />

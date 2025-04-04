@@ -1,5 +1,4 @@
 
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ChevronsUp, ChevronUp, Award } from "lucide-react";
 
@@ -11,24 +10,25 @@ interface ScoringPanelProps {
     athlete2: { name: string; color: string };
   };
   isActive: boolean;
+  scores: {
+    athlete1: { yuko: number, wazari: number, ippon: number };
+    athlete2: { yuko: number, wazari: number, ippon: number };
+  };
+  onUpdateScore: (athlete: 'athlete1' | 'athlete2', type: 'yuko' | 'wazari' | 'ippon', value: number) => void;
 }
 
-export function ScoringPanel({ match, isActive }: ScoringPanelProps) {
-  const [scores, setScores] = useState({
-    athlete1: { yuko: 0, wazari: 0, ippon: 0 },
-    athlete2: { yuko: 0, wazari: 0, ippon: 0 }
-  });
-
+export function ScoringPanel({ match, isActive, scores, onUpdateScore }: ScoringPanelProps) {
   const addPoint = (athlete: 'athlete1' | 'athlete2', type: 'yuko' | 'wazari' | 'ippon') => {
     if (!isActive) return;
     
-    setScores(prev => ({
-      ...prev,
-      [athlete]: {
-        ...prev[athlete],
-        [type]: prev[athlete][type] + 1
-      }
-    }));
+    onUpdateScore(athlete, type, scores[athlete][type] + 1);
+  };
+  
+  const removePoint = (athlete: 'athlete1' | 'athlete2', type: 'yuko' | 'wazari' | 'ippon') => {
+    if (!isActive) return;
+    if (scores[athlete][type] <= 0) return;
+    
+    onUpdateScore(athlete, type, scores[athlete][type] - 1);
   };
 
   const calculateTotal = (athlete: 'athlete1' | 'athlete2') => {
@@ -44,22 +44,12 @@ export function ScoringPanel({ match, isActive }: ScoringPanelProps) {
     return null;
   };
 
-  const resetScores = () => {
-    setScores({
-      athlete1: { yuko: 0, wazari: 0, ippon: 0 },
-      athlete2: { yuko: 0, wazari: 0, ippon: 0 }
-    });
-  };
-
   const winner = getWinner();
 
   return (
     <div className="glass-card rounded-lg p-5">
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-lg font-semibold">Pontuação</h2>
-        <Button variant="outline" size="sm" onClick={resetScores} disabled={!isActive}>
-          Limpar Pontos
-        </Button>
       </div>
       
       <div className="grid grid-cols-2 gap-6">
@@ -77,7 +67,8 @@ export function ScoringPanel({ match, isActive }: ScoringPanelProps) {
               label="Yuko (1pt)" 
               count={scores.athlete1.yuko}
               icon={<ChevronUp className="h-4 w-4" />}
-              onClick={() => addPoint('athlete1', 'yuko')}
+              onAdd={() => addPoint('athlete1', 'yuko')}
+              onRemove={() => removePoint('athlete1', 'yuko')}
               disabled={!isActive}
             />
             
@@ -86,7 +77,8 @@ export function ScoringPanel({ match, isActive }: ScoringPanelProps) {
               count={scores.athlete1.wazari}
               icon={<ChevronUp className="h-4 w-4" />}
               iconCount={2}
-              onClick={() => addPoint('athlete1', 'wazari')}
+              onAdd={() => addPoint('athlete1', 'wazari')}
+              onRemove={() => removePoint('athlete1', 'wazari')}
               disabled={!isActive}
             />
             
@@ -94,7 +86,8 @@ export function ScoringPanel({ match, isActive }: ScoringPanelProps) {
               label="Ippon (4pts)" 
               count={scores.athlete1.ippon}
               icon={<ChevronsUp className="h-4 w-4" />}
-              onClick={() => addPoint('athlete1', 'ippon')}
+              onAdd={() => addPoint('athlete1', 'ippon')}
+              onRemove={() => removePoint('athlete1', 'ippon')}
               disabled={!isActive}
             />
           </div>
@@ -114,7 +107,8 @@ export function ScoringPanel({ match, isActive }: ScoringPanelProps) {
               label="Yuko (1pt)" 
               count={scores.athlete2.yuko}
               icon={<ChevronUp className="h-4 w-4" />}
-              onClick={() => addPoint('athlete2', 'yuko')}
+              onAdd={() => addPoint('athlete2', 'yuko')}
+              onRemove={() => removePoint('athlete2', 'yuko')}
               disabled={!isActive}
             />
             
@@ -123,7 +117,8 @@ export function ScoringPanel({ match, isActive }: ScoringPanelProps) {
               count={scores.athlete2.wazari}
               icon={<ChevronUp className="h-4 w-4" />}
               iconCount={2}
-              onClick={() => addPoint('athlete2', 'wazari')}
+              onAdd={() => addPoint('athlete2', 'wazari')}
+              onRemove={() => removePoint('athlete2', 'wazari')}
               disabled={!isActive}
             />
             
@@ -131,7 +126,8 @@ export function ScoringPanel({ match, isActive }: ScoringPanelProps) {
               label="Ippon (4pts)" 
               count={scores.athlete2.ippon}
               icon={<ChevronsUp className="h-4 w-4" />}
-              onClick={() => addPoint('athlete2', 'ippon')}
+              onAdd={() => addPoint('athlete2', 'ippon')}
+              onRemove={() => removePoint('athlete2', 'ippon')}
               disabled={!isActive}
             />
           </div>
@@ -155,28 +151,52 @@ interface PointButtonProps {
   count: number;
   icon: React.ReactNode;
   iconCount?: number;
-  onClick: () => void;
+  onAdd: () => void;
+  onRemove: () => void;
   disabled?: boolean;
 }
 
-function PointButton({ label, count, icon, iconCount = 1, onClick, disabled }: PointButtonProps) {
+function PointButton({ label, count, icon, iconCount = 1, onAdd, onRemove, disabled }: PointButtonProps) {
   return (
     <div className="flex flex-col items-center">
       <Button 
         variant="outline" 
-        className="w-full mb-2 h-16 flex flex-col items-center justify-center bg-background"
-        onClick={onClick}
+        className="w-full mb-1 h-12 flex flex-col items-center justify-center bg-background"
+        onClick={onAdd}
         disabled={disabled}
       >
-        <div className="flex gap-0.5 mb-1">
+        <div className="flex gap-0.5">
           {Array.from({ length: iconCount }).map((_, i) => (
             <span key={i}>{icon}</span>
           ))}
         </div>
         <span className="text-xs">{label}</span>
       </Button>
-      <div className="bg-background/50 border rounded-full h-8 w-8 flex items-center justify-center font-semibold">
-        {count}
+      
+      <div className="flex items-center gap-2 mt-1">
+        <Button
+          variant="outline"
+          size="icon"
+          className="h-6 w-6"
+          onClick={onRemove}
+          disabled={disabled || count <= 0}
+        >
+          <span className="text-xs">-</span>
+        </Button>
+        
+        <div className="bg-background/50 border rounded-full h-8 w-8 flex items-center justify-center font-semibold">
+          {count}
+        </div>
+        
+        <Button
+          variant="outline"
+          size="icon"
+          className="h-6 w-6"
+          onClick={onAdd}
+          disabled={disabled}
+        >
+          <span className="text-xs">+</span>
+        </Button>
       </div>
     </div>
   );

@@ -1,5 +1,6 @@
 
 import { useState, useEffect, useRef } from "react";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import { Sidebar } from "@/components/Sidebar";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
@@ -13,6 +14,7 @@ import {
   RotateCcw,
   AlertTriangle,
   Minus,
+  ExternalLink
 } from "lucide-react";
 import { ScoringPanel } from "@/components/ScoringPanel";
 
@@ -29,10 +31,17 @@ interface Match {
 }
 
 const Scoring = () => {
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   const [matchStarted, setMatchStarted] = useState(false);
   const [matchPaused, setMatchPaused] = useState(false);
   const [time, setTime] = useState(120); // 2 minutes in seconds
   const [selectedMatch, setSelectedMatch] = useState<Match | null>(null);
+  const [scores, setScores] = useState({
+    athlete1: { yuko: 0, wazari: 0, ippon: 0 },
+    athlete2: { yuko: 0, wazari: 0, ippon: 0 }
+  });
+  const [fullscreenWindow, setFullscreenWindow] = useState<Window | null>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const { toast } = useToast();
 
@@ -57,6 +66,58 @@ const Scoring = () => {
       athlete2: { name: "Fernando Costa", color: "blue" },
     },
   ];
+
+  // Carregar a luta selecionada via query param
+  useEffect(() => {
+    const matchId = searchParams.get('matchId');
+    if (matchId) {
+      const match = upcomingMatches.find(m => m.id === Number(matchId));
+      if (match) {
+        setSelectedMatch(match);
+        resetMatch();
+      }
+    }
+  }, [searchParams]);
+
+  // Função para atualizar os pontos
+  const updateScore = (athlete: 'athlete1' | 'athlete2', type: 'yuko' | 'wazari' | 'ippon', value: number) => {
+    setScores(prev => ({
+      ...prev,
+      [athlete]: {
+        ...prev[athlete],
+        [type]: value
+      }
+    }));
+
+    // Enviar atualização para a tela cheia
+    if (fullscreenWindow && !fullscreenWindow.closed && selectedMatch) {
+      const calculatedScores = {
+        athlete1: {
+          yuko: athlete === 'athlete1' && type === 'yuko' ? value : scores.athlete1.yuko,
+          wazari: athlete === 'athlete1' && type === 'wazari' ? value : scores.athlete1.wazari,
+          ippon: athlete === 'athlete1' && type === 'ippon' ? value : scores.athlete1.ippon,
+          total: calculateTotal('athlete1', {
+            ...scores.athlete1,
+            [type]: athlete === 'athlete1' ? value : scores.athlete1[type]
+          })
+        },
+        athlete2: {
+          yuko: athlete === 'athlete2' && type === 'yuko' ? value : scores.athlete2.yuko,
+          wazari: athlete === 'athlete2' && type === 'wazari' ? value : scores.athlete2.wazari,
+          ippon: athlete === 'athlete2' && type === 'ippon' ? value : scores.athlete2.ippon,
+          total: calculateTotal('athlete2', {
+            ...scores.athlete2,
+            [type]: athlete === 'athlete2' ? value : scores.athlete2[type]
+          })
+        }
+      };
+
+      fullscreenWindow.postMessage({
+        type: 'UPDATE_SCORES',
+        scores: calculatedScores
+      }, '*');
+    }
+  };
 
   const handleSelectMatch = (match: Match) => {
     setSelectedMatch(match);
@@ -89,13 +150,32 @@ const Scoring = () => {
       clearInterval(timerRef.current);
     }
 
+    // Atualizar o timer na tela cheia
+    if (fullscreenWindow && !fullscreenWindow.closed && selectedMatch) {
+      fullscreenWindow.postMessage({
+        type: 'UPDATE_TIME',
+        time,
+        matchStarted,
+        matchPaused
+      }, '*');
+    }
+
     // Cleanup na desmontagem
     return () => {
       if (timerRef.current) {
         clearInterval(timerRef.current);
       }
     };
-  }, [matchStarted, matchPaused, toast]);
+  }, [matchStarted, matchPaused, time, toast, fullscreenWindow, selectedMatch]);
+
+  // Fechar a tela cheia ao desmontar
+  useEffect(() => {
+    return () => {
+      if (fullscreenWindow && !fullscreenWindow.closed) {
+        fullscreenWindow.close();
+      }
+    };
+  }, [fullscreenWindow]);
 
   const startMatch = () => {
     setMatchStarted(true);
@@ -117,12 +197,83 @@ const Scoring = () => {
     setMatchStarted(false);
     setMatchPaused(false);
     setTime(120);
+    setScores({
+      athlete1: { yuko: 0, wazari: 0, ippon: 0 },
+      athlete2: { yuko: 0, wazari: 0, ippon: 0 }
+    });
+
+    // Atualizar a tela cheia com o reset
+    if (fullscreenWindow && !fullscreenWindow.closed && selectedMatch) {
+      fullscreenWindow.postMessage({
+        type: 'UPDATE_SCORES',
+        scores: {
+          athlete1: { yuko: 0, wazari: 0, ippon: 0, total: 0 },
+          athlete2: { yuko: 0, wazari: 0, ippon: 0, total: 0 }
+        }
+      }, '*');
+      
+      fullscreenWindow.postMessage({
+        type: 'UPDATE_TIME',
+        time: 120,
+        matchStarted: false,
+        matchPaused: false
+      }, '*');
+    }
   };
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${mins}:${secs < 10 ? "0" : ""}${secs}`;
+  };
+
+  const calculateTotal = (athlete: 'athlete1' | 'athlete2', scoreState = scores[athlete]) => {
+    return scoreState.yuko + (scoreState.wazari * 2) + (scoreState.ippon * 4);
+  };
+
+  const openFullScreen = () => {
+    if (!selectedMatch) return;
+    
+    // Verificar se já existe uma janela aberta para este match
+    if (fullscreenWindow && !fullscreenWindow.closed) {
+      fullscreenWindow.focus();
+      toast({
+        title: "Tela já aberta",
+        description: "A tela de pontuação já está aberta em outra janela",
+        variant: "default",
+      });
+      return;
+    }
+
+    const matchType = selectedMatch.category.toLowerCase().includes('kata') ? 'kata' : 'kumite';
+    const url = `/scoring-fullscreen/${selectedMatch.id}?type=${matchType}`;
+    const windowName = `fullscreen-scoring-${selectedMatch.id}`;
+    
+    const win = window.open(url, windowName, 'fullscreen=yes,menubar=no,toolbar=no,location=no');
+    
+    if (win) {
+      setFullscreenWindow(win);
+      
+      // Verificar quando a janela for fechada
+      const checkClosed = setInterval(() => {
+        if (win.closed) {
+          clearInterval(checkClosed);
+          setFullscreenWindow(null);
+        }
+      }, 1000);
+      
+      toast({
+        title: "Tela de pontuação aberta",
+        description: "A tela de pontuação foi aberta em uma nova janela",
+        variant: "default",
+      });
+    } else {
+      toast({
+        title: "Erro ao abrir tela",
+        description: "Não foi possível abrir a tela de pontuação. Verifique se o bloqueador de pop-ups está desativado.",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -187,6 +338,10 @@ const Scoring = () => {
                   <Button onClick={resetMatch} size="icon" variant="outline">
                     <RotateCcw className="h-4 w-4" />
                   </Button>
+                  
+                  <Button onClick={openFullScreen} size="icon" variant="outline" className="ml-2">
+                    <ExternalLink className="h-4 w-4" />
+                  </Button>
                 </div>
               </div>
             ) : (
@@ -205,6 +360,8 @@ const Scoring = () => {
                 <ScoringPanel
                   match={selectedMatch}
                   isActive={matchStarted && !matchPaused}
+                  scores={scores}
+                  onUpdateScore={updateScore}
                 />
               </div>
 

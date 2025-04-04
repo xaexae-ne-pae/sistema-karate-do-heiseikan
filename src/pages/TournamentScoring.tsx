@@ -1,16 +1,141 @@
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { TournamentSidebar } from "@/components/TournamentSidebar";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Trophy, Swords, Award, PenTool, ExternalLink } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 const TournamentScoring = () => {
   const { id: tournamentId } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<string>("kumite");
+  const [activeFullScreenWindows, setActiveFullScreenWindows] = useState<Record<string, Window | null>>({});
+  const { toast } = useToast();
+  
+  // Referência para o estado atual dos pontos de cada luta
+  const matchScoresRef = useRef<Record<number, {
+    athlete1: { yuko: number, wazari: number, ippon: number, total: number },
+    athlete2: { yuko: number, wazari: number, ippon: number, total: number }
+  }>>({});
+
+  // Referência para o estado atual dos timers de cada luta
+  const matchTimersRef = useRef<Record<number, {
+    time: number,
+    matchStarted: boolean,
+    matchPaused: boolean
+  }>>({});
+  
+  // Manipular mensagens da janela de tela cheia
+  useEffect(() => {
+    const handleMessage = (event: MessageEvent) => {
+      if (event.data.type === 'REQUEST_STATE') {
+        const { matchId } = event.data;
+        const matchIdNum = Number(matchId);
+        
+        // Verificar se temos estado para este match
+        if (matchScoresRef.current[matchIdNum]) {
+          // Enviar pontuação atual
+          event.source?.postMessage({
+            type: 'UPDATE_SCORES',
+            scores: matchScoresRef.current[matchIdNum]
+          }, { targetOrigin: '*' } as WindowPostMessageOptions);
+          
+          // Enviar tempo atual
+          if (matchTimersRef.current[matchIdNum]) {
+            event.source?.postMessage({
+              type: 'UPDATE_TIME',
+              time: matchTimersRef.current[matchIdNum].time,
+              matchStarted: matchTimersRef.current[matchIdNum].matchStarted,
+              matchPaused: matchTimersRef.current[matchIdNum].matchPaused
+            }, { targetOrigin: '*' } as WindowPostMessageOptions);
+          }
+        }
+      }
+    };
+
+    window.addEventListener('message', handleMessage);
+    
+    return () => {
+      window.removeEventListener('message', handleMessage);
+      
+      // Fechar todas as janelas ao desmontar
+      Object.values(activeFullScreenWindows).forEach(win => {
+        if (win && !win.closed) {
+          win.close();
+        }
+      });
+    };
+  }, [activeFullScreenWindows]);
+  
+  // Inicializar estado de pontuação para uma luta (quando necessário)
+  const initializeMatchState = (matchId: number) => {
+    if (!matchScoresRef.current[matchId]) {
+      matchScoresRef.current[matchId] = {
+        athlete1: { yuko: 0, wazari: 0, ippon: 0, total: 0 },
+        athlete2: { yuko: 0, wazari: 0, ippon: 0, total: 0 }
+      };
+    }
+    
+    if (!matchTimersRef.current[matchId]) {
+      matchTimersRef.current[matchId] = {
+        time: 120,
+        matchStarted: false,
+        matchPaused: false
+      };
+    }
+  };
+  
+  // Função para atualizar pontos e notificar tela cheia
+  const updateMatchScore = (matchId: number, athlete: 'athlete1' | 'athlete2', type: 'yuko' | 'wazari' | 'ippon', value: number) => {
+    // Garantir que o estado existe
+    initializeMatchState(matchId);
+    
+    // Atualizar pontuação
+    matchScoresRef.current[matchId][athlete][type] = value;
+    
+    // Recalcular total
+    matchScoresRef.current[matchId][athlete].total = 
+      matchScoresRef.current[matchId][athlete].yuko + 
+      (matchScoresRef.current[matchId][athlete].wazari * 2) + 
+      (matchScoresRef.current[matchId][athlete].ippon * 4);
+    
+    // Enviar atualização para tela cheia
+    const fullScreenWindow = activeFullScreenWindows[`${matchId}-${athlete === 'athlete1' ? 'red' : 'blue'}`];
+    if (fullScreenWindow && !fullScreenWindow.closed) {
+      fullScreenWindow.postMessage({
+        type: 'UPDATE_SCORES',
+        scores: matchScoresRef.current[matchId]
+      }, '*');
+    }
+  };
+  
+  // Função para atualizar timer e notificar tela cheia
+  const updateMatchTimer = (matchId: number, time: number, matchStarted: boolean, matchPaused: boolean) => {
+    // Garantir que o estado existe
+    initializeMatchState(matchId);
+    
+    // Atualizar timer
+    matchTimersRef.current[matchId] = {
+      time,
+      matchStarted,
+      matchPaused
+    };
+    
+    // Enviar atualização para todas as telas cheias deste match
+    Object.entries(activeFullScreenWindows).forEach(([key, win]) => {
+      if (key.startsWith(`${matchId}-`) && win && !win.closed) {
+        win.postMessage({
+          type: 'UPDATE_TIME',
+          time,
+          matchStarted,
+          matchPaused
+        }, '*');
+      }
+    });
+  };
   
   // Dados fictícios para demonstração
   const kumiteMatches = [
@@ -56,7 +181,57 @@ const TournamentScoring = () => {
   ];
   
   const openFullScreenScoring = (matchId: number, matchType: string) => {
-    window.open(`/scoring-fullscreen/${matchId}?type=${matchType}`, "_blank");
+    const url = `/scoring-fullscreen/${matchId}?type=${matchType}`;
+    const windowName = `fullscreen-scoring-${matchId}`;
+    
+    // Verificar se já existe uma janela aberta para este match
+    if (activeFullScreenWindows[`${matchId}-window`] && !activeFullScreenWindows[`${matchId}-window`]?.closed) {
+      activeFullScreenWindows[`${matchId}-window`]?.focus();
+      toast({
+        title: "Tela já aberta",
+        description: "A tela de pontuação já está aberta em outra janela",
+        variant: "default",
+      });
+      return;
+    }
+    
+    // Abrir nova janela
+    const win = window.open(url, windowName, 'fullscreen=yes,menubar=no,toolbar=no,location=no');
+    
+    if (win) {
+      // Armazenar referência à janela
+      setActiveFullScreenWindows(prev => ({
+        ...prev,
+        [`${matchId}-window`]: win
+      }));
+      
+      // Inicializar estado
+      initializeMatchState(matchId);
+      
+      // Verificar quando a janela for fechada
+      const checkClosed = setInterval(() => {
+        if (win.closed) {
+          clearInterval(checkClosed);
+          setActiveFullScreenWindows(prev => {
+            const updated = { ...prev };
+            delete updated[`${matchId}-window`];
+            return updated;
+          });
+        }
+      }, 1000);
+      
+      toast({
+        title: "Tela de pontuação aberta",
+        description: "A tela de pontuação foi aberta em uma nova janela",
+        variant: "default",
+      });
+    } else {
+      toast({
+        title: "Erro ao abrir tela",
+        description: "Não foi possível abrir a tela de pontuação. Verifique se o bloqueador de pop-ups está desativado.",
+        variant: "destructive",
+      });
+    }
   };
   
   return (

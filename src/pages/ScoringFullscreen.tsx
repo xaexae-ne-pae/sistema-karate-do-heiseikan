@@ -1,7 +1,6 @@
 
 import { useState, useEffect } from "react";
 import { useParams, useSearchParams } from "react-router-dom";
-import { ScoringPanel } from "@/components/ScoringPanel";
 import { Timer, Trophy } from "lucide-react";
 
 const ScoringFullscreen = () => {
@@ -10,6 +9,10 @@ const ScoringFullscreen = () => {
   const matchType = searchParams.get("type") || "kumite";
   const [match, setMatch] = useState<any>(null);
   const [time, setTime] = useState(120); // 2 minutes in seconds
+  const [scores, setScores] = useState({
+    athlete1: { yuko: 0, wazari: 0, ippon: 0, total: 0 },
+    athlete2: { yuko: 0, wazari: 0, ippon: 0, total: 0 }
+  });
   const [matchStarted, setMatchStarted] = useState(false);
   const [matchPaused, setMatchPaused] = useState(false);
   
@@ -74,25 +77,32 @@ const ScoringFullscreen = () => {
     
     fetchMatch();
   }, [id, matchType]);
-  
-  // Efeito para simular o temporizador (em uma versão real, isso seria controlado do painel principal)
+
+  // Atualização dos pontos e tempo via mensagens
   useEffect(() => {
-    // Apenas para simulação
-    const timer = setInterval(() => {
-      if (!matchStarted || matchPaused) return;
+    const handleMessage = (event: MessageEvent) => {
+      const data = event.data;
       
-      setTime(prevTime => {
-        if (prevTime <= 0) {
-          clearInterval(timer);
-          setMatchStarted(false);
-          return 0;
-        }
-        return prevTime - 1;
-      });
-    }, 1000);
+      if (data.type === 'UPDATE_SCORES') {
+        setScores(data.scores);
+      } else if (data.type === 'UPDATE_TIME') {
+        setTime(data.time);
+        setMatchStarted(data.matchStarted);
+        setMatchPaused(data.matchPaused);
+      }
+    };
+
+    window.addEventListener('message', handleMessage);
     
-    return () => clearInterval(timer);
-  }, [matchStarted, matchPaused]);
+    // Solicitar estado atual
+    if (window.opener) {
+      window.opener.postMessage({ type: 'REQUEST_STATE', matchId: id }, '*');
+    }
+
+    return () => {
+      window.removeEventListener('message', handleMessage);
+    };
+  }, [id]);
   
   if (!match) {
     return (
@@ -101,6 +111,13 @@ const ScoringFullscreen = () => {
       </div>
     );
   }
+  
+  // Cálculo de pontuação total
+  const totalPoints1 = scores.athlete1.yuko + (scores.athlete1.wazari * 2) + (scores.athlete1.ippon * 4);
+  const totalPoints2 = scores.athlete2.yuko + (scores.athlete2.wazari * 2) + (scores.athlete2.ippon * 4);
+  
+  // Determinar o vencedor atual
+  const winner = totalPoints1 > totalPoints2 ? 'athlete1' : totalPoints1 < totalPoints2 ? 'athlete2' : null;
   
   return (
     <div className="min-h-screen w-full bg-black overflow-hidden text-white flex flex-col">
@@ -121,7 +138,7 @@ const ScoringFullscreen = () => {
       
       {/* Área principal com a pontuação */}
       <main className="flex-1 flex items-stretch p-6">
-        <div className="flex-1 p-6 bg-gradient-to-b from-red-900/20 to-red-900/5 rounded-l-xl border-r border-white/10 flex flex-col">
+        <div className={`flex-1 p-6 bg-gradient-to-b from-red-900/20 to-red-900/5 rounded-l-xl border-r border-white/10 flex flex-col ${winner === 'athlete1' ? 'ring-2 ring-red-500/50' : ''}`}>
           <div className="bg-gradient-to-r from-red-700/30 to-red-700/10 py-6 px-8 rounded-lg mb-8">
             <h2 className="text-4xl font-bold mb-2">{match.athlete1.name}</h2>
             <div className="flex items-center gap-2">
@@ -131,20 +148,20 @@ const ScoringFullscreen = () => {
           </div>
           
           <div className="grid grid-cols-3 gap-8 mt-4">
-            <ScoreBlock label="YUKO" points="1" value={0} color="red" />
-            <ScoreBlock label="WAZARI" points="2" value={0} color="red" />
-            <ScoreBlock label="IPPON" points="4" value={0} color="red" />
+            <ScoreBlock label="YUKO" points="1" value={scores.athlete1.yuko} color="red" />
+            <ScoreBlock label="WAZARI" points="2" value={scores.athlete1.wazari} color="red" />
+            <ScoreBlock label="IPPON" points="4" value={scores.athlete1.ippon} color="red" />
           </div>
           
           <div className="mt-auto">
             <div className="flex justify-between items-center bg-black/40 rounded-lg p-4">
               <span className="text-xl">Total de Pontos</span>
-              <span className="text-5xl font-bold">0</span>
+              <span className="text-5xl font-bold">{totalPoints1}</span>
             </div>
           </div>
         </div>
         
-        <div className="flex-1 p-6 bg-gradient-to-b from-blue-900/20 to-blue-900/5 rounded-r-xl border-l border-white/10 flex flex-col">
+        <div className={`flex-1 p-6 bg-gradient-to-b from-blue-900/20 to-blue-900/5 rounded-r-xl border-l border-white/10 flex flex-col ${winner === 'athlete2' ? 'ring-2 ring-blue-500/50' : ''}`}>
           <div className="bg-gradient-to-r from-blue-700/30 to-blue-700/10 py-6 px-8 rounded-lg mb-8">
             <h2 className="text-4xl font-bold mb-2">{match.athlete2.name}</h2>
             <div className="flex items-center gap-2">
@@ -154,15 +171,15 @@ const ScoringFullscreen = () => {
           </div>
           
           <div className="grid grid-cols-3 gap-8 mt-4">
-            <ScoreBlock label="YUKO" points="1" value={0} color="blue" />
-            <ScoreBlock label="WAZARI" points="2" value={0} color="blue" />
-            <ScoreBlock label="IPPON" points="4" value={0} color="blue" />
+            <ScoreBlock label="YUKO" points="1" value={scores.athlete2.yuko} color="blue" />
+            <ScoreBlock label="WAZARI" points="2" value={scores.athlete2.wazari} color="blue" />
+            <ScoreBlock label="IPPON" points="4" value={scores.athlete2.ippon} color="blue" />
           </div>
           
           <div className="mt-auto">
             <div className="flex justify-between items-center bg-black/40 rounded-lg p-4">
               <span className="text-xl">Total de Pontos</span>
-              <span className="text-5xl font-bold">0</span>
+              <span className="text-5xl font-bold">{totalPoints2}</span>
             </div>
           </div>
         </div>

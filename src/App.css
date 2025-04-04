@@ -15,6 +15,19 @@
   height: 100vh;
 }
 
+/* Estilo específico para a página de pontuação em tela cheia */
+body:has(.min-h-screen.w-full.bg-black) {
+  overflow: hidden;
+}
+
+body:has(.min-h-screen.w-full.bg-black) #root {
+  max-width: none;
+  padding: 0;
+  margin: 0;
+  width: 100vw;
+  height: 100vh;
+}
+
 .logo {
   height: 6em;
   padding: 1.5em;
