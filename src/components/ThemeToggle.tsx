@@ -12,12 +12,14 @@ export function ThemeToggle({ className, iconOnly = false }: ThemeToggleProps) {
   const [theme, setTheme] = useState<"light" | "dark">("dark");
 
   useEffect(() => {
+    // Usar dark como padrão ao invés de confiar na preferência do sistema
     const storedTheme = localStorage.getItem("theme") as "light" | "dark" | null;
-    const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
     
-    const initialTheme = storedTheme || (prefersDark ? "dark" : "light");
+    // Se não houver tema armazenado, usar dark como padrão
+    const initialTheme = storedTheme || "dark";
     setTheme(initialTheme);
     
+    // Aplicar classe dark por padrão ao documento
     if (initialTheme === "dark") {
       document.documentElement.classList.add("dark");
     } else {

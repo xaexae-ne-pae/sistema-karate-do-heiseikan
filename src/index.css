@@ -9,7 +9,7 @@
     --foreground: 222 60% 6%;
     
     --card: 210 40% 96.1%;
-    --card-foreground: 222 60% 6%;
+    --card-foreground: 222 50% 6%;
     
     --popover: 210 40% 98%;
     --popover-foreground: 222 60% 6%;
@@ -17,11 +17,11 @@
     --primary: 357 86% 55%;
     --primary-foreground: 210 40% 98%;
     
-    --secondary: 210 40% 90%;
+    --secondary: 210 40% 86%;
     --secondary-foreground: 222 60% 6%;
     
     --muted: 210 40% 90%;
-    --muted-foreground: 222 36% 25%;
+    --muted-foreground: 222 40% 20%;
     
     --accent: 210 40% 90%;
     --accent-foreground: 222 60% 6%;
@@ -29,19 +29,19 @@
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
     
-    --border: 214.3 31.8% 85%;
-    --input: 214.3 31.8% 85%;
+    --border: 214.3 31.8% 75%;
+    --input: 214.3 31.8% 75%;
     --ring: 357 86% 55%;
     
     --radius: 0.8rem;
 
-    --sidebar-background: 210 40% 97%;
+    --sidebar-background: 210 40% 95%;
     --sidebar-foreground: 222 60% 6%;
     --sidebar-primary: 357 86% 55%;
     --sidebar-primary-foreground: 0 0% 100%;
     --sidebar-accent: 210 40% 90%;
     --sidebar-accent-foreground: 222 60% 6%;
-    --sidebar-border: 214.3 31.8% 85%;
+    --sidebar-border: 214.3 31.8% 75%;
     --sidebar-ring: 357 86% 55%;
   }
 
@@ -104,6 +104,15 @@
     @apply bg-background text-foreground;
   }
   
+  /* Melhorar a legibilidade no modo claro */
+  .dashboard-active:not(.dark) body {
+    @apply text-gray-800;
+  }
+  
+  .dashboard-active:not(.dark) .text-muted-foreground {
+    @apply text-gray-600;
+  }
+  
   ::selection {
     @apply bg-primary/20 text-foreground;
   }
@@ -145,6 +154,15 @@
   
   .hover-glow {
     @apply transition-shadow duration-300 hover:shadow-md hover:shadow-primary/10;
+  }
+  
+  /* Modo claro: melhorar contraste e legibilidade */
+  .light-mode-enhanced-text {
+    @apply text-gray-800 dark:text-current;
+  }
+  
+  .light-mode-enhanced-bg {
+    @apply bg-white dark:bg-transparent shadow-sm dark:shadow-none;
   }
   
   @keyframes pulse-slow {
