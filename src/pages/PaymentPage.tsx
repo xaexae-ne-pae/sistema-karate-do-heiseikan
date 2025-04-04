@@ -13,10 +13,9 @@ import {
   CardTitle 
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
 import {
   Form,
   FormControl,
@@ -32,7 +31,9 @@ import {
   CreditCard, 
   Zap,
   FileText,
-  ArrowRight 
+  ArrowRight,
+  Shield,
+  Receipt
 } from "lucide-react";
 import {
   AlertDialog,
@@ -205,32 +206,32 @@ const PaymentPage = () => {
         </header>
         
         <main className="px-8 py-6">
-          <div className="grid gap-6 lg:grid-cols-3">
+          <div className="grid gap-8 lg:grid-cols-3">
             {/* LEFT COLUMN - Registration Data Summary */}
             <div>
-              <Card className="shadow-md hover:shadow-lg transition-shadow">
-                <CardHeader className="bg-primary/5 border-b">
+              <Card className="shadow-lg hover:shadow-xl transition-shadow border-border/30 overflow-hidden">
+                <CardHeader className="bg-primary/10 border-b">
                   <CardTitle className="flex items-center">
-                    <FileText className="h-5 w-5 mr-2" />
+                    <FileText className="h-5 w-5 mr-2 text-primary" />
                     Resumo da Inscrição
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="p-6 space-y-6">
-                  <div className="space-y-3">
-                    <div className="bg-primary/5 rounded-lg p-3">
+                  <div className="space-y-4">
+                    <div className="glass-morphism rounded-lg p-4">
                       <h3 className="font-semibold text-lg">{registrationData.name}</h3>
                       <p className="text-sm text-muted-foreground mt-1">{registrationData.email}</p>
                     </div>
                     
-                    <div className="bg-primary/5 rounded-lg p-3">
-                      <div className="flex justify-between items-center mb-2">
-                        <h4 className="font-medium">Evento</h4>
-                        <Badge variant="outline" className="bg-blue-50 text-blue-800 border-blue-200">
+                    <div className="glass-morphism rounded-lg p-4">
+                      <div className="flex justify-between items-center mb-3">
+                        <h4 className="font-medium text-primary">Evento</h4>
+                        <Badge variant="outline" className="bg-primary/10 text-primary border-primary/30">
                           {registrationData.event}
                         </Badge>
                       </div>
                       
-                      <div className="grid grid-cols-2 gap-y-3 gap-x-4 mt-3">
+                      <div className="grid grid-cols-2 gap-y-4 gap-x-4 mt-4">
                         <div>
                           <h4 className="text-xs text-muted-foreground">Idade</h4>
                           <p className="font-medium">{registrationData.age} anos</p>
@@ -257,7 +258,7 @@ const PaymentPage = () => {
                     </div>
                   </div>
                   
-                  <div className="pt-4 border-t space-y-2">
+                  <div className="pt-4 border-t space-y-3">
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Taxa de inscrição</span>
                       <span className="font-medium">R$ 80,00</span>
@@ -266,34 +267,47 @@ const PaymentPage = () => {
                       <span className="text-muted-foreground">Taxa de processamento</span>
                       <span className="font-medium">R$ 5,00</span>
                     </div>
-                    <div className="flex justify-between font-semibold text-lg mt-3 pt-3 border-t">
+                    <div className="flex justify-between font-semibold text-lg mt-4 pt-4 border-t border-border/30">
                       <span>Total</span>
                       <span className="text-primary">R$ 85,00</span>
                     </div>
                   </div>
                 </CardContent>
               </Card>
+              
+              <div className="mt-6 p-4 glass-morphism rounded-lg flex items-start gap-3">
+                <Shield className="h-5 w-5 text-primary mt-1 flex-shrink-0" />
+                <div>
+                  <h4 className="font-medium">Pagamento seguro</h4>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Seus dados estão protegidos e sua inscrição será confirmada imediatamente após o pagamento.
+                  </p>
+                </div>
+              </div>
             </div>
             
             {/* RIGHT COLUMNS - Payment Methods */}
             <div className="lg:col-span-2">
-              <Card className="shadow-md hover:shadow-lg transition-shadow">
-                <CardHeader className="bg-primary/5 border-b">
-                  <CardTitle>Método de Pagamento</CardTitle>
+              <Card className="shadow-lg hover:shadow-xl transition-shadow border-border/30 overflow-hidden">
+                <CardHeader className="bg-primary/10 border-b">
+                  <CardTitle className="flex items-center">
+                    <Receipt className="h-5 w-5 mr-2 text-primary" />
+                    Método de Pagamento
+                  </CardTitle>
                   <CardDescription>Escolha como deseja pagar por sua inscrição</CardDescription>
                 </CardHeader>
                 <CardContent className="p-6">
                   <Tabs defaultValue="card" onValueChange={setPaymentMethod} className="mt-2">
-                    <TabsList className="grid w-full grid-cols-3 mb-6">
-                      <TabsTrigger value="card" className="flex items-center gap-2">
+                    <TabsList className="grid w-full grid-cols-3 mb-8 bg-muted/50">
+                      <TabsTrigger value="card" className="flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
                         <CreditCard className="h-4 w-4" />
                         <span>Cartão</span>
                       </TabsTrigger>
-                      <TabsTrigger value="pix" className="flex items-center gap-2">
+                      <TabsTrigger value="pix" className="flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
                         <Zap className="h-4 w-4" />
                         <span>PIX</span>
                       </TabsTrigger>
-                      <TabsTrigger value="boleto" className="flex items-center gap-2">
+                      <TabsTrigger value="boleto" className="flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
                         <FileText className="h-4 w-4" />
                         <span>Boleto</span>
                       </TabsTrigger>
@@ -301,7 +315,7 @@ const PaymentPage = () => {
                     
                     <TabsContent value="card">
                       <Form {...form}>
-                        <form className="space-y-4">
+                        <form className="space-y-5">
                           <FormField
                             control={form.control}
                             name="cardName"
@@ -311,7 +325,7 @@ const PaymentPage = () => {
                                 <FormControl>
                                   <Input 
                                     placeholder="Nome impresso no cartão" 
-                                    className="bg-white border-input/80 focus:border-primary"
+                                    className="bg-muted/30 border-border/30 focus:border-primary"
                                     {...field} 
                                   />
                                 </FormControl>
@@ -329,7 +343,7 @@ const PaymentPage = () => {
                                 <FormControl>
                                   <Input 
                                     placeholder="0000 0000 0000 0000" 
-                                    className="bg-white border-input/80 focus:border-primary"
+                                    className="bg-muted/30 border-border/30 focus:border-primary"
                                     {...field} 
                                     maxLength={19}
                                     onChange={(e) => {
@@ -347,7 +361,7 @@ const PaymentPage = () => {
                             )}
                           />
                           
-                          <div className="grid grid-cols-2 gap-4">
+                          <div className="grid grid-cols-2 gap-5">
                             <FormField
                               control={form.control}
                               name="expiryDate"
@@ -357,7 +371,7 @@ const PaymentPage = () => {
                                   <FormControl>
                                     <Input 
                                       placeholder="MM/AA" 
-                                      className="bg-white border-input/80 focus:border-primary"
+                                      className="bg-muted/30 border-border/30 focus:border-primary"
                                       {...field} 
                                       maxLength={5}
                                       onChange={(e) => {
@@ -383,7 +397,7 @@ const PaymentPage = () => {
                                   <FormControl>
                                     <Input 
                                       placeholder="123" 
-                                      className="bg-white border-input/80 focus:border-primary"
+                                      className="bg-muted/30 border-border/30 focus:border-primary"
                                       {...field} 
                                       maxLength={4}
                                       onChange={(e) => {
@@ -402,28 +416,45 @@ const PaymentPage = () => {
                     </TabsContent>
                     
                     <TabsContent value="pix">
-                      <div className="rounded-lg border border-input/50 p-8 text-center">
-                        <div className="mx-auto mb-6 h-40 w-40 bg-muted/50 flex items-center justify-center rounded-lg border border-input/30">
-                          <p className="text-muted-foreground">QR Code PIX</p>
+                      <div className="glass-morphism rounded-lg p-8 text-center">
+                        <div className="mx-auto mb-6 h-48 w-48 flex items-center justify-center rounded-lg bg-muted/30 border-border/30 border">
+                          <svg width="100" height="100" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-primary/70">
+                            <path d="M25 25H35V35H25V25Z" fill="currentColor"/>
+                            <path d="M45 25H55V35H45V25Z" fill="currentColor"/>
+                            <path d="M65 25H75V35H65V25Z" fill="currentColor"/>
+                            <path d="M25 45H35V55H25V45Z" fill="currentColor"/>
+                            <path d="M45 45H55V55H45V45Z" fill="currentColor"/>
+                            <path d="M65 45H75V55H65V45Z" fill="currentColor"/>
+                            <path d="M25 65H35V75H25V65Z" fill="currentColor"/>
+                            <path d="M45 65H55V75H45V65Z" fill="currentColor"/>
+                            <path d="M65 65H75V75H65V65Z" fill="currentColor"/>
+                          </svg>
                         </div>
-                        <p className="text-sm text-muted-foreground">
+                        <p className="text-sm text-muted-foreground mb-4">
                           Escaneie o QR Code acima ou copie a chave PIX abaixo
                         </p>
-                        <div className="mt-4 p-3 bg-muted/30 rounded-lg flex items-center justify-between border border-input/20">
+                        <div className="p-3 bg-muted/30 rounded-lg flex items-center justify-between border border-border/20 mb-4">
                           <span className="text-sm truncate font-mono">pix@doheiseikan.com.br</span>
-                          <Button variant="outline" size="sm" className="bg-white">Copiar</Button>
+                          <Button variant="outline" size="sm" className="bg-primary/10 hover:bg-primary/20 border-border/30">Copiar</Button>
                         </div>
+                        <p className="text-xs text-primary/90">O pagamento via PIX é processado instantaneamente</p>
                       </div>
                     </TabsContent>
                     
                     <TabsContent value="boleto">
-                      <div className="rounded-lg border border-input/50 p-8 text-center">
-                        <FileText className="mx-auto mb-6 h-20 w-20 text-muted-foreground opacity-80" />
-                        <p className="text-sm text-muted-foreground mb-6">
+                      <div className="glass-morphism rounded-lg p-8 text-center">
+                        <FileText className="mx-auto mb-6 h-20 w-20 text-primary/70" />
+                        <p className="text-sm text-muted-foreground mb-6 max-w-md mx-auto">
                           Gere o boleto e realize o pagamento em qualquer banco ou casa lotérica.
                           <br />Vencimento em 3 dias úteis.
                         </p>
-                        <Button className="bg-primary hover:bg-primary/90">Gerar Boleto</Button>
+                        <Button className="bg-primary hover:bg-primary/90 text-white gap-2">
+                          <Receipt className="h-4 w-4" />
+                          <span>Gerar Boleto</span>
+                        </Button>
+                        <p className="text-xs text-muted-foreground mt-4">
+                          O boleto será enviado também para o seu e-mail
+                        </p>
                       </div>
                     </TabsContent>
                   </Tabs>
@@ -444,7 +475,7 @@ const PaymentPage = () => {
       </div>
       
       <AlertDialog open={isConfirmationOpen} onOpenChange={setIsConfirmationOpen}>
-        <AlertDialogContent className="max-w-md">
+        <AlertDialogContent className="max-w-md border-border/30 glass-card">
           <AlertDialogHeader>
             <AlertDialogTitle className="text-center text-xl flex items-center justify-center">
               <CheckCircle className="h-6 w-6 text-green-500 mr-2" />
