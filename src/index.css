@@ -5,49 +5,49 @@
 
 @layer base {
   :root {
-    /* Tema claro - valores ajustados para melhor contraste */
-    --background: 210 40% 98%;
-    --foreground: 222 60% 6%;
+    /* Valores que serão ignorados em favor do tema escuro */
+    --background: 225 15% 8%;
+    --foreground: 213 31% 91%;
     
-    --card: 0 0% 100%;
-    --card-foreground: 222 50% 6%;
+    --card: 225 12% 12%;
+    --card-foreground: 213 31% 91%;
     
-    --popover: 0 0% 100%;
-    --popover-foreground: 222 60% 6%;
+    --popover: 225 15% 8%;
+    --popover-foreground: 213 31% 91%;
     
     --primary: 357 86% 55%;
     --primary-foreground: 210 40% 98%;
     
-    --secondary: 210 40% 96%;
-    --secondary-foreground: 222 60% 6%;
+    --secondary: 222 14% 18%;
+    --secondary-foreground: 210 40% 98%;
     
-    --muted: 210 40% 96%;
-    --muted-foreground: 222 40% 40%;
+    --muted: 222 14% 18%;
+    --muted-foreground: 215 20.2% 65.1%;
     
-    --accent: 210 40% 96%;
-    --accent-foreground: 222 60% 6%;
+    --accent: 222 14% 18%;
+    --accent-foreground: 210 40% 98%;
     
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
     
-    --border: 214.3 31.8% 75%;
-    --input: 214.3 31.8% 75%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
     --ring: 357 86% 55%;
     
     --radius: 0.8rem;
 
-    --sidebar-background: 0 0% 100%;
-    --sidebar-foreground: 222 60% 6%;
+    --sidebar-background: 225 22% 6%;
+    --sidebar-foreground: 213 31% 91%;
     --sidebar-primary: 357 86% 55%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 210 40% 96%;
-    --sidebar-accent-foreground: 222 60% 6%;
-    --sidebar-border: 214.3 31.8% 75%;
+    --sidebar-accent: 223 14% 15%;
+    --sidebar-accent-foreground: 213 31% 91%;
+    --sidebar-border: 223 14% 15%;
     --sidebar-ring: 357 86% 55%;
   }
 
+  /* Mantemos a configuração dark, mas agora será aplicada como padrão */
   .dark {
-    /* Valores do tema escuro permanecem os mesmos */
     --background: 225 15% 8%;
     --foreground: 213 31% 91%;
     
@@ -101,22 +101,9 @@
     @apply scroll-smooth;
   }
   
-  /* Inside Dashboard - modo claro */
+  /* Inside Dashboard */
   .dashboard-active body {
     @apply bg-background text-foreground;
-  }
-  
-  /* Melhorar a legibilidade no modo claro */
-  .dashboard-active:not(.dark) body {
-    @apply text-gray-800 bg-gray-50;
-  }
-  
-  .dashboard-active:not(.dark) .text-muted-foreground {
-    @apply text-gray-600;
-  }
-
-  .dashboard-active:not(.dark) .bg-card {
-    @apply bg-white shadow-sm;
   }
   
   ::selection {
@@ -160,23 +147,6 @@
   
   .hover-glow {
     @apply transition-shadow duration-300 hover:shadow-md hover:shadow-primary/10;
-  }
-  
-  /* Modo claro: melhorar contraste e legibilidade */
-  .light-mode-enhanced-text {
-    @apply text-gray-800 dark:text-current;
-  }
-  
-  .light-mode-enhanced-bg {
-    @apply bg-white dark:bg-transparent shadow-sm dark:shadow-none;
-  }
-
-  :root:not(.dark) .sidebar-link {
-    @apply text-gray-700 hover:bg-gray-100;
-  }
-
-  :root:not(.dark) .sidebar-link.active {
-    @apply bg-gray-100 text-primary;
   }
   
   @keyframes pulse-slow {
