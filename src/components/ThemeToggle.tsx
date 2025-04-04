@@ -44,7 +44,7 @@ export function ThemeToggle({ className, iconOnly = false }: ThemeToggleProps) {
       variant="ghost"
       size={iconOnly ? "icon" : "default"}
       onClick={toggleTheme}
-      className={`rounded-full transition-all duration-300 ${className}`}
+      className={`rounded-full transition-all duration-300 ${className} ${theme === 'light' ? 'bg-gray-100 text-gray-800 hover:bg-gray-200' : ''}`}
       aria-label="Toggle theme"
     >
       {theme === "light" ? (

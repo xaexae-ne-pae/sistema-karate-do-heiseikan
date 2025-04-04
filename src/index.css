@@ -5,25 +5,26 @@
 
 @layer base {
   :root {
+    /* Tema claro - valores ajustados para melhor contraste */
     --background: 210 40% 98%;
     --foreground: 222 60% 6%;
     
-    --card: 210 40% 96.1%;
+    --card: 0 0% 100%;
     --card-foreground: 222 50% 6%;
     
-    --popover: 210 40% 98%;
+    --popover: 0 0% 100%;
     --popover-foreground: 222 60% 6%;
     
     --primary: 357 86% 55%;
     --primary-foreground: 210 40% 98%;
     
-    --secondary: 210 40% 86%;
+    --secondary: 210 40% 96%;
     --secondary-foreground: 222 60% 6%;
     
-    --muted: 210 40% 90%;
-    --muted-foreground: 222 40% 20%;
+    --muted: 210 40% 96%;
+    --muted-foreground: 222 40% 40%;
     
-    --accent: 210 40% 90%;
+    --accent: 210 40% 96%;
     --accent-foreground: 222 60% 6%;
     
     --destructive: 0 84.2% 60.2%;
@@ -35,17 +36,18 @@
     
     --radius: 0.8rem;
 
-    --sidebar-background: 210 40% 95%;
+    --sidebar-background: 0 0% 100%;
     --sidebar-foreground: 222 60% 6%;
     --sidebar-primary: 357 86% 55%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 210 40% 90%;
+    --sidebar-accent: 210 40% 96%;
     --sidebar-accent-foreground: 222 60% 6%;
     --sidebar-border: 214.3 31.8% 75%;
     --sidebar-ring: 357 86% 55%;
   }
 
   .dark {
+    /* Valores do tema escuro permanecem os mesmos */
     --background: 225 15% 8%;
     --foreground: 213 31% 91%;
     
@@ -99,18 +101,22 @@
     @apply scroll-smooth;
   }
   
-  /* Inside Dashboard */
+  /* Inside Dashboard - modo claro */
   .dashboard-active body {
     @apply bg-background text-foreground;
   }
   
   /* Melhorar a legibilidade no modo claro */
   .dashboard-active:not(.dark) body {
-    @apply text-gray-800;
+    @apply text-gray-800 bg-gray-50;
   }
   
   .dashboard-active:not(.dark) .text-muted-foreground {
     @apply text-gray-600;
+  }
+
+  .dashboard-active:not(.dark) .bg-card {
+    @apply bg-white shadow-sm;
   }
   
   ::selection {
@@ -163,6 +169,14 @@
   
   .light-mode-enhanced-bg {
     @apply bg-white dark:bg-transparent shadow-sm dark:shadow-none;
+  }
+
+  :root:not(.dark) .sidebar-link {
+    @apply text-gray-700 hover:bg-gray-100;
+  }
+
+  :root:not(.dark) .sidebar-link.active {
+    @apply bg-gray-100 text-primary;
   }
   
   @keyframes pulse-slow {
