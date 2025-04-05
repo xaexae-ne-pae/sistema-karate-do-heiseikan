@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { TournamentSidebar } from "@/components/TournamentSidebar";
@@ -344,6 +345,10 @@ const TournamentScoring = () => {
       });
     }
   };
+
+  const handleScoreMatch = (matchId: number) => {
+    navigate(`/scoring?matchId=${matchId}`);
+  };
   
   return (
     <div className="flex min-h-screen bg-background">
@@ -358,35 +363,37 @@ const TournamentScoring = () => {
         </header>
         
         <main className="px-8 py-6">
-          <Tabs defaultValue="kumite" onValueChange={setActiveTab} className="mb-6">
-            <TabsList className="w-full md:w-auto grid grid-cols-2 h-auto p-1 bg-muted/50">
-              <TabsTrigger 
-                value="kumite" 
-                className="flex items-center gap-2 py-3 px-5 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
-              >
-                <Swords className="h-4 w-4" />
-                <span>Kumite</span>
-              </TabsTrigger>
-              <TabsTrigger 
-                value="kata" 
-                className="flex items-center gap-2 py-3 px-5 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
-              >
-                <PenTool className="h-4 w-4" />
-                <span>Kata</span>
-              </TabsTrigger>
-            </TabsList>
+          <Tabs defaultValue="kumite" value={activeTab} onValueChange={setActiveTab} className="mb-6">
+            <div className="flex justify-between items-center mb-4">
+              <TabsList className="h-12 p-1 bg-background border">
+                <TabsTrigger 
+                  value="kumite" 
+                  className="flex items-center gap-2 py-2.5 px-8 data-[state=active]:bg-red-500 data-[state=active]:text-white rounded-none"
+                >
+                  <Swords className="h-4 w-4" />
+                  <span>Kumite</span>
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="kata" 
+                  className="flex items-center gap-2 py-2.5 px-8 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-none"
+                >
+                  <PenTool className="h-4 w-4" />
+                  <span>Kata</span>
+                </TabsTrigger>
+              </TabsList>
+            </div>
             
             <TabsContent value="kumite" className="pt-4">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {kumiteMatches.map((match) => (
-                  <Card key={match.id} className="overflow-hidden border-border/30 shadow-md hover:shadow-lg transition-all">
-                    <CardHeader className="bg-primary/10 border-b">
+                  <Card key={match.id} className="overflow-hidden border-border/30 bg-card/60">
+                    <CardHeader className="bg-card p-4 border-b">
                       <CardTitle className="text-lg">
                         {match.category}
                       </CardTitle>
                     </CardHeader>
-                    <CardContent className="p-6">
-                      <div className="flex items-center justify-between mb-4">
+                    <CardContent className="p-5">
+                      <div className="flex items-center justify-between mb-6">
                         <div className="flex items-center gap-2">
                           <div className="w-3 h-3 rounded-full bg-red-500"></div>
                           <span>{match.athlete1.name}</span>
@@ -399,8 +406,8 @@ const TournamentScoring = () => {
                       </div>
                       
                       <Button 
-                        className="w-full bg-primary hover:bg-primary/90 gap-2 mt-2"
-                        onClick={() => navigate(`/scoring?matchId=${match.id}`)}
+                        className="w-full bg-red-500 hover:bg-red-600 gap-2 mb-3"
+                        onClick={() => handleScoreMatch(match.id)}
                       >
                         <Trophy className="h-4 w-4" />
                         <span>Pontuar</span>
@@ -408,7 +415,7 @@ const TournamentScoring = () => {
                       
                       <Button 
                         variant="outline" 
-                        className="w-full mt-3 gap-2 border-border/30"
+                        className="w-full gap-2 border-border/30"
                         onClick={() => openFullScreenScoring(match.id, "kumite")}
                       >
                         <ExternalLink className="h-4 w-4" />
@@ -423,14 +430,14 @@ const TournamentScoring = () => {
             <TabsContent value="kata" className="pt-4">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {kataMatches.map((match) => (
-                  <Card key={match.id} className="overflow-hidden border-border/30 shadow-md hover:shadow-lg transition-all">
-                    <CardHeader className="bg-primary/10 border-b">
+                  <Card key={match.id} className="overflow-hidden border-border/30 bg-card/60">
+                    <CardHeader className="bg-card p-4 border-b">
                       <CardTitle className="text-lg">
                         {match.category}
                       </CardTitle>
                     </CardHeader>
-                    <CardContent className="p-6">
-                      <div className="flex items-center justify-between mb-4">
+                    <CardContent className="p-5">
+                      <div className="flex items-center justify-between mb-6">
                         <div className="flex items-center gap-2">
                           <div className="w-3 h-3 rounded-full bg-red-500"></div>
                           <span>{match.athlete1.name}</span>
@@ -443,8 +450,8 @@ const TournamentScoring = () => {
                       </div>
                       
                       <Button 
-                        className="w-full bg-primary hover:bg-primary/90 gap-2 mt-2"
-                        onClick={() => navigate(`/scoring?matchId=${match.id}`)}
+                        className="w-full bg-primary hover:bg-primary/90 gap-2 mb-3"
+                        onClick={() => handleScoreMatch(match.id)}
                       >
                         <Award className="h-4 w-4" />
                         <span>Pontuar</span>
@@ -452,7 +459,7 @@ const TournamentScoring = () => {
                       
                       <Button 
                         variant="outline" 
-                        className="w-full mt-3 gap-2 border-border/30"
+                        className="w-full gap-2 border-border/30"
                         onClick={() => openFullScreenScoring(match.id, "kata")}
                       >
                         <ExternalLink className="h-4 w-4" />
