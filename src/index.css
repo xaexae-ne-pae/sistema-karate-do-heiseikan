@@ -5,7 +5,6 @@
 
 @layer base {
   :root {
-    /* Valores que serão ignorados em favor do tema escuro */
     --background: 225 15% 8%;
     --foreground: 213 31% 91%;
     
@@ -35,46 +34,6 @@
     --ring: 357 86% 55%;
     
     --radius: 0.8rem;
-
-    --sidebar-background: 225 22% 6%;
-    --sidebar-foreground: 213 31% 91%;
-    --sidebar-primary: 357 86% 55%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 223 14% 15%;
-    --sidebar-accent-foreground: 213 31% 91%;
-    --sidebar-border: 223 14% 15%;
-    --sidebar-ring: 357 86% 55%;
-  }
-
-  /* Mantemos a configuração dark, mas agora será aplicada como padrão */
-  .dark {
-    --background: 225 15% 8%;
-    --foreground: 213 31% 91%;
-    
-    --card: 225 12% 12%;
-    --card-foreground: 213 31% 91%;
-    
-    --popover: 225 15% 8%;
-    --popover-foreground: 213 31% 91%;
-    
-    --primary: 357 86% 55%;
-    --primary-foreground: 210 40% 98%;
-    
-    --secondary: 222 14% 18%;
-    --secondary-foreground: 210 40% 98%;
-    
-    --muted: 222 14% 18%;
-    --muted-foreground: 215 20.2% 65.1%;
-    
-    --accent: 222 14% 18%;
-    --accent-foreground: 210 40% 98%;
-    
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-    
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 357 86% 55%;
 
     --sidebar-background: 225 22% 6%;
     --sidebar-foreground: 213 31% 91%;

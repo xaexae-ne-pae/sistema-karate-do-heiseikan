@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { Sidebar } from "@/components/Sidebar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Calendar, Flag, Plus, Search, Trophy, Users, ChevronRight, BarChart2, Shield } from "lucide-react";
+import { Calendar, Flag, Plus, Search, Trophy, Users, ChevronRight, Shield } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Tournament } from "@/types/tournament";
 import { useToast } from "@/hooks/use-toast";
@@ -44,11 +44,6 @@ const Tournaments = () => {
   
   const handleEnterTournament = (id: number) => {
     navigate(`/torneios/${id}`);
-  };
-  
-  const handleGoToScoring = (id: number, e: React.MouseEvent) => {
-    e.stopPropagation(); // Evita propagar o clique para o card do torneio
-    navigate(`/torneios/${id}/pontuacao`);
   };
   
   const filteredTournaments = tournaments.filter(tournament => 
@@ -184,15 +179,6 @@ const Tournaments = () => {
                             >
                               <span>Entrar no Torneio</span>
                               <ChevronRight className="h-4 w-4" />
-                            </Button>
-                            
-                            <Button 
-                              variant="outline" 
-                              className="px-3"
-                              onClick={(e) => handleGoToScoring(tournament.id, e)}
-                              title="Gerenciar Pontuação"
-                            >
-                              <BarChart2 className="h-4 w-4" />
                             </Button>
                           </div>
                         </div>
