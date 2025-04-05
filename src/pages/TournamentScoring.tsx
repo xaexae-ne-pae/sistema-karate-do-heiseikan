@@ -1,12 +1,12 @@
-
 import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { TournamentSidebar } from "@/components/TournamentSidebar";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Trophy, Swords, Award, PenTool, ExternalLink } from "lucide-react";
+import { Trophy, Swords, Award, PenTool } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { MatchCard } from "@/components/MatchCard";
 
 const TournamentScoring = () => {
   const { id: tournamentId } = useParams<{ id: string }>();
@@ -348,6 +348,8 @@ const TournamentScoring = () => {
 
   const handleScoreMatch = (matchId: number) => {
     navigate(`/scoring?matchId=${matchId}`);
+    const matchType = activeTab;
+    openFullScreenScoring(matchId, matchType);
   };
   
   return (
@@ -386,43 +388,15 @@ const TournamentScoring = () => {
             <TabsContent value="kumite" className="pt-4">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {kumiteMatches.map((match) => (
-                  <Card key={match.id} className="overflow-hidden border-border/30 bg-card/60">
-                    <CardHeader className="bg-card p-4 border-b">
-                      <CardTitle className="text-lg">
-                        {match.category}
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="p-5">
-                      <div className="flex items-center justify-between mb-6">
-                        <div className="flex items-center gap-2">
-                          <div className="w-3 h-3 rounded-full bg-red-500"></div>
-                          <span>{match.athlete1.name}</span>
-                        </div>
-                        <div className="font-bold text-lg">VS</div>
-                        <div className="flex items-center gap-2">
-                          <span>{match.athlete2.name}</span>
-                          <div className="w-3 h-3 rounded-full bg-blue-500"></div>
-                        </div>
-                      </div>
-                      
-                      <Button 
-                        className="w-full bg-red-500 hover:bg-red-600 gap-2 mb-3"
-                        onClick={() => handleScoreMatch(match.id)}
-                      >
-                        <Trophy className="h-4 w-4" />
-                        <span>Pontuar</span>
-                      </Button>
-                      
-                      <Button 
-                        variant="outline" 
-                        className="w-full gap-2 border-border/30"
-                        onClick={() => openFullScreenScoring(match.id, "kumite")}
-                      >
-                        <ExternalLink className="h-4 w-4" />
-                        <span>Tela Cheia</span>
-                      </Button>
-                    </CardContent>
-                  </Card>
+                  <MatchCard 
+                    key={match.id} 
+                    category={match.category}
+                    time="14:30"
+                    mat="Tatame 1"
+                    player1={match.athlete1.name}
+                    player2={match.athlete2.name}
+                    onScore={() => handleScoreMatch(match.id)}
+                  />
                 ))}
               </div>
             </TabsContent>
@@ -430,43 +404,15 @@ const TournamentScoring = () => {
             <TabsContent value="kata" className="pt-4">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {kataMatches.map((match) => (
-                  <Card key={match.id} className="overflow-hidden border-border/30 bg-card/60">
-                    <CardHeader className="bg-card p-4 border-b">
-                      <CardTitle className="text-lg">
-                        {match.category}
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="p-5">
-                      <div className="flex items-center justify-between mb-6">
-                        <div className="flex items-center gap-2">
-                          <div className="w-3 h-3 rounded-full bg-red-500"></div>
-                          <span>{match.athlete1.name}</span>
-                        </div>
-                        <div className="font-bold text-lg">VS</div>
-                        <div className="flex items-center gap-2">
-                          <span>{match.athlete2.name}</span>
-                          <div className="w-3 h-3 rounded-full bg-blue-500"></div>
-                        </div>
-                      </div>
-                      
-                      <Button 
-                        className="w-full bg-primary hover:bg-primary/90 gap-2 mb-3"
-                        onClick={() => handleScoreMatch(match.id)}
-                      >
-                        <Award className="h-4 w-4" />
-                        <span>Pontuar</span>
-                      </Button>
-                      
-                      <Button 
-                        variant="outline" 
-                        className="w-full gap-2 border-border/30"
-                        onClick={() => openFullScreenScoring(match.id, "kata")}
-                      >
-                        <ExternalLink className="h-4 w-4" />
-                        <span>Tela Cheia</span>
-                      </Button>
-                    </CardContent>
-                  </Card>
+                  <MatchCard 
+                    key={match.id} 
+                    category={match.category}
+                    time="15:45"
+                    mat="Tatame 2"
+                    player1={match.athlete1.name}
+                    player2={match.athlete2.name}
+                    onScore={() => handleScoreMatch(match.id)}
+                  />
                 ))}
               </div>
             </TabsContent>

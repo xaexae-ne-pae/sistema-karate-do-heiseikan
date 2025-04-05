@@ -13,9 +13,19 @@ interface MatchCardProps {
   player2: string;
   tournament?: string;
   round?: string;
+  onScore?: () => void;
 }
 
-export function MatchCard({ category, time, mat, player1, player2, tournament, round }: MatchCardProps) {
+export function MatchCard({ 
+  category, 
+  time, 
+  mat, 
+  player1, 
+  player2, 
+  tournament, 
+  round, 
+  onScore 
+}: MatchCardProps) {
   const [detailsOpen, setDetailsOpen] = useState(false);
   
   return (
@@ -55,8 +65,18 @@ export function MatchCard({ category, time, mat, player1, player2, tournament, r
             </div>
           </div>
           
+          {/* Botão de pontuar */}
+          <div className="flex justify-center">
+            <Button 
+              onClick={onScore}
+              className="w-full gap-2 bg-red-500 hover:bg-red-600"
+            >
+              <span className="text-sm">Pontuar</span>
+            </Button>
+          </div>
+          
           {/* Botão de detalhes */}
-          <div className="flex justify-end">
+          <div className="flex justify-end mt-3">
             <Button 
               variant="outline" 
               size="sm" 
