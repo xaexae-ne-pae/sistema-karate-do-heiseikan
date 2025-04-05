@@ -13,6 +13,7 @@ import TournamentDetails from "./pages/TournamentDetails";
 import TournamentAthletes from "./pages/TournamentAthletes";
 import TournamentCategories from "./pages/TournamentCategories";
 import TournamentResults from "./pages/TournamentResults";
+import AllMatches from "./pages/AllMatches";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 import { ProtectedRoute } from "./components/ProtectedRoute";
@@ -78,6 +79,13 @@ const App = () => (
           <Route path="/torneios/:id/resultados" element={
             <ProtectedRoute>
               <TournamentResults />
+            </ProtectedRoute>
+          } />
+          
+          {/* All Matches Page */}
+          <Route path="/todas-lutas" element={
+            <ProtectedRoute>
+              <AllMatches />
             </ProtectedRoute>
           } />
           

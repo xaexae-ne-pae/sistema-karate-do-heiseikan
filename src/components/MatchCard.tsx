@@ -13,7 +13,6 @@ interface MatchCardProps {
   player2: string;
   tournament?: string;
   round?: string;
-  onScore?: () => void;
 }
 
 export function MatchCard({ 
@@ -23,8 +22,7 @@ export function MatchCard({
   player1, 
   player2, 
   tournament, 
-  round, 
-  onScore 
+  round 
 }: MatchCardProps) {
   const [detailsOpen, setDetailsOpen] = useState(false);
   
@@ -63,16 +61,6 @@ export function MatchCard({
             <div className="flex-1">
               <div className="text-lg font-medium text-right">{player2}</div>
             </div>
-          </div>
-          
-          {/* Botão de pontuar */}
-          <div className="flex justify-center">
-            <Button 
-              onClick={onScore}
-              className="w-full gap-2 bg-red-500 hover:bg-red-600"
-            >
-              <span className="text-sm">Pontuar</span>
-            </Button>
           </div>
           
           {/* Botão de detalhes */}
