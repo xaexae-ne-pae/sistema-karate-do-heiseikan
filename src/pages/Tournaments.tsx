@@ -199,7 +199,7 @@ const Tournaments = () => {
                       </div>
                     ))}
                     
-                    <div 
+                    <button 
                       className="rounded-lg border border-dashed border-border flex flex-col items-center justify-center p-12 text-center cursor-pointer hover:border-primary/40 hover:bg-background/30 transition-colors"
                       onClick={handleCreateTournament}
                     >
@@ -210,7 +210,7 @@ const Tournaments = () => {
                       <p className="text-sm text-muted-foreground">
                         Crie um novo torneio para gerenciar
                       </p>
-                    </div>
+                    </button>
                   </div>
                 )}
               </div>
