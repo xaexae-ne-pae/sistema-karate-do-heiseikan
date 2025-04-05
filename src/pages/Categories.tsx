@@ -1,8 +1,10 @@
+
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Sidebar } from "@/components/Sidebar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Plus, Search, Tag, Pencil, Trash2, X } from "lucide-react";
+import { Plus, Search, Tag, Pencil, Trash2, X, BarChart2 } from "lucide-react";
 import { CategoriesList } from "@/components/CategoriesList";
 import { CategoryForm } from "@/components/CategoryForm";
 import {
@@ -21,6 +23,7 @@ interface Category {
 }
 
 const Categories = () => {
+  const navigate = useNavigate();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [editingCategory, setEditingCategory] = useState<Category | null>(null); // Usando o tipo 'Category'
@@ -35,6 +38,10 @@ const Categories = () => {
     setEditingCategory(null);
   };
 
+  const goToTournaments = () => {
+    navigate('/torneios');
+  };
+
   return (
     <div className="flex min-h-screen bg-background">
       <Sidebar />
@@ -47,6 +54,10 @@ const Categories = () => {
           </div>
           
           <div className="flex items-center gap-3">
+            <Button variant="outline" className="gap-2" onClick={goToTournaments}>
+              <BarChart2 className="h-4 w-4" />
+              <span>Pontuação</span>
+            </Button>
             <Button onClick={() => handleOpenDialog()} className="gap-2">
               <Tag className="h-4 w-4" />
               <span>Nova Categoria</span>

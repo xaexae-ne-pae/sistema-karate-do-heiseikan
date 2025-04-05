@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { Sidebar } from "@/components/Sidebar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Calendar, Flag, Plus, Search, Trophy, Users, ChevronRight, BarChart2 } from "lucide-react";
+import { Calendar, Flag, Plus, Search, Trophy, Users, ChevronRight, BarChart2, Shield } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Tournament } from "@/types/tournament";
 import { useToast } from "@/hooks/use-toast";

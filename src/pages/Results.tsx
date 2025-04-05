@@ -1,5 +1,5 @@
-
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Sidebar } from "@/components/Sidebar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -27,10 +27,14 @@ import { MatchResultCard } from "@/components/MatchResultCard";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const Results = () => {
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState("rankings");
   
-  // Dados fictícios para demonstração
+  const goToTournaments = () => {
+    navigate('/torneios');
+  };
+  
   const rankingsData = [
     { position: 1, name: "João Silva", category: "Kumite Masculino -75kg", points: 250, medals: { gold: 2, silver: 1, bronze: 0 } },
     { position: 2, name: "Carlos Eduardo", category: "Kumite Masculino -75kg", points: 210, medals: { gold: 1, silver: 2, bronze: 1 } },
@@ -105,6 +109,10 @@ const Results = () => {
           </div>
           
           <div className="flex items-center gap-3">
+            <Button variant="outline" className="gap-2" onClick={goToTournaments}>
+              <BarChart2 className="h-4 w-4" />
+              <span>Pontuação</span>
+            </Button>
             <Button variant="outline" className="gap-2">
               <Download className="h-4 w-4" />
               <span>Exportar</span>

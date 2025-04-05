@@ -1,4 +1,3 @@
-
 import { Award, Calendar, ChevronRight, List, Trophy, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { StatCard } from "@/components/StatCard";
@@ -138,9 +137,9 @@ const Dashboard = () => {
               <div className="space-y-4">
                 <ActionCard 
                   icon={Award} 
-                  title="Iniciar Pontuação" 
-                  description="Registrar pontos das lutas" 
-                  to="/torneios/1/pontuacao" 
+                  title="Gerenciar Torneios" 
+                  description="Acessar todos os torneios ativos" 
+                  to="/torneios" 
                 />
                 <ActionCard 
                   icon={List} 

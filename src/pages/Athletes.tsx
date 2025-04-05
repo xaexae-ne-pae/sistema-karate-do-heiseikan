@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Sidebar } from "@/components/Sidebar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -18,7 +18,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { UserPlus, Search, Filter, X } from "lucide-react";
+import { UserPlus, Search, Filter, X, BarChart2 } from "lucide-react";
 import { AthleteForm } from "@/components/AthleteForm";
 import { AthletesList } from "@/components/AthletesList";
 
@@ -36,6 +36,7 @@ interface Athlete {
 }
 
 const Athletes = () => {
+  const navigate = useNavigate();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [editingAthlete, setEditingAthlete] = useState<Athlete | null>(null);
@@ -69,6 +70,10 @@ const Athletes = () => {
 
   const handleAthleteUpdated = () => {
     setAthletesUpdated(prev => prev + 1);
+  };
+
+  const goToTournaments = () => {
+    navigate('/torneios');
   };
 
   const toggleBeltFilter = (belt: string) => {
@@ -120,6 +125,10 @@ const Athletes = () => {
           </div>
           
           <div className="flex items-center gap-3">
+            <Button variant="outline" className="gap-2" onClick={goToTournaments}>
+              <BarChart2 className="h-4 w-4" />
+              <span>Pontuação</span>
+            </Button>
             <Button onClick={() => handleOpenDialog()} className="gap-2">
               <UserPlus className="h-4 w-4" />
               <span>Novo Atleta</span>
