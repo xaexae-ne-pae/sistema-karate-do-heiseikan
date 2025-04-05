@@ -59,6 +59,13 @@ const Scoring = () => {
       type: "kumite"
     },
     {
+      id: 2,
+      category: "Kumite Feminino -61kg",
+      athlete1: { name: "Ana Pereira", color: "red" },
+      athlete2: { name: "Lúcia Fernandes", color: "blue" },
+      type: "kumite"
+    },
+    {
       id: 3,
       category: "Kumite Masculino -67kg",
       athlete1: { name: "Pedro Santos", color: "red" },
@@ -69,17 +76,24 @@ const Scoring = () => {
   
   const kataMatches: Match[] = [
     {
-      id: 2,
-      category: "Kata Feminino",
-      athlete1: { name: "Ana Pereira", color: "red" },
-      athlete2: { name: "Lúcia Fernandes", color: "blue" },
+      id: 4,
+      category: "Kata Individual Masculino",
+      athlete1: { name: "Ricardo Gomes", color: "red" },
+      athlete2: { name: "Henrique Lima", color: "blue" },
       type: "kata"
     },
     {
-      id: 4,
-      category: "Kata Masculino",
-      athlete1: { name: "Roberto Alves", color: "red" },
-      athlete2: { name: "Ricardo Mendes", color: "blue" },
+      id: 5,
+      category: "Kata Individual Feminino",
+      athlete1: { name: "Maria Oliveira", color: "red" },
+      athlete2: { name: "Juliana Costa", color: "blue" },
+      type: "kata"
+    },
+    {
+      id: 6,
+      category: "Kata por Equipes",
+      athlete1: { name: "Equipe Shotokan", color: "red" },
+      athlete2: { name: "Equipe Wado-Ryu", color: "blue" },
       type: "kata"
     },
   ];
@@ -90,8 +104,12 @@ const Scoring = () => {
     setActiveTab(matchType as "kumite" | "kata");
     
     if (matchId) {
+      // Determine which array to search based on the matchType
       const matches = matchType === "kumite" ? kumiteMatches : kataMatches;
+      
+      // Find the match by ID
       const match = matches.find(m => m.id === Number(matchId));
+      
       if (match) {
         setSelectedMatch(match);
         resetMatch();
@@ -338,7 +356,7 @@ const Scoring = () => {
         if (!win.closed) {
           console.log("Initializing fullscreen with current state");
           
-          fullscreenWindow.postMessage({
+          win.postMessage({
             type: 'UPDATE_SCORES',
             scores: {
               athlete1: { ...scores.athlete1, total: calculateTotal('athlete1') },
@@ -346,14 +364,14 @@ const Scoring = () => {
             }
           }, '*');
           
-          fullscreenWindow.postMessage({
+          win.postMessage({
             type: 'UPDATE_TIME',
             time,
             matchStarted,
             matchPaused
           }, '*');
           
-          fullscreenWindow.postMessage({
+          win.postMessage({
             type: 'UPDATE_PENALTIES',
             penalties
           }, '*');

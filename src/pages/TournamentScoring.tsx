@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { TournamentSidebar } from "@/components/TournamentSidebar";
@@ -347,9 +348,12 @@ const TournamentScoring = () => {
   };
 
   const handleScoreMatch = (matchId: number) => {
-    navigate(`/scoring?matchId=${matchId}`);
-    const matchType = activeTab;
-    openFullScreenScoring(matchId, matchType);
+    // Abre a tela de pontuação em tela cheia diretamente
+    openFullScreenScoring(matchId, activeTab);
+    
+    // Apenas navegue para a tela de pontuação sem abrir em tela cheia
+    // Isso foi comentado para resolver o problema de 404
+    // navigate(`/scoring?matchId=${matchId}`);
   };
   
   return (
