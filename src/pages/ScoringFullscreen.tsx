@@ -20,6 +20,11 @@ const ScoringFullscreen = () => {
   const [matchStarted, setMatchStarted] = useState(false);
   const [matchPaused, setMatchPaused] = useState(false);
   
+  // Log initial state
+  useEffect(() => {
+    console.log("ScoringFullscreen mounted. ID:", id, "Type:", matchType);
+  }, [id, matchType]);
+  
   // Formatar o tempo em MM:SS
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -31,6 +36,7 @@ const ScoringFullscreen = () => {
   useEffect(() => {
     // Em uma aplicação real, buscaria os dados da API
     const fetchMatch = () => {
+      console.log("Fetching match data for ID:", id, "Type:", matchType);
       // Simulando dados
       if (matchType === "kumite") {
         const kumiteMatches = [
@@ -86,15 +92,21 @@ const ScoringFullscreen = () => {
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
       const data = event.data;
+      console.log("Received message in fullscreen:", data);
       
       if (data.type === 'UPDATE_SCORES') {
+        console.log("Updating scores:", data.scores);
         setScores(data.scores);
       } else if (data.type === 'UPDATE_TIME') {
+        console.log("Updating time:", data.time, "Started:", data.matchStarted, "Paused:", data.matchPaused);
         setTime(data.time);
         setMatchStarted(data.matchStarted);
         setMatchPaused(data.matchPaused);
       } else if (data.type === 'UPDATE_PENALTIES') {
+        console.log("Updating penalties:", data.penalties);
         setPenalties(data.penalties);
+      } else if (data.type === 'REQUEST_STATE') {
+        console.log("Main window requested state");
       }
     };
 
@@ -102,6 +114,7 @@ const ScoringFullscreen = () => {
     
     // Solicitar estado atual
     if (window.opener) {
+      console.log("Requesting state from opener");
       window.opener.postMessage({ type: 'REQUEST_STATE', matchId: id }, '*');
     }
 
@@ -118,9 +131,9 @@ const ScoringFullscreen = () => {
     );
   }
   
-  // Cálculo de pontuação total
-  const totalPoints1 = scores.athlete1.yuko + (scores.athlete1.wazari * 2) + (scores.athlete1.ippon * 4);
-  const totalPoints2 = scores.athlete2.yuko + (scores.athlete2.wazari * 2) + (scores.athlete2.ippon * 4);
+  // Cálculo de pontuação total - usando os valores já calculados vindos da tela principal
+  const totalPoints1 = scores.athlete1.total || 0;
+  const totalPoints2 = scores.athlete2.total || 0;
   
   // Determinar o vencedor atual
   const winner = totalPoints1 > totalPoints2 ? 'athlete1' : totalPoints1 < totalPoints2 ? 'athlete2' : null;

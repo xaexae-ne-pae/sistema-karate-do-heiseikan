@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { Sidebar } from "@/components/Sidebar";
@@ -51,7 +50,6 @@ const Scoring = () => {
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const { toast } = useToast();
 
-  // Dados fictícios para demonstração
   const kumiteMatches: Match[] = [
     {
       id: 1,
@@ -86,7 +84,6 @@ const Scoring = () => {
     },
   ];
 
-  // Carregar a luta selecionada via query param
   useEffect(() => {
     const matchId = searchParams.get('matchId');
     const matchType = searchParams.get('type') || "kumite";
@@ -102,7 +99,6 @@ const Scoring = () => {
     }
   }, [searchParams]);
 
-  // Função para atualizar os pontos
   const updateScore = (athlete: 'athlete1' | 'athlete2', type: 'yuko' | 'wazari' | 'ippon', value: number) => {
     setScores(prev => ({
       ...prev,
@@ -112,9 +108,8 @@ const Scoring = () => {
       }
     }));
 
-    // Enviar atualização para a tela cheia
     if (fullscreenWindow && !fullscreenWindow.closed && selectedMatch) {
-      const calculatedScores = {
+      const updatedScores = {
         athlete1: {
           yuko: athlete === 'athlete1' && type === 'yuko' ? value : scores.athlete1.yuko,
           wazari: athlete === 'athlete1' && type === 'wazari' ? value : scores.athlete1.wazari,
@@ -135,14 +130,14 @@ const Scoring = () => {
         }
       };
 
+      console.log("Sending scores update to fullscreen:", updatedScores);
       fullscreenWindow.postMessage({
         type: 'UPDATE_SCORES',
-        scores: calculatedScores
+        scores: updatedScores
       }, '*');
     }
   };
   
-  // Função para atualizar as penalidades
   const updatePenalty = (athlete: 'athlete1' | 'athlete2', type: 'jogai' | 'chukoku' | 'keikoku', value: number) => {
     setPenalties(prev => ({
       ...prev,
@@ -152,8 +147,18 @@ const Scoring = () => {
       }
     }));
 
-    // Poderíamos enviar penalidades para a tela cheia se quisermos exibi-las lá também
-    // Por enquanto, vamos manter as penalidades apenas na interface de pontuação
+    if (fullscreenWindow && !fullscreenWindow.closed && selectedMatch) {
+      fullscreenWindow.postMessage({
+        type: 'UPDATE_PENALTIES',
+        penalties: {
+          ...penalties,
+          [athlete]: {
+            ...penalties[athlete],
+            [type]: value
+          }
+        }
+      }, '*');
+    }
   };
 
   const handleSelectMatch = (match: Match) => {
@@ -161,13 +166,14 @@ const Scoring = () => {
     resetMatch();
   };
 
-  // Configurar o efeito para o timer
   useEffect(() => {
+    console.log("Timer effect running. Started:", matchStarted, "Paused:", matchPaused);
+    
     if (matchStarted && !matchPaused) {
+      console.log("Starting/resuming timer");
       timerRef.current = setInterval(() => {
         setTime(prevTime => {
           if (prevTime <= 1) {
-            // Tempo acabou
             clearInterval(timerRef.current as NodeJS.Timeout);
             setMatchStarted(false);
             setMatchPaused(false);
@@ -184,11 +190,12 @@ const Scoring = () => {
         });
       }, 1000);
     } else if (timerRef.current) {
+      console.log("Clearing timer");
       clearInterval(timerRef.current);
     }
 
-    // Atualizar o timer na tela cheia
     if (fullscreenWindow && !fullscreenWindow.closed && selectedMatch) {
+      console.log("Sending timer update to fullscreen:", { time, matchStarted, matchPaused });
       fullscreenWindow.postMessage({
         type: 'UPDATE_TIME',
         time,
@@ -197,15 +204,25 @@ const Scoring = () => {
       }, '*');
     }
 
-    // Cleanup na desmontagem
     return () => {
       if (timerRef.current) {
         clearInterval(timerRef.current);
       }
     };
-  }, [matchStarted, matchPaused, time, toast, fullscreenWindow, selectedMatch]);
+  }, [matchStarted, matchPaused, toast, fullscreenWindow, selectedMatch]);
 
-  // Fechar a tela cheia ao desmontar
+  useEffect(() => {
+    if (fullscreenWindow && !fullscreenWindow.closed && selectedMatch) {
+      console.log("Sending timer update on time change:", { time, matchStarted, matchPaused });
+      fullscreenWindow.postMessage({
+        type: 'UPDATE_TIME',
+        time,
+        matchStarted,
+        matchPaused
+      }, '*');
+    }
+  }, [time, fullscreenWindow, selectedMatch, matchStarted, matchPaused]);
+
   useEffect(() => {
     return () => {
       if (fullscreenWindow && !fullscreenWindow.closed) {
@@ -215,15 +232,18 @@ const Scoring = () => {
   }, [fullscreenWindow]);
 
   const startMatch = () => {
+    console.log("Starting match");
     setMatchStarted(true);
     setMatchPaused(false);
   };
 
   const pauseMatch = () => {
+    console.log("Pausing match");
     setMatchPaused(true);
   };
 
   const resumeMatch = () => {
+    console.log("Resuming match");
     setMatchPaused(false);
   };
 
@@ -231,6 +251,7 @@ const Scoring = () => {
     if (timerRef.current) {
       clearInterval(timerRef.current);
     }
+    console.log("Resetting match");
     setMatchStarted(false);
     setMatchPaused(false);
     setTime(120);
@@ -243,8 +264,8 @@ const Scoring = () => {
       athlete2: { jogai: 0, chukoku: 0, keikoku: 0 }
     });
 
-    // Atualizar a tela cheia com o reset
     if (fullscreenWindow && !fullscreenWindow.closed && selectedMatch) {
+      console.log("Sending reset to fullscreen");
       fullscreenWindow.postMessage({
         type: 'UPDATE_SCORES',
         scores: {
@@ -258,6 +279,14 @@ const Scoring = () => {
         time: 120,
         matchStarted: false,
         matchPaused: false
+      }, '*');
+      
+      fullscreenWindow.postMessage({
+        type: 'UPDATE_PENALTIES',
+        penalties: {
+          athlete1: { jogai: 0, chukoku: 0, keikoku: 0 },
+          athlete2: { jogai: 0, chukoku: 0, keikoku: 0 }
+        }
       }, '*');
     }
   };
@@ -275,7 +304,6 @@ const Scoring = () => {
   const openFullScreen = () => {
     if (!selectedMatch) return;
     
-    // Verificar se já existe uma janela aberta para este match
     if (fullscreenWindow && !fullscreenWindow.closed) {
       fullscreenWindow.focus();
       toast({
@@ -294,7 +322,6 @@ const Scoring = () => {
     if (win) {
       setFullscreenWindow(win);
       
-      // Verificar quando a janela for fechada
       const checkClosed = setInterval(() => {
         if (win.closed) {
           clearInterval(checkClosed);
@@ -302,11 +329,11 @@ const Scoring = () => {
         }
       }, 1000);
       
-      // Enviar estado atual após um breve atraso para dar tempo à janela de carregar
       setTimeout(() => {
         if (!win.closed) {
-          // Enviar pontuação atual
-          win.postMessage({
+          console.log("Initializing fullscreen with current state");
+          
+          fullscreenWindow.postMessage({
             type: 'UPDATE_SCORES',
             scores: {
               athlete1: { ...scores.athlete1, total: calculateTotal('athlete1') },
@@ -314,12 +341,16 @@ const Scoring = () => {
             }
           }, '*');
           
-          // Enviar tempo atual
-          win.postMessage({
+          fullscreenWindow.postMessage({
             type: 'UPDATE_TIME',
             time,
             matchStarted,
             matchPaused
+          }, '*');
+          
+          fullscreenWindow.postMessage({
+            type: 'UPDATE_PENALTIES',
+            penalties
           }, '*');
         }
       }, 1000);

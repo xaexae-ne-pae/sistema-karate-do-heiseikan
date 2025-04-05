@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { TournamentSidebar } from "@/components/TournamentSidebar";
@@ -27,17 +26,27 @@ const TournamentScoring = () => {
     matchStarted: boolean,
     matchPaused: boolean
   }>>({});
+
+  // Referência para o estado atual das penalidades de cada luta
+  const matchPenaltiesRef = useRef<Record<number, {
+    athlete1: { jogai: number, chukoku: number, keikoku: number },
+    athlete2: { jogai: number, chukoku: number, keikoku: number }
+  }>>({});
   
   // Manipular mensagens da janela de tela cheia
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
+      console.log("Received message in tournament scoring:", event.data);
+      
       if (event.data.type === 'REQUEST_STATE') {
         const { matchId } = event.data;
         const matchIdNum = Number(matchId);
+        console.log("Fullscreen requested state for match:", matchIdNum);
         
         // Verificar se temos estado para este match
         if (matchScoresRef.current[matchIdNum]) {
           // Enviar pontuação atual
+          console.log("Sending scores to fullscreen:", matchScoresRef.current[matchIdNum]);
           event.source?.postMessage({
             type: 'UPDATE_SCORES',
             scores: matchScoresRef.current[matchIdNum]
@@ -45,6 +54,7 @@ const TournamentScoring = () => {
           
           // Enviar tempo atual
           if (matchTimersRef.current[matchIdNum]) {
+            console.log("Sending timer to fullscreen:", matchTimersRef.current[matchIdNum]);
             event.source?.postMessage({
               type: 'UPDATE_TIME',
               time: matchTimersRef.current[matchIdNum].time,
@@ -52,14 +62,47 @@ const TournamentScoring = () => {
               matchPaused: matchTimersRef.current[matchIdNum].matchPaused
             }, { targetOrigin: '*' } as WindowPostMessageOptions);
           }
+          
+          // Enviar penalidades
+          if (matchPenaltiesRef.current[matchIdNum]) {
+            console.log("Sending penalties to fullscreen:", matchPenaltiesRef.current[matchIdNum]);
+            event.source?.postMessage({
+              type: 'UPDATE_PENALTIES',
+              penalties: matchPenaltiesRef.current[matchIdNum]
+            }, { targetOrigin: '*' } as WindowPostMessageOptions);
+          }
+        } else {
+          console.log("No state found for match:", matchIdNum);
+          // Inicializar estado para este match
+          initializeMatchState(matchIdNum);
+          
+          // Enviar estado inicial
+          event.source?.postMessage({
+            type: 'UPDATE_SCORES',
+            scores: matchScoresRef.current[matchIdNum]
+          }, { targetOrigin: '*' } as WindowPostMessageOptions);
+          
+          event.source?.postMessage({
+            type: 'UPDATE_TIME',
+            time: matchTimersRef.current[matchIdNum].time,
+            matchStarted: matchTimersRef.current[matchIdNum].matchStarted,
+            matchPaused: matchTimersRef.current[matchIdNum].matchPaused
+          }, { targetOrigin: '*' } as WindowPostMessageOptions);
+          
+          event.source?.postMessage({
+            type: 'UPDATE_PENALTIES',
+            penalties: matchPenaltiesRef.current[matchIdNum]
+          }, { targetOrigin: '*' } as WindowPostMessageOptions);
         }
       }
     };
 
     window.addEventListener('message', handleMessage);
+    console.log("Message event listener added in tournament scoring");
     
     return () => {
       window.removeEventListener('message', handleMessage);
+      console.log("Message event listener removed in tournament scoring");
       
       // Fechar todas as janelas ao desmontar
       Object.values(activeFullScreenWindows).forEach(win => {
@@ -72,6 +115,8 @@ const TournamentScoring = () => {
   
   // Inicializar estado de pontuação para uma luta (quando necessário)
   const initializeMatchState = (matchId: number) => {
+    console.log("Initializing state for match:", matchId);
+    
     if (!matchScoresRef.current[matchId]) {
       matchScoresRef.current[matchId] = {
         athlete1: { yuko: 0, wazari: 0, ippon: 0, total: 0 },
@@ -86,12 +131,21 @@ const TournamentScoring = () => {
         matchPaused: false
       };
     }
+    
+    if (!matchPenaltiesRef.current[matchId]) {
+      matchPenaltiesRef.current[matchId] = {
+        athlete1: { jogai: 0, chukoku: 0, keikoku: 0 },
+        athlete2: { jogai: 0, chukoku: 0, keikoku: 0 }
+      };
+    }
   };
   
   // Função para atualizar pontos e notificar tela cheia
   const updateMatchScore = (matchId: number, athlete: 'athlete1' | 'athlete2', type: 'yuko' | 'wazari' | 'ippon', value: number) => {
     // Garantir que o estado existe
     initializeMatchState(matchId);
+    
+    console.log("Updating score for match:", matchId, "athlete:", athlete, "type:", type, "value:", value);
     
     // Atualizar pontuação
     matchScoresRef.current[matchId][athlete][type] = value;
@@ -103,8 +157,11 @@ const TournamentScoring = () => {
       (matchScoresRef.current[matchId][athlete].ippon * 4);
     
     // Enviar atualização para tela cheia
-    const fullScreenWindow = activeFullScreenWindows[`${matchId}-${athlete === 'athlete1' ? 'red' : 'blue'}`];
+    const fullScreenWindowKey = `${matchId}-window`;
+    const fullScreenWindow = activeFullScreenWindows[fullScreenWindowKey];
+    
     if (fullScreenWindow && !fullScreenWindow.closed) {
+      console.log("Sending score update to fullscreen:", matchScoresRef.current[matchId]);
       fullScreenWindow.postMessage({
         type: 'UPDATE_SCORES',
         scores: matchScoresRef.current[matchId]
@@ -117,6 +174,8 @@ const TournamentScoring = () => {
     // Garantir que o estado existe
     initializeMatchState(matchId);
     
+    console.log("Updating timer for match:", matchId, "time:", time, "started:", matchStarted, "paused:", matchPaused);
+    
     // Atualizar timer
     matchTimersRef.current[matchId] = {
       time,
@@ -125,16 +184,41 @@ const TournamentScoring = () => {
     };
     
     // Enviar atualização para todas as telas cheias deste match
-    Object.entries(activeFullScreenWindows).forEach(([key, win]) => {
-      if (key.startsWith(`${matchId}-`) && win && !win.closed) {
-        win.postMessage({
-          type: 'UPDATE_TIME',
-          time,
-          matchStarted,
-          matchPaused
-        }, '*');
-      }
-    });
+    const fullScreenWindowKey = `${matchId}-window`;
+    const fullScreenWindow = activeFullScreenWindows[fullScreenWindowKey];
+    
+    if (fullScreenWindow && !fullScreenWindow.closed) {
+      console.log("Sending timer update to fullscreen");
+      fullScreenWindow.postMessage({
+        type: 'UPDATE_TIME',
+        time,
+        matchStarted,
+        matchPaused
+      }, '*');
+    }
+  };
+
+  // Função para atualizar penalidades e notificar tela cheia
+  const updateMatchPenalties = (matchId: number, athlete: 'athlete1' | 'athlete2', type: 'jogai' | 'chukoku' | 'keikoku', value: number) => {
+    // Garantir que o estado existe
+    initializeMatchState(matchId);
+    
+    console.log("Updating penalties for match:", matchId, "athlete:", athlete, "type:", type, "value:", value);
+    
+    // Atualizar penalidades
+    matchPenaltiesRef.current[matchId][athlete][type] = value;
+    
+    // Enviar atualização para tela cheia
+    const fullScreenWindowKey = `${matchId}-window`;
+    const fullScreenWindow = activeFullScreenWindows[fullScreenWindowKey];
+    
+    if (fullScreenWindow && !fullScreenWindow.closed) {
+      console.log("Sending penalties update to fullscreen");
+      fullScreenWindow.postMessage({
+        type: 'UPDATE_PENALTIES',
+        penalties: matchPenaltiesRef.current[matchId]
+      }, '*');
+    }
   };
   
   // Dados fictícios para demonstração
@@ -183,10 +267,11 @@ const TournamentScoring = () => {
   const openFullScreenScoring = (matchId: number, matchType: string) => {
     const url = `/scoring-fullscreen/${matchId}?type=${matchType}`;
     const windowName = `fullscreen-scoring-${matchId}`;
+    const windowKey = `${matchId}-window`;
     
     // Verificar se já existe uma janela aberta para este match
-    if (activeFullScreenWindows[`${matchId}-window`] && !activeFullScreenWindows[`${matchId}-window`]?.closed) {
-      activeFullScreenWindows[`${matchId}-window`]?.focus();
+    if (activeFullScreenWindows[windowKey] && !activeFullScreenWindows[windowKey]?.closed) {
+      activeFullScreenWindows[windowKey]?.focus();
       toast({
         title: "Tela já aberta",
         description: "A tela de pontuação já está aberta em outra janela",
@@ -195,6 +280,8 @@ const TournamentScoring = () => {
       return;
     }
     
+    console.log("Opening fullscreen window for match:", matchId, "type:", matchType);
+    
     // Abrir nova janela
     const win = window.open(url, windowName, 'fullscreen=yes,menubar=no,toolbar=no,location=no');
     
@@ -202,7 +289,7 @@ const TournamentScoring = () => {
       // Armazenar referência à janela
       setActiveFullScreenWindows(prev => ({
         ...prev,
-        [`${matchId}-window`]: win
+        [windowKey]: win
       }));
       
       // Inicializar estado
@@ -214,9 +301,33 @@ const TournamentScoring = () => {
           clearInterval(checkClosed);
           setActiveFullScreenWindows(prev => {
             const updated = { ...prev };
-            delete updated[`${matchId}-window`];
+            delete updated[windowKey];
             return updated;
           });
+          console.log("Fullscreen window closed for match:", matchId);
+        }
+      }, 1000);
+      
+      // Inicializar a tela cheia com os dados atuais após um breve atraso
+      setTimeout(() => {
+        if (!win.closed) {
+          console.log("Initializing fullscreen with data for match:", matchId);
+          win.postMessage({
+            type: 'UPDATE_SCORES',
+            scores: matchScoresRef.current[matchId]
+          }, '*');
+          
+          win.postMessage({
+            type: 'UPDATE_TIME',
+            time: matchTimersRef.current[matchId].time,
+            matchStarted: matchTimersRef.current[matchId].matchStarted,
+            matchPaused: matchTimersRef.current[matchId].matchPaused
+          }, '*');
+          
+          win.postMessage({
+            type: 'UPDATE_PENALTIES',
+            penalties: matchPenaltiesRef.current[matchId]
+          }, '*');
         }
       }, 1000);
       
