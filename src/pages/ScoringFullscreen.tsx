@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from "react";
 import { useParams, useSearchParams } from "react-router-dom";
-import { Timer, Trophy } from "lucide-react";
+import { Timer, Trophy, AlertTriangle, Flag, Minus } from "lucide-react";
 
 const ScoringFullscreen = () => {
   const { id } = useParams<{ id: string }>();
@@ -12,6 +12,10 @@ const ScoringFullscreen = () => {
   const [scores, setScores] = useState({
     athlete1: { yuko: 0, wazari: 0, ippon: 0, total: 0 },
     athlete2: { yuko: 0, wazari: 0, ippon: 0, total: 0 }
+  });
+  const [penalties, setPenalties] = useState({
+    athlete1: { jogai: 0, chukoku: 0, keikoku: 0 },
+    athlete2: { jogai: 0, chukoku: 0, keikoku: 0 }
   });
   const [matchStarted, setMatchStarted] = useState(false);
   const [matchPaused, setMatchPaused] = useState(false);
@@ -89,6 +93,8 @@ const ScoringFullscreen = () => {
         setTime(data.time);
         setMatchStarted(data.matchStarted);
         setMatchPaused(data.matchPaused);
+      } else if (data.type === 'UPDATE_PENALTIES') {
+        setPenalties(data.penalties);
       }
     };
 
@@ -130,6 +136,7 @@ const ScoringFullscreen = () => {
         
         <div className={`flex items-center justify-center gap-2 px-5 py-2 rounded-lg font-mono text-2xl
           ${time <= 10 ? "bg-red-500/30 text-red-500" : "bg-black/30"}
+          ${!matchStarted || matchPaused ? "animate-pulse" : ""}
         `}>
           <Timer className={`h-5 w-5 ${time <= 10 ? "text-red-500" : "text-white"}`} />
           <span>{formatTime(time)}</span>
@@ -184,6 +191,17 @@ const ScoringFullscreen = () => {
           </div>
         </div>
       </main>
+      
+      {/* Status do jogo */}
+      <div className="py-2 px-6 bg-black/60 text-center">
+        {!matchStarted ? (
+          <span className="text-yellow-400 font-medium">Aguardando início da luta</span>
+        ) : matchPaused ? (
+          <span className="text-yellow-400 font-medium">Luta pausada</span>
+        ) : (
+          <span className="text-green-400 font-medium">Luta em andamento</span>
+        )}
+      </div>
       
       {/* Informações de rodapé */}
       <footer className="py-4 px-6 bg-black/50 flex justify-between items-center">

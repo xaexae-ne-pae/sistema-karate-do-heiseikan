@@ -8,15 +8,15 @@ import {
   Activity,
   Trophy,
   Timer,
-  Flag,
   Play,
   Pause,
   RotateCcw,
-  AlertTriangle,
-  Minus,
-  ExternalLink
+  ExternalLink,
+  Swords,
+  PenTool
 } from "lucide-react";
 import { ScoringPanel } from "@/components/ScoringPanel";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface Athlete {
   name: string;
@@ -28,6 +28,7 @@ interface Match {
   category: string;
   athlete1: Athlete;
   athlete2: Athlete;
+  type: "kumite" | "kata";
 }
 
 const Scoring = () => {
@@ -37,41 +38,63 @@ const Scoring = () => {
   const [matchPaused, setMatchPaused] = useState(false);
   const [time, setTime] = useState(120); // 2 minutes in seconds
   const [selectedMatch, setSelectedMatch] = useState<Match | null>(null);
+  const [activeTab, setActiveTab] = useState<"kumite" | "kata">("kumite");
   const [scores, setScores] = useState({
     athlete1: { yuko: 0, wazari: 0, ippon: 0 },
     athlete2: { yuko: 0, wazari: 0, ippon: 0 }
+  });
+  const [penalties, setPenalties] = useState({
+    athlete1: { jogai: 0, chukoku: 0, keikoku: 0 },
+    athlete2: { jogai: 0, chukoku: 0, keikoku: 0 }
   });
   const [fullscreenWindow, setFullscreenWindow] = useState<Window | null>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const { toast } = useToast();
 
   // Dados fictícios para demonstração
-  const upcomingMatches: Match[] = [
+  const kumiteMatches: Match[] = [
     {
       id: 1,
       category: "Kumite Masculino -75kg",
       athlete1: { name: "João Silva", color: "red" },
       athlete2: { name: "Carlos Eduardo", color: "blue" },
-    },
-    {
-      id: 2,
-      category: "Kata Feminino",
-      athlete1: { name: "Ana Pereira", color: "red" },
-      athlete2: { name: "Lúcia Fernandes", color: "blue" },
+      type: "kumite"
     },
     {
       id: 3,
       category: "Kumite Masculino -67kg",
       athlete1: { name: "Pedro Santos", color: "red" },
       athlete2: { name: "Fernando Costa", color: "blue" },
+      type: "kumite"
+    },
+  ];
+  
+  const kataMatches: Match[] = [
+    {
+      id: 2,
+      category: "Kata Feminino",
+      athlete1: { name: "Ana Pereira", color: "red" },
+      athlete2: { name: "Lúcia Fernandes", color: "blue" },
+      type: "kata"
+    },
+    {
+      id: 4,
+      category: "Kata Masculino",
+      athlete1: { name: "Roberto Alves", color: "red" },
+      athlete2: { name: "Ricardo Mendes", color: "blue" },
+      type: "kata"
     },
   ];
 
   // Carregar a luta selecionada via query param
   useEffect(() => {
     const matchId = searchParams.get('matchId');
+    const matchType = searchParams.get('type') || "kumite";
+    setActiveTab(matchType as "kumite" | "kata");
+    
     if (matchId) {
-      const match = upcomingMatches.find(m => m.id === Number(matchId));
+      const matches = matchType === "kumite" ? kumiteMatches : kataMatches;
+      const match = matches.find(m => m.id === Number(matchId));
       if (match) {
         setSelectedMatch(match);
         resetMatch();
@@ -117,6 +140,20 @@ const Scoring = () => {
         scores: calculatedScores
       }, '*');
     }
+  };
+  
+  // Função para atualizar as penalidades
+  const updatePenalty = (athlete: 'athlete1' | 'athlete2', type: 'jogai' | 'chukoku' | 'keikoku', value: number) => {
+    setPenalties(prev => ({
+      ...prev,
+      [athlete]: {
+        ...prev[athlete],
+        [type]: value
+      }
+    }));
+
+    // Poderíamos enviar penalidades para a tela cheia se quisermos exibi-las lá também
+    // Por enquanto, vamos manter as penalidades apenas na interface de pontuação
   };
 
   const handleSelectMatch = (match: Match) => {
@@ -201,6 +238,10 @@ const Scoring = () => {
       athlete1: { yuko: 0, wazari: 0, ippon: 0 },
       athlete2: { yuko: 0, wazari: 0, ippon: 0 }
     });
+    setPenalties({
+      athlete1: { jogai: 0, chukoku: 0, keikoku: 0 },
+      athlete2: { jogai: 0, chukoku: 0, keikoku: 0 }
+    });
 
     // Atualizar a tela cheia com o reset
     if (fullscreenWindow && !fullscreenWindow.closed && selectedMatch) {
@@ -245,8 +286,7 @@ const Scoring = () => {
       return;
     }
 
-    const matchType = selectedMatch.category.toLowerCase().includes('kata') ? 'kata' : 'kumite';
-    const url = `/scoring-fullscreen/${selectedMatch.id}?type=${matchType}`;
+    const url = `/scoring-fullscreen/${selectedMatch.id}?type=${selectedMatch.type}`;
     const windowName = `fullscreen-scoring-${selectedMatch.id}`;
     
     const win = window.open(url, windowName, 'fullscreen=yes,menubar=no,toolbar=no,location=no');
@@ -262,6 +302,28 @@ const Scoring = () => {
         }
       }, 1000);
       
+      // Enviar estado atual após um breve atraso para dar tempo à janela de carregar
+      setTimeout(() => {
+        if (!win.closed) {
+          // Enviar pontuação atual
+          win.postMessage({
+            type: 'UPDATE_SCORES',
+            scores: {
+              athlete1: { ...scores.athlete1, total: calculateTotal('athlete1') },
+              athlete2: { ...scores.athlete2, total: calculateTotal('athlete2') }
+            }
+          }, '*');
+          
+          // Enviar tempo atual
+          win.postMessage({
+            type: 'UPDATE_TIME',
+            time,
+            matchStarted,
+            matchPaused
+          }, '*');
+        }
+      }, 1000);
+      
       toast({
         title: "Tela de pontuação aberta",
         description: "A tela de pontuação foi aberta em uma nova janela",
@@ -274,6 +336,11 @@ const Scoring = () => {
         variant: "destructive",
       });
     }
+  };
+
+  const handleTabChange = (tab: string) => {
+    setActiveTab(tab as "kumite" | "kata");
+    setSelectedMatch(null);
   };
 
   return (
@@ -339,7 +406,13 @@ const Scoring = () => {
                     <RotateCcw className="h-4 w-4" />
                   </Button>
                   
-                  <Button onClick={openFullScreen} size="icon" variant="outline" className="ml-2">
+                  <Button 
+                    onClick={openFullScreen} 
+                    size="icon" 
+                    variant="outline" 
+                    className="ml-2"
+                    title="Abrir em tela cheia"
+                  >
                     <ExternalLink className="h-4 w-4" />
                   </Button>
                 </div>
@@ -354,96 +427,76 @@ const Scoring = () => {
         </header>
 
         <main className="p-6">
-          {selectedMatch ? (
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              <div className="lg:col-span-2 space-y-6">
-                <ScoringPanel
-                  match={selectedMatch}
-                  isActive={matchStarted && !matchPaused}
-                  scores={scores}
-                  onUpdateScore={updateScore}
-                />
-              </div>
+          <Tabs defaultValue="kumite" value={activeTab} onValueChange={handleTabChange} className="mb-6">
+            <TabsList className="w-full md:w-auto grid grid-cols-2 h-auto p-1 bg-muted/50">
+              <TabsTrigger 
+                value="kumite" 
+                className="flex items-center gap-2 py-3 px-5 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+              >
+                <Swords className="h-4 w-4" />
+                <span>Kumite</span>
+              </TabsTrigger>
+              <TabsTrigger 
+                value="kata" 
+                className="flex items-center gap-2 py-3 px-5 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+              >
+                <PenTool className="h-4 w-4" />
+                <span>Kata</span>
+              </TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="kumite" className="pt-4">
+              {selectedMatch ? (
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                  <div className="lg:col-span-2 space-y-6">
+                    <ScoringPanel
+                      match={selectedMatch}
+                      isActive={matchStarted && !matchPaused}
+                      scores={scores}
+                      onUpdateScore={updateScore}
+                      penalties={penalties}
+                      onUpdatePenalty={updatePenalty}
+                    />
+                  </div>
 
-              <div className="space-y-6">
-                <div className="glass-card rounded-lg p-5">
-                  <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                    <Activity className="h-5 w-5 text-primary" />
-                    Penalidades
-                  </h2>
+                  <div className="space-y-6">
+                    <div className="glass-card rounded-lg p-5">
+                      <h2 className="text-lg font-semibold mb-4">Próximas Lutas</h2>
 
-                  <div className="space-y-4">
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <div className="w-3 h-3 rounded-full bg-red-500"></div>
-                          <span className="font-medium">{selectedMatch.athlete1.name}</span>
-                        </div>
-                        <div className="flex gap-2">
-                          <Button size="sm" variant="outline" className="h-8 w-8 p-0">
-                            <span className="sr-only">Jogai</span>
-                            <Flag className="h-4 w-4" />
-                          </Button>
-                          <Button size="sm" variant="outline" className="h-8 w-8 p-0">
-                            <span className="sr-only">Chukoku</span>
-                            <AlertTriangle className="h-4 w-4" />
-                          </Button>
-                          <Button size="sm" variant="outline" className="h-8 w-8 p-0">
-                            <span className="sr-only">Keikoku</span>
-                            <Minus className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </div>
-
-                      <div className="flex justify-end gap-1">
-                        <Badge count={0} />
-                        <Badge count={0} />
-                        <Badge count={0} />
-                      </div>
-                    </div>
-
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <div className="w-3 h-3 rounded-full bg-blue-500"></div>
-                          <span className="font-medium">{selectedMatch.athlete2.name}</span>
-                        </div>
-                        <div className="flex gap-2">
-                          <Button size="sm" variant="outline" className="h-8 w-8 p-0">
-                            <span className="sr-only">Jogai</span>
-                            <Flag className="h-4 w-4" />
-                          </Button>
-                          <Button size="sm" variant="outline" className="h-8 w-8 p-0">
-                            <span className="sr-only">Chukoku</span>
-                            <AlertTriangle className="h-4 w-4" />
-                          </Button>
-                          <Button size="sm" variant="outline" className="h-8 w-8 p-0">
-                            <span className="sr-only">Keikoku</span>
-                            <Minus className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </div>
-
-                      <div className="flex justify-end gap-1">
-                        <Badge count={0} />
-                        <Badge count={0} />
-                        <Badge count={0} />
+                      <div className="space-y-3">
+                        {kumiteMatches
+                          .filter((match) => match.id !== selectedMatch?.id)
+                          .map((match) => (
+                            <button
+                              key={match.id}
+                              onClick={() => handleSelectMatch(match)}
+                              className="w-full p-3 rounded-md border border-border hover:border-primary hover:bg-primary/5 transition-colors text-left"
+                            >
+                              <p className="font-medium">{match.category}</p>
+                              <p className="text-sm text-muted-foreground">
+                                {match.athlete1.name} vs {match.athlete2.name}
+                              </p>
+                            </button>
+                          ))}
                       </div>
                     </div>
                   </div>
                 </div>
+              ) : (
+                <div className="text-center py-16 border rounded-lg border-dashed">
+                  <div className="mx-auto flex flex-col items-center">
+                    <Trophy className="h-10 w-10 text-muted-foreground mb-3" />
+                    <h3 className="text-lg font-medium mb-1">Selecione uma luta para pontuar</h3>
+                    <p className="text-muted-foreground mb-4 max-w-md">
+                      Escolha uma das lutas abaixo para começar a registrar pontuações.
+                    </p>
 
-                <div className="glass-card rounded-lg p-5">
-                  <h2 className="text-lg font-semibold mb-4">Próximas Lutas</h2>
-
-                  <div className="space-y-3">
-                    {upcomingMatches
-                      .filter((match) => match.id !== selectedMatch?.id)
-                      .map((match) => (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 max-w-4xl mx-auto">
+                      {kumiteMatches.map((match) => (
                         <button
                           key={match.id}
                           onClick={() => handleSelectMatch(match)}
-                          className="w-full p-3 rounded-md border border-border hover:border-primary hover:bg-primary/5 transition-colors text-left"
+                          className="p-4 rounded-md border border-border hover:border-primary hover:bg-primary/5 transition-colors text-left"
                         >
                           <p className="font-medium">{match.category}</p>
                           <p className="text-sm text-muted-foreground">
@@ -451,52 +504,81 @@ const Scoring = () => {
                           </p>
                         </button>
                       ))}
+                    </div>
                   </div>
                 </div>
-              </div>
-            </div>
-          ) : (
-            <div className="text-center py-16 border rounded-lg border-dashed">
-              <div className="mx-auto flex flex-col items-center">
-                <Trophy className="h-10 w-10 text-muted-foreground mb-3" />
-                <h3 className="text-lg font-medium mb-1">Selecione uma luta para pontuar</h3>
-                <p className="text-muted-foreground mb-4 max-w-md">
-                  Escolha uma das lutas abaixo para começar a registrar pontuações e penalidades.
-                </p>
+              )}
+            </TabsContent>
+            
+            <TabsContent value="kata" className="pt-4">
+              {selectedMatch ? (
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                  <div className="lg:col-span-2 space-y-6">
+                    <ScoringPanel
+                      match={selectedMatch}
+                      isActive={matchStarted && !matchPaused}
+                      scores={scores}
+                      onUpdateScore={updateScore}
+                      penalties={penalties}
+                      onUpdatePenalty={updatePenalty}
+                    />
+                  </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 max-w-4xl mx-auto">
-                  {upcomingMatches.map((match) => (
-                    <button
-                      key={match.id}
-                      onClick={() => handleSelectMatch(match)}
-                      className="p-4 rounded-md border border-border hover:border-primary hover:bg-primary/5 transition-colors text-left"
-                    >
-                      <p className="font-medium">{match.category}</p>
-                      <p className="text-sm text-muted-foreground">
-                        {match.athlete1.name} vs {match.athlete2.name}
-                      </p>
-                    </button>
-                  ))}
+                  <div className="space-y-6">
+                    <div className="glass-card rounded-lg p-5">
+                      <h2 className="text-lg font-semibold mb-4">Próximas Lutas</h2>
+
+                      <div className="space-y-3">
+                        {kataMatches
+                          .filter((match) => match.id !== selectedMatch?.id)
+                          .map((match) => (
+                            <button
+                              key={match.id}
+                              onClick={() => handleSelectMatch(match)}
+                              className="w-full p-3 rounded-md border border-border hover:border-primary hover:bg-primary/5 transition-colors text-left"
+                            >
+                              <p className="font-medium">{match.category}</p>
+                              <p className="text-sm text-muted-foreground">
+                                {match.athlete1.name} vs {match.athlete2.name}
+                              </p>
+                            </button>
+                          ))}
+                      </div>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
-          )}
+              ) : (
+                <div className="text-center py-16 border rounded-lg border-dashed">
+                  <div className="mx-auto flex flex-col items-center">
+                    <Trophy className="h-10 w-10 text-muted-foreground mb-3" />
+                    <h3 className="text-lg font-medium mb-1">Selecione uma luta para pontuar</h3>
+                    <p className="text-muted-foreground mb-4 max-w-md">
+                      Escolha uma das lutas abaixo para começar a registrar pontuações.
+                    </p>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 max-w-4xl mx-auto">
+                      {kataMatches.map((match) => (
+                        <button
+                          key={match.id}
+                          onClick={() => handleSelectMatch(match)}
+                          className="p-4 rounded-md border border-border hover:border-primary hover:bg-primary/5 transition-colors text-left"
+                        >
+                          <p className="font-medium">{match.category}</p>
+                          <p className="text-sm text-muted-foreground">
+                            {match.athlete1.name} vs {match.athlete2.name}
+                          </p>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </TabsContent>
+          </Tabs>
         </main>
       </div>
     </div>
   );
 };
-
-function Badge({ count }: { count: number }) {
-  return (
-    <div
-      className={`h-6 w-6 rounded-full flex items-center justify-center text-xs font-medium ${
-        count > 0 ? "bg-primary/20 text-primary" : "bg-muted"
-      }`}
-    >
-      {count}
-    </div>
-  );
-}
 
 export default Scoring;

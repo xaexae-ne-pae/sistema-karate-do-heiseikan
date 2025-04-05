@@ -123,7 +123,7 @@ const App = () => (
             </ProtectedRoute>
           } />
           
-          {/* Tela Cheia de Pontuação */}
+          {/* Tela Cheia de Pontuação - Deixando fora da proteção para facilitar o acesso em TVs públicas */}
           <Route path="/scoring-fullscreen/:id" element={<ScoringFullscreen />} />
           
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

@@ -1,6 +1,7 @@
 
 import { Button } from "@/components/ui/button";
-import { ChevronsUp, ChevronUp, Award } from "lucide-react";
+import { ChevronsUp, ChevronUp, Award, Flag, AlertTriangle, Minus } from "lucide-react";
+import { useState } from "react";
 
 interface ScoringPanelProps {
   match: {
@@ -15,9 +16,24 @@ interface ScoringPanelProps {
     athlete2: { yuko: number, wazari: number, ippon: number };
   };
   onUpdateScore: (athlete: 'athlete1' | 'athlete2', type: 'yuko' | 'wazari' | 'ippon', value: number) => void;
+  penalties?: {
+    athlete1: { jogai: number, chukoku: number, keikoku: number };
+    athlete2: { jogai: number, chukoku: number, keikoku: number };
+  };
+  onUpdatePenalty?: (athlete: 'athlete1' | 'athlete2', type: 'jogai' | 'chukoku' | 'keikoku', value: number) => void;
 }
 
-export function ScoringPanel({ match, isActive, scores, onUpdateScore }: ScoringPanelProps) {
+export function ScoringPanel({ 
+  match, 
+  isActive, 
+  scores, 
+  onUpdateScore,
+  penalties = {
+    athlete1: { jogai: 0, chukoku: 0, keikoku: 0 },
+    athlete2: { jogai: 0, chukoku: 0, keikoku: 0 }
+  },
+  onUpdatePenalty
+}: ScoringPanelProps) {
   const addPoint = (athlete: 'athlete1' | 'athlete2', type: 'yuko' | 'wazari' | 'ippon') => {
     if (!isActive) return;
     
@@ -29,6 +45,19 @@ export function ScoringPanel({ match, isActive, scores, onUpdateScore }: Scoring
     if (scores[athlete][type] <= 0) return;
     
     onUpdateScore(athlete, type, scores[athlete][type] - 1);
+  };
+
+  const addPenalty = (athlete: 'athlete1' | 'athlete2', type: 'jogai' | 'chukoku' | 'keikoku') => {
+    if (!isActive || !onUpdatePenalty) return;
+    
+    onUpdatePenalty(athlete, type, (penalties[athlete][type] || 0) + 1);
+  };
+  
+  const removePenalty = (athlete: 'athlete1' | 'athlete2', type: 'jogai' | 'chukoku' | 'keikoku') => {
+    if (!isActive || !onUpdatePenalty) return;
+    if ((penalties[athlete][type] || 0) <= 0) return;
+    
+    onUpdatePenalty(athlete, type, penalties[athlete][type] - 1);
   };
 
   const calculateTotal = (athlete: 'athlete1' | 'athlete2') => {
@@ -52,7 +81,7 @@ export function ScoringPanel({ match, isActive, scores, onUpdateScore }: Scoring
         <h2 className="text-lg font-semibold">Pontuação</h2>
       </div>
       
-      <div className="grid grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className={`rounded-lg p-5 border-2 ${winner === 'athlete1' ? 'border-red-500 bg-red-500/5' : 'border-muted'}`}>
           <div className="flex justify-between items-center mb-4">
             <div className="flex items-center gap-2">
@@ -62,7 +91,7 @@ export function ScoringPanel({ match, isActive, scores, onUpdateScore }: Scoring
             <div className="text-3xl font-bold">{calculateTotal('athlete1')}</div>
           </div>
           
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-3 gap-4 mb-5">
             <PointButton 
               label="Yuko (1pt)" 
               count={scores.athlete1.yuko}
@@ -91,6 +120,40 @@ export function ScoringPanel({ match, isActive, scores, onUpdateScore }: Scoring
               disabled={!isActive}
             />
           </div>
+          
+          {onUpdatePenalty && (
+            <div className="space-y-2 pt-3 border-t border-border/30">
+              <div className="flex items-center justify-between">
+                <h4 className="text-sm font-medium">Penalidades</h4>
+                <div className="flex gap-2">
+                  <PenaltyButton 
+                    label="Jogai"
+                    icon={<Flag className="h-4 w-4" />}
+                    count={penalties.athlete1.jogai}
+                    onAdd={() => addPenalty('athlete1', 'jogai')}
+                    onRemove={() => removePenalty('athlete1', 'jogai')}
+                    disabled={!isActive}
+                  />
+                  <PenaltyButton 
+                    label="Chukoku"
+                    icon={<AlertTriangle className="h-4 w-4" />}
+                    count={penalties.athlete1.chukoku}
+                    onAdd={() => addPenalty('athlete1', 'chukoku')}
+                    onRemove={() => removePenalty('athlete1', 'chukoku')}
+                    disabled={!isActive}
+                  />
+                  <PenaltyButton 
+                    label="Keikoku"
+                    icon={<Minus className="h-4 w-4" />}
+                    count={penalties.athlete1.keikoku}
+                    onAdd={() => addPenalty('athlete1', 'keikoku')}
+                    onRemove={() => removePenalty('athlete1', 'keikoku')}
+                    disabled={!isActive}
+                  />
+                </div>
+              </div>
+            </div>
+          )}
         </div>
         
         <div className={`rounded-lg p-5 border-2 ${winner === 'athlete2' ? 'border-blue-500 bg-blue-500/5' : 'border-muted'}`}>
@@ -102,7 +165,7 @@ export function ScoringPanel({ match, isActive, scores, onUpdateScore }: Scoring
             <div className="text-3xl font-bold">{calculateTotal('athlete2')}</div>
           </div>
           
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-3 gap-4 mb-5">
             <PointButton 
               label="Yuko (1pt)" 
               count={scores.athlete2.yuko}
@@ -131,6 +194,40 @@ export function ScoringPanel({ match, isActive, scores, onUpdateScore }: Scoring
               disabled={!isActive}
             />
           </div>
+          
+          {onUpdatePenalty && (
+            <div className="space-y-2 pt-3 border-t border-border/30">
+              <div className="flex items-center justify-between">
+                <h4 className="text-sm font-medium">Penalidades</h4>
+                <div className="flex gap-2">
+                  <PenaltyButton 
+                    label="Jogai"
+                    icon={<Flag className="h-4 w-4" />}
+                    count={penalties.athlete2.jogai}
+                    onAdd={() => addPenalty('athlete2', 'jogai')}
+                    onRemove={() => removePenalty('athlete2', 'jogai')}
+                    disabled={!isActive}
+                  />
+                  <PenaltyButton 
+                    label="Chukoku"
+                    icon={<AlertTriangle className="h-4 w-4" />}
+                    count={penalties.athlete2.chukoku}
+                    onAdd={() => addPenalty('athlete2', 'chukoku')}
+                    onRemove={() => removePenalty('athlete2', 'chukoku')}
+                    disabled={!isActive}
+                  />
+                  <PenaltyButton 
+                    label="Keikoku"
+                    icon={<Minus className="h-4 w-4" />}
+                    count={penalties.athlete2.keikoku}
+                    onAdd={() => addPenalty('athlete2', 'keikoku')}
+                    onRemove={() => removePenalty('athlete2', 'keikoku')}
+                    disabled={!isActive}
+                  />
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
       
@@ -198,6 +295,47 @@ function PointButton({ label, count, icon, iconCount = 1, onAdd, onRemove, disab
           <span className="text-xs">+</span>
         </Button>
       </div>
+    </div>
+  );
+}
+
+interface PenaltyButtonProps {
+  label: string;
+  icon: React.ReactNode;
+  count: number;
+  onAdd: () => void;
+  onRemove: () => void;
+  disabled?: boolean;
+}
+
+function PenaltyButton({ label, icon, count, onAdd, onRemove, disabled }: PenaltyButtonProps) {
+  return (
+    <div className="flex flex-col items-center" title={label}>
+      <Button
+        size="sm"
+        variant={count > 0 ? "default" : "outline"}
+        className={`h-8 w-8 p-0 ${count > 0 ? "bg-yellow-600 hover:bg-yellow-700" : ""}`}
+        onClick={onAdd}
+        disabled={disabled}
+      >
+        <span className="sr-only">{label}</span>
+        {icon}
+      </Button>
+      
+      {count > 0 && (
+        <div className="text-xs font-medium mt-1 flex items-center gap-1">
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className="h-4 w-4 p-0" 
+            onClick={onRemove}
+            disabled={disabled}
+          >
+            <span className="text-xs">-</span>
+          </Button>
+          <span>{count}</span>
+        </div>
+      )}
     </div>
   );
 }
