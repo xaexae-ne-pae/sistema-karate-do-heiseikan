@@ -63,7 +63,13 @@ const TournamentDetails = () => {
       description: "O torneio foi finalizado com sucesso."
     });
     
+    // Close dialog
     setIsConfirmDialogOpen(false);
+
+    // Navigate back to tournaments page after 1.5 seconds
+    setTimeout(() => {
+      navigate("/torneios");
+    }, 1500);
   };
   
   if (isLoading) {
@@ -137,9 +143,9 @@ const TournamentDetails = () => {
               <Button 
                 variant="outline" 
                 onClick={() => setIsConfirmDialogOpen(true)}
-                className="text-xs bg-background"
+                className="gap-2 bg-background"
               >
-                <CheckCircle className="h-4 w-4 mr-2" />
+                <CheckCircle className="h-4 w-4" />
                 Finalizar Torneio
               </Button>
             )}
