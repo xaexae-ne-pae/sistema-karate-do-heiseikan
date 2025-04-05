@@ -1,10 +1,11 @@
 
 import { useState } from "react";
-import { Calendar, MapPin, Users, Tag, ChevronRight, CheckCircle, Timer } from "lucide-react";
+import { Calendar, MapPin, Users, Tag, ChevronRight, CheckCircle, Timer, History } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { ConfirmationDialog } from "@/components/ConfirmationDialog";
+import { useNavigate } from "react-router-dom";
 
 interface TournamentCardProps {
   tournament: {
@@ -23,6 +24,7 @@ interface TournamentCardProps {
 
 export function TournamentCard({ tournament, onFinishTournament, isAdmin, isJudge }: TournamentCardProps) {
   const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
+  const navigate = useNavigate();
   
   const getStatusDetails = (status: string) => {
     const statusMap = {
@@ -60,6 +62,18 @@ export function TournamentCard({ tournament, onFinishTournament, isAdmin, isJudg
       onFinishTournament(tournament.id);
     }
     setIsConfirmDialogOpen(false);
+  };
+  
+  const handleCardClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    
+    if (tournament.status === 'completed') {
+      // Para torneios finalizados, mostrar uma mensagem ou redirecionar para uma página específica
+      navigate(`/torneios/${tournament.id}/resultados`);
+    } else {
+      // Para torneios ativos ou futuros, redirecionar para a página do torneio
+      navigate(`/torneios/${tournament.id}`);
+    }
   };
 
   // Check if user can finish tournaments (admin or judge)
@@ -145,12 +159,28 @@ export function TournamentCard({ tournament, onFinishTournament, isAdmin, isJudg
       </div>
       
       <div className="relative z-10 mt-auto">
-        <Link to={`/torneios/${tournament.id}`}>
-          <Button variant="default" className="w-full justify-between bg-primary hover:bg-primary/90">
-            <span>{tournament.status === 'active' ? 'Entrar no Torneio' : tournament.status === 'completed' ? 'Ver Resultados' : 'Detalhes'}</span>
-            <ChevronRight className="h-4 w-4" />
-          </Button>
-        </Link>
+        <Button 
+          variant="default" 
+          className="w-full justify-between bg-primary hover:bg-primary/90"
+          onClick={handleCardClick}
+        >
+          {tournament.status === 'active' ? (
+            <>
+              <span>Entrar no Torneio</span>
+              <ChevronRight className="h-4 w-4" />
+            </>
+          ) : tournament.status === 'completed' ? (
+            <>
+              <span>Ver Histórico</span>
+              <History className="h-4 w-4" />
+            </>
+          ) : (
+            <>
+              <span>Detalhes</span>
+              <ChevronRight className="h-4 w-4" />
+            </>
+          )}
+        </Button>
       </div>
 
       <ConfirmationDialog 

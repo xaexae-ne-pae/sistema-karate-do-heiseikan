@@ -8,6 +8,7 @@ import { Tournament } from "@/types/tournament";
 import { ConfirmationDialog } from "@/components/ConfirmationDialog";
 import { useToast } from "@/hooks/use-toast";
 import { TournamentSidebar } from "@/components/TournamentSidebar";
+import { finalizeTournament } from "@/services/tournamentService";
 
 const TournamentDetails = () => {
   const { id } = useParams<{ id: string }>();
@@ -25,51 +26,82 @@ const TournamentDetails = () => {
     setUsername(savedUsername);
     setUserRole(savedRole);
     
-    // Mock fetch tournament data
-    setTimeout(() => {
-      // This would be a real API call in a production app
-      const mockTournament: Tournament = {
-        id: parseInt(id || "0"),
-        name: "Campeonato Regional de Karatê 2025",
-        date: "15/05/2025",
-        location: "Ginásio Municipal",
-        status: "active",
-        categoriesCount: 12,
-        athletesCount: 98,
-        description: "Descrição detalhada do torneio regional de karatê, incluindo regras e categorias."
-      };
+    // Fetch tournament data
+    const fetchTournament = async () => {
+      setIsLoading(true);
       
-      setTournament(mockTournament);
-      setIsLoading(false);
-    }, 500);
+      // Get tournaments from localStorage
+      const storedTournaments = localStorage.getItem('karate_tournaments');
+      if (storedTournaments) {
+        const tournaments = JSON.parse(storedTournaments);
+        const found = tournaments.find((t: Tournament) => t.id === parseInt(id || "0"));
+        
+        if (found) {
+          setTournament(found);
+          setIsLoading(false);
+          return;
+        }
+      }
+      
+      // If not found, use mock data
+      setTimeout(() => {
+        const mockTournament: Tournament = {
+          id: parseInt(id || "0"),
+          name: "Campeonato Regional de Karatê 2025",
+          date: "15/05/2025",
+          location: "Ginásio Municipal",
+          status: "active",
+          categoriesCount: 12,
+          athletesCount: 98,
+          description: "Descrição detalhada do torneio regional de karatê, incluindo regras e categorias."
+        };
+        
+        setTournament(mockTournament);
+        setIsLoading(false);
+      }, 500);
+    };
+    
+    fetchTournament();
   }, [id]);
   
   const isAdmin = userRole === 'admin' || username === 'Francivaldo';
   const isJudge = userRole === 'judge';
   const canFinishTournament = (isAdmin || isJudge) && tournament?.status === 'active';
   
-  const handleFinishTournament = () => {
+  const handleFinishTournament = async () => {
     if (!tournament) return;
     
-    // Update tournament status
-    setTournament({
-      ...tournament,
-      status: 'completed'
-    });
-    
-    // Show success message
-    toast({
-      title: "Torneio finalizado",
-      description: "O torneio foi finalizado com sucesso."
-    });
-    
-    // Close dialog
-    setIsConfirmDialogOpen(false);
+    try {
+      // Call the API to finalize the tournament
+      await finalizeTournament(tournament.id);
+      
+      // Update tournament status locally
+      setTournament({
+        ...tournament,
+        status: 'completed'
+      });
+      
+      // Show success message
+      toast({
+        title: "Torneio finalizado",
+        description: "O torneio foi finalizado com sucesso."
+      });
+      
+      // Close dialog
+      setIsConfirmDialogOpen(false);
 
-    // Navigate back to tournaments page after 1.5 seconds
-    setTimeout(() => {
-      navigate("/torneios");
-    }, 1500);
+      // Navigate back to tournaments page after 1.5 seconds
+      setTimeout(() => {
+        navigate("/torneios");
+      }, 1500);
+    } catch (error) {
+      console.error("Erro ao finalizar torneio:", error);
+      toast({
+        title: "Erro",
+        description: "Ocorreu um erro ao finalizar o torneio.",
+        variant: "destructive"
+      });
+    }
   };
   
   if (isLoading) {
@@ -116,14 +148,14 @@ const TournamentDetails = () => {
               <ArrowLeft className="h-5 w-5" />
             </Button>
             <div>
-              <h1 className="text-2xl font-semibold tracking-tight">{tournament.name}</h1>
+              <h1 className="text-2xl font-semibold tracking-tight">{tournament?.name}</h1>
               <div className="flex items-center gap-2 mt-1">
-                {tournament.status === 'active' ? (
+                {tournament?.status === 'active' ? (
                   <Badge className="bg-green-500 px-3 py-1 text-white capitalize flex items-center">
                     <Timer className="h-4 w-4 mr-1 text-white" />
                     Em Andamento
                   </Badge>
-                ) : tournament.status === 'upcoming' ? (
+                ) : tournament?.status === 'upcoming' ? (
                   <Badge variant="outline" className="px-3 py-1 capitalize flex items-center">
                     <Timer className="h-4 w-4 mr-1" />
                     <span>Próximo</span>
@@ -162,19 +194,19 @@ const TournamentDetails = () => {
                     <p className="text-sm text-muted-foreground">Data</p>
                     <div className="flex items-center gap-2">
                       <Calendar className="h-4 w-4 text-primary" />
-                      <span>{tournament.date}</span>
+                      <span>{tournament?.date}</span>
                     </div>
                   </div>
                   <div className="space-y-1">
                     <p className="text-sm text-muted-foreground">Local</p>
                     <div className="flex items-center gap-2">
                       <MapPin className="h-4 w-4 text-primary" />
-                      <span>{tournament.location}</span>
+                      <span>{tournament?.location}</span>
                     </div>
                   </div>
                 </div>
                 
-                {tournament.description && (
+                {tournament?.description && (
                   <div className="mt-4 pt-4 border-t">
                     <p className="text-sm text-muted-foreground mb-2">Descrição</p>
                     <p>{tournament.description}</p>
@@ -198,16 +230,16 @@ const TournamentDetails = () => {
                 <div className="space-y-4">
                   <div className="flex justify-between items-center pb-2 border-b">
                     <span className="text-muted-foreground">Categorias</span>
-                    <span className="font-medium">{tournament.categoriesCount}</span>
+                    <span className="font-medium">{tournament?.categoriesCount}</span>
                   </div>
                   <div className="flex justify-between items-center pb-2 border-b">
                     <span className="text-muted-foreground">Atletas</span>
-                    <span className="font-medium">{tournament.athletesCount}</span>
+                    <span className="font-medium">{tournament?.athletesCount}</span>
                   </div>
                 </div>
               </div>
               
-              {tournament.status === 'active' && (
+              {tournament?.status === 'active' && (
                 <div className="bg-card border rounded-lg p-6">
                   <h2 className="text-xl font-semibold mb-4">Ações</h2>
                   <div className="space-y-3">
@@ -232,7 +264,7 @@ const TournamentDetails = () => {
         onClose={() => setIsConfirmDialogOpen(false)}
         onConfirm={handleFinishTournament}
         title="Finalizar Torneio"
-        description={`Tem certeza que deseja finalizar o torneio "${tournament.name}"? Esta ação não pode ser desfeita.`}
+        description={tournament ? `Tem certeza que deseja finalizar o torneio "${tournament.name}"? Esta ação não pode ser desfeita.` : ""}
       />
     </div>
   );
