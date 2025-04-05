@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { Sidebar } from "@/components/Sidebar";
@@ -10,7 +11,6 @@ import {
   Play,
   Pause,
   RotateCcw,
-  ExternalLink,
   Swords,
   PenTool
 } from "lucide-react";
@@ -95,6 +95,11 @@ const Scoring = () => {
       if (match) {
         setSelectedMatch(match);
         resetMatch();
+        
+        // Automatically open fullscreen scoring when a match is selected
+        setTimeout(() => {
+          openFullScreen();
+        }, 500);
       }
     }
   }, [searchParams]);
@@ -435,16 +440,6 @@ const Scoring = () => {
 
                   <Button onClick={resetMatch} size="icon" variant="outline">
                     <RotateCcw className="h-4 w-4" />
-                  </Button>
-                  
-                  <Button 
-                    onClick={openFullScreen} 
-                    size="icon" 
-                    variant="outline" 
-                    className="ml-2"
-                    title="Abrir em tela cheia"
-                  >
-                    <ExternalLink className="h-4 w-4" />
                   </Button>
                 </div>
               </div>
