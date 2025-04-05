@@ -17,7 +17,7 @@ export function Sidebar() {
     const savedUsername = localStorage.getItem('karate_username') || '';
     const savedRole = localStorage.getItem('karate_role') || 'user';
     setUsername(savedUsername);
-    setUserRole(savedRole); // Fixed: was passing setUserRole to itself
+    setUserRole(savedRole);
   }, []);
   
   const handleLogout = () => {
@@ -47,7 +47,6 @@ export function Sidebar() {
         <SidebarLink icon={Trophy} label="Torneios" to="/torneios" />
         <SidebarLink icon={Clipboard} label="Inscrições" to="/inscricoes" />
         <SidebarLink icon={Shield} label="Categorias" to="/categorias" />
-        <SidebarLink icon={BarChart2} label="Pontuação" to="/pontuacao" />
         <SidebarLink icon={Medal} label="Resultados" to="/resultados" />
         <SidebarLink icon={Settings} label="Configurações" to="/configuracoes" />
       </div>

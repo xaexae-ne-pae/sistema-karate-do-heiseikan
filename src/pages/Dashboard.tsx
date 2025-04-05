@@ -39,6 +39,12 @@ const Dashboard = () => {
   const handleTournamentClick = () => {
     navigate("/torneios");
   };
+  
+  const goToActiveTournament = () => {
+    // Assumindo que o primeiro torneio ativo tem ID 1
+    // Em uma implementação real, você buscaria o ID do torneio ativo
+    navigate("/torneios/1/pontuacao");
+  };
 
   return (
     <div className="flex min-h-screen bg-background">
@@ -134,7 +140,7 @@ const Dashboard = () => {
                   icon={Award} 
                   title="Iniciar Pontuação" 
                   description="Registrar pontos das lutas" 
-                  to="/pontuacao" 
+                  to="/torneios/1/pontuacao" 
                 />
                 <ActionCard 
                   icon={List} 

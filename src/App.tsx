@@ -8,7 +8,6 @@ import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
 import Athletes from "./pages/Athletes";
 import Categories from "./pages/Categories";
-import Scoring from "./pages/Scoring";
 import Results from "./pages/Results";
 import Inscriptions from "./pages/Inscriptions";
 import PaymentPage from "./pages/PaymentPage";
@@ -100,11 +99,6 @@ const App = () => (
           <Route path="/categorias" element={
             <ProtectedRoute>
               <Categories />
-            </ProtectedRoute>
-          } />
-          <Route path="/pontuacao" element={
-            <ProtectedRoute>
-              <Scoring />
             </ProtectedRoute>
           } />
           <Route path="/resultados" element={
