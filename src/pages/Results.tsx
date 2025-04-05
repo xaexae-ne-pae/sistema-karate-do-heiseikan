@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Sidebar } from "@/components/Sidebar";
@@ -23,7 +24,6 @@ import {
   TableRow 
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { MatchResultCard } from "@/components/MatchResultCard";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const Results = () => {
@@ -45,56 +45,10 @@ const Results = () => {
     { position: 7, name: "Mariana Alves", category: "Kata Feminino", points: 130, medals: { gold: 0, silver: 1, bronze: 3 } },
     { position: 8, name: "Carla Mendes", category: "Kata Feminino", points: 120, medals: { gold: 0, silver: 1, bronze: 2 } },
   ];
-  
-  const matchesData = [
-    { 
-      id: 1, 
-      category: "Kumite Masculino -75kg", 
-      date: "15/03/2025", 
-      tournament: "Copa Shotokan - 2ª Etapa",
-      athlete1: { name: "João Silva", color: "red", score: 8 },
-      athlete2: { name: "Carlos Eduardo", color: "blue", score: 6 },
-      winner: "athlete1" as "athlete1" | "athlete2"
-    },
-    { 
-      id: 2, 
-      category: "Kata Feminino", 
-      date: "15/03/2025", 
-      tournament: "Copa Shotokan - 2ª Etapa",
-      athlete1: { name: "Ana Pereira", color: "red", score: 26.5 },
-      athlete2: { name: "Lúcia Fernandes", color: "blue", score: 25.8 },
-      winner: "athlete1" as "athlete1" | "athlete2"
-    },
-    { 
-      id: 3, 
-      category: "Kumite Masculino -67kg", 
-      date: "20/01/2025", 
-      tournament: "Copa Shotokan - 1ª Etapa",
-      athlete1: { name: "Pedro Santos", color: "red", score: 5 },
-      athlete2: { name: "Fernando Costa", color: "blue", score: 7 },
-      winner: "athlete2" as "athlete1" | "athlete2"
-    },
-    { 
-      id: 4, 
-      category: "Kata Feminino", 
-      date: "20/01/2025", 
-      tournament: "Copa Shotokan - 1ª Etapa",
-      athlete1: { name: "Mariana Alves", color: "red", score: 24.7 },
-      athlete2: { name: "Carla Mendes", color: "blue", score: 25.2 },
-      winner: "athlete2" as "athlete1" | "athlete2"
-    },
-  ];
 
   const filteredRankings = rankingsData.filter(athlete => 
     athlete.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     athlete.category.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-  
-  const filteredMatches = matchesData.filter(match => 
-    match.athlete1.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    match.athlete2.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    match.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    match.tournament.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
@@ -128,10 +82,6 @@ const Results = () => {
                   <Trophy className="h-4 w-4" />
                   <span>Rankings</span>
                 </TabsTrigger>
-                <TabsTrigger value="matches" className="gap-2">
-                  <FileText className="h-4 w-4" />
-                  <span>Histórico</span>
-                </TabsTrigger>
                 <TabsTrigger value="statistics" className="gap-2">
                   <BarChart2 className="h-4 w-4" />
                   <span>Estatísticas</span>
@@ -143,7 +93,7 @@ const Results = () => {
                   <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                   <Input
                     type="search"
-                    placeholder={activeTab === "rankings" ? "Buscar atletas..." : "Buscar lutas..."}
+                    placeholder="Buscar atletas..."
                     className="w-full pl-9 bg-background"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
@@ -227,28 +177,6 @@ const Results = () => {
                     )}
                   </TableBody>
                 </Table>
-              </div>
-            </TabsContent>
-            
-            <TabsContent value="matches" className="space-y-6">
-              <div>
-                <h2 className="text-xl font-semibold mb-4">Histórico de Lutas</h2>
-                
-                {filteredMatches.length > 0 ? (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {filteredMatches.map(match => (
-                      <MatchResultCard key={match.id} match={match} />
-                    ))}
-                  </div>
-                ) : (
-                  <div className="text-center py-16 border rounded-lg">
-                    <p className="text-muted-foreground">
-                      {searchQuery 
-                        ? `Nenhuma luta encontrada para "${searchQuery}"`
-                        : "Nenhuma luta registrada"}
-                    </p>
-                  </div>
-                )}
               </div>
             </TabsContent>
             

@@ -12,11 +12,7 @@ import Tournaments from "./pages/Tournaments";
 import TournamentDetails from "./pages/TournamentDetails";
 import TournamentAthletes from "./pages/TournamentAthletes";
 import TournamentCategories from "./pages/TournamentCategories";
-import TournamentScoring from "./pages/TournamentScoring";
 import TournamentResults from "./pages/TournamentResults";
-import ScoringFullscreen from "./pages/ScoringFullscreen";
-import Scoring from "./pages/Scoring";
-import AllMatches from "./pages/AllMatches";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 import { ProtectedRoute } from "./components/ProtectedRoute";
@@ -79,21 +75,9 @@ const App = () => (
               <TournamentCategories />
             </ProtectedRoute>
           } />
-          <Route path="/torneios/:id/pontuacao" element={
-            <ProtectedRoute>
-              <TournamentScoring />
-            </ProtectedRoute>
-          } />
           <Route path="/torneios/:id/resultados" element={
             <ProtectedRoute>
               <TournamentResults />
-            </ProtectedRoute>
-          } />
-          
-          {/* Scoring Routes */}
-          <Route path="/scoring" element={
-            <ProtectedRoute>
-              <Scoring />
             </ProtectedRoute>
           } />
           
@@ -102,19 +86,11 @@ const App = () => (
           <Route path="/categorias" element={<Navigate to="/torneios" replace />} />
           <Route path="/resultados" element={<Navigate to="/torneios" replace />} />
           
-          <Route path="/todas-lutas" element={
-            <ProtectedRoute>
-              <AllMatches />
-            </ProtectedRoute>
-          } />
           <Route path="/configuracoes" element={
             <ProtectedRoute>
               <Settings />
             </ProtectedRoute>
           } />
-          
-          {/* Tela Cheia de Pontuação - Deixando fora da proteção para facilitar o acesso em TVs públicas */}
-          <Route path="/scoring-fullscreen/:id" element={<ScoringFullscreen />} />
           
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />

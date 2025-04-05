@@ -1,5 +1,5 @@
 
-import { Home, BarChart2, Medal, Shield, Users, Trophy, LogOut } from "lucide-react";
+import { Home, Medal, Shield, Users, Trophy, LogOut } from "lucide-react";
 import Logo from "./Logo";
 import { SidebarLink } from "./SidebarLink";
 import { ThemeToggle } from "./ThemeToggle";
@@ -46,7 +46,6 @@ export function TournamentSidebar() {
         <SidebarLink icon={Home} label="Visão Geral" to={`/torneios/${tournamentId}`} />
         <SidebarLink icon={Users} label="Atletas" to={`/torneios/${tournamentId}/atletas`} />
         <SidebarLink icon={Shield} label="Categorias" to={`/torneios/${tournamentId}/categorias`} />
-        <SidebarLink icon={BarChart2} label="Pontuação" to={`/torneios/${tournamentId}/pontuacao`} />
         <SidebarLink icon={Medal} label="Resultados" to={`/torneios/${tournamentId}/resultados`} />
         <SidebarLink icon={Trophy} label="Voltar para Torneios" to="/torneios" />
       </div>
