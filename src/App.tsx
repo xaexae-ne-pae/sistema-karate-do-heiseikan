@@ -3,12 +3,9 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
-import Athletes from "./pages/Athletes";
-import Categories from "./pages/Categories";
-import Results from "./pages/Results";
 import Inscriptions from "./pages/Inscriptions";
 import PaymentPage from "./pages/PaymentPage";
 import Tournaments from "./pages/Tournaments";
@@ -22,6 +19,7 @@ import AllMatches from "./pages/AllMatches";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 import { ProtectedRoute } from "./components/ProtectedRoute";
+import Categories from "./pages/Categories";
 
 // Create a client
 const queryClient = new QueryClient({
@@ -46,11 +44,6 @@ const App = () => (
           <Route path="/dashboard" element={
             <ProtectedRoute>
               <Dashboard />
-            </ProtectedRoute>
-          } />
-          <Route path="/atletas" element={
-            <ProtectedRoute>
-              <Athletes />
             </ProtectedRoute>
           } />
           <Route path="/inscricoes" element={
@@ -96,16 +89,11 @@ const App = () => (
             </ProtectedRoute>
           } />
           
-          <Route path="/categorias" element={
-            <ProtectedRoute>
-              <Categories />
-            </ProtectedRoute>
-          } />
-          <Route path="/resultados" element={
-            <ProtectedRoute>
-              <Results />
-            </ProtectedRoute>
-          } />
+          {/* Redirect old routes to tournaments */}
+          <Route path="/atletas" element={<Navigate to="/torneios" replace />} />
+          <Route path="/categorias" element={<Navigate to="/torneios" replace />} />
+          <Route path="/resultados" element={<Navigate to="/torneios" replace />} />
+          
           <Route path="/todas-lutas" element={
             <ProtectedRoute>
               <AllMatches />

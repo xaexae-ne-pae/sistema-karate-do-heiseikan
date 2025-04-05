@@ -45,10 +45,10 @@ export function TournamentSidebar() {
       <div className="flex flex-1 flex-col px-4 py-4 gap-1">
         <SidebarLink icon={Home} label="Visão Geral" to={`/torneios/${tournamentId}`} />
         <SidebarLink icon={Users} label="Atletas" to={`/torneios/${tournamentId}/atletas`} />
-        <SidebarLink icon={Trophy} label="Voltar para Torneios" to="/torneios" />
         <SidebarLink icon={Shield} label="Categorias" to={`/torneios/${tournamentId}/categorias`} />
         <SidebarLink icon={BarChart2} label="Pontuação" to={`/torneios/${tournamentId}/pontuacao`} />
         <SidebarLink icon={Medal} label="Resultados" to={`/torneios/${tournamentId}/resultados`} />
+        <SidebarLink icon={Trophy} label="Voltar para Torneios" to="/torneios" />
       </div>
 
       <div className="border-t border-border/30 p-4">

@@ -1,4 +1,5 @@
-import { Award, Calendar, ChevronRight, List, Trophy, Users } from "lucide-react";
+
+import { Calendar, ChevronRight, List, Trophy, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { StatCard } from "@/components/StatCard";
 import { MatchCard } from "@/components/MatchCard";
@@ -12,7 +13,7 @@ const STAT_CARDS = [
   { title: "Total Atletas", value: "124", icon: Users, iconColor: "bg-primary/10 text-primary" },
   { title: "Eventos Ativos", value: "3", icon: Calendar, iconColor: "bg-green-500/10 text-green-500" },
   { title: "Categorias", value: "15", icon: List, iconColor: "bg-yellow-500/10 text-yellow-500" },
-  { title: "Lutas Concluídas", value: "48", icon: Award, iconColor: "bg-purple-500/10 text-purple-500" }
+  { title: "Lutas Concluídas", value: "48", icon: Trophy, iconColor: "bg-purple-500/10 text-purple-500" }
 ];
 
 const Dashboard = () => {
@@ -28,7 +29,7 @@ const Dashboard = () => {
   }, []);
 
   const handleNewAthleteClick = () => {
-    navigate("/atletas?newAthlete=true");
+    navigate("/torneios/1/atletas?newAthlete=true");
   };
 
   const handleViewAllMatches = () => {
@@ -59,10 +60,10 @@ const Dashboard = () => {
           <div className="flex items-center gap-3">
             <Button variant="outline" className="gap-2" onClick={handleTournamentClick}>
               <Trophy className="h-4 w-4" />
-              <span>Torneio</span>
+              <span>Torneios</span>
             </Button>
-            <Button className="gap-2" onClick={handleNewAthleteClick}>
-              <span>Novo Atleta</span>
+            <Button className="gap-2" onClick={handleTournamentClick}>
+              <span>Gerenciar Torneios</span>
               <span className="text-lg">+</span>
             </Button>
           </div>
@@ -136,22 +137,22 @@ const Dashboard = () => {
               
               <div className="space-y-4">
                 <ActionCard 
-                  icon={Award} 
+                  icon={Trophy} 
                   title="Gerenciar Torneios" 
                   description="Acessar todos os torneios ativos" 
                   to="/torneios" 
                 />
                 <ActionCard 
-                  icon={List} 
-                  title="Gerenciar Categorias" 
-                  description="Editar divisões de peso e idade" 
-                  to="/categorias" 
+                  icon={Calendar} 
+                  title="Ver Calendário" 
+                  description="Visualizar próximos eventos" 
+                  to="/calendario" 
                 />
                 <ActionCard 
-                  icon={Trophy} 
-                  title="Visualizar Resultados" 
-                  description="Ver classificação do torneio" 
-                  to="/resultados" 
+                  icon={List} 
+                  title="Todas as Lutas" 
+                  description="Ver listagem de combates" 
+                  to="/todas-lutas" 
                 />
               </div>
             </div>
