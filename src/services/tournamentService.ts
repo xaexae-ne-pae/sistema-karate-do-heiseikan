@@ -61,113 +61,129 @@ const MOCK_TOURNAMENTS: Tournament[] = [
 
 // Get all tournaments
 export const getAllTournaments = async (): Promise<Tournament[]> => {
-  // Get tournaments from localStorage if available, otherwise use mock data
-  const storedTournaments = localStorage.getItem('karate_tournaments');
-  if (storedTournaments) {
-    const tournaments = JSON.parse(storedTournaments);
+  try {
+    // Get tournaments from localStorage if available, otherwise use mock data
+    const storedTournaments = localStorage.getItem('karate_tournaments');
+    let tournaments: Tournament[];
     
-    // Update status based on date and time for each tournament
-    const updatedTournaments = tournaments.map((t: Tournament) => {
-      // Skip completed tournaments
-      if (t.status === "completed") return t;
+    if (storedTournaments) {
+      tournaments = JSON.parse(storedTournaments);
       
-      // Determine current status based on date and time
-      const currentStatus = determineTournamentStatus(t.date, t.time);
-      return { ...t, status: currentStatus };
-    });
+      // Update status based on date and time for each tournament
+      const updatedTournaments = tournaments.map((t: Tournament) => {
+        // Skip completed tournaments
+        if (t.status === "completed") return t;
+        
+        // Determine current status based on date and time
+        const currentStatus = determineTournamentStatus(t.date, t.time);
+        return { ...t, status: currentStatus };
+      });
+      
+      // Save updated statuses
+      localStorage.setItem('karate_tournaments', JSON.stringify(updatedTournaments));
+      return updatedTournaments;
+    } else {
+      // Initialize with mock data
+      localStorage.setItem('karate_tournaments', JSON.stringify(MOCK_TOURNAMENTS));
+      return MOCK_TOURNAMENTS;
+    }
+  } catch (error) {
+    console.error("Error fetching tournaments:", error);
     
-    // Save updated statuses
-    localStorage.setItem('karate_tournaments', JSON.stringify(updatedTournaments));
-    return updatedTournaments;
+    // Return empty array instead of throwing error
+    return [];
   }
-
-  // Simulating API delay
-  await new Promise((resolve) => setTimeout(resolve, 800));
-  
-  // Initialize with mock data
-  localStorage.setItem('karate_tournaments', JSON.stringify(MOCK_TOURNAMENTS));
-  return MOCK_TOURNAMENTS;
 };
 
 // Save tournament
 export const saveTournament = async (tournamentData: Partial<Tournament>): Promise<Tournament> => {
-  // Simulating API delay
-  await new Promise((resolve) => setTimeout(resolve, 1000));
-  
-  // Get current tournaments
-  const storedTournaments = localStorage.getItem('karate_tournaments');
-  const tournaments = storedTournaments ? JSON.parse(storedTournaments) : MOCK_TOURNAMENTS;
-  
-  let savedTournament: Tournament;
-  
-  if (tournamentData.id && tournaments.some((t: Tournament) => t.id === tournamentData.id)) {
-    // Update existing tournament
-    savedTournament = {
-      ...tournaments.find((t: Tournament) => t.id === tournamentData.id),
-      ...tournamentData
-    } as Tournament;
+  try {
+    // Simulating API delay
+    await new Promise((resolve) => setTimeout(resolve, 1000));
     
-    const updatedTournaments = tournaments.map((t: Tournament) => 
-      t.id === tournamentData.id ? savedTournament : t
-    );
+    // Get current tournaments
+    const storedTournaments = localStorage.getItem('karate_tournaments');
+    const tournaments = storedTournaments ? JSON.parse(storedTournaments) : MOCK_TOURNAMENTS;
     
-    localStorage.setItem('karate_tournaments', JSON.stringify(updatedTournaments));
-  } else {
-    // Format date if needed
-    let dateStr = tournamentData.date || new Date().toLocaleDateString('pt-BR');
+    let savedTournament: Tournament;
     
-    // Check if dateStr is a Date object and convert to string if needed
-    if (typeof dateStr !== 'string') {
-      dateStr = new Date(dateStr).toLocaleDateString('pt-BR');
+    if (tournamentData.id && tournaments.some((t: Tournament) => t.id === tournamentData.id)) {
+      // Update existing tournament
+      savedTournament = {
+        ...tournaments.find((t: Tournament) => t.id === tournamentData.id),
+        ...tournamentData
+      } as Tournament;
+      
+      const updatedTournaments = tournaments.map((t: Tournament) => 
+        t.id === tournamentData.id ? savedTournament : t
+      );
+      
+      localStorage.setItem('karate_tournaments', JSON.stringify(updatedTournaments));
+    } else {
+      // Format date if needed
+      let dateStr = tournamentData.date || new Date().toLocaleDateString('pt-BR');
+      
+      // Check if dateStr is a Date object and convert to string if needed
+      if (typeof dateStr !== 'string') {
+        dateStr = new Date(dateStr).toLocaleDateString('pt-BR');
+      }
+      
+      // Determine status based on date and time
+      const timeStr = tournamentData.time || "08:00";
+      const status = determineTournamentStatus(dateStr, timeStr);
+      
+      // Create new tournament
+      savedTournament = {
+        id: Math.max(0, ...tournaments.map((t: Tournament) => t.id)) + 1,
+        name: tournamentData.name || "Unnamed Tournament",
+        date: dateStr,
+        time: timeStr,
+        location: tournamentData.location || "No location set",
+        description: tournamentData.description || "",
+        status: status,
+        categoriesCount: tournamentData.categoriesCount || 0,
+        athletesCount: tournamentData.athletesCount || 0
+      };
+      
+      tournaments.push(savedTournament);
+      localStorage.setItem('karate_tournaments', JSON.stringify(tournaments));
     }
     
-    // Determine status based on date and time
-    const timeStr = tournamentData.time || "08:00";
-    const status = determineTournamentStatus(dateStr, timeStr);
-    
-    // Create new tournament
-    savedTournament = {
-      id: Math.max(0, ...tournaments.map((t: Tournament) => t.id)) + 1,
-      name: tournamentData.name || "Unnamed Tournament",
-      date: dateStr,
-      time: timeStr,
-      location: tournamentData.location || "No location set",
-      description: tournamentData.description || "",
-      status: status,
-      categoriesCount: tournamentData.categoriesCount || 0,
-      athletesCount: tournamentData.athletesCount || 0
-    };
-    
-    tournaments.push(savedTournament);
-    localStorage.setItem('karate_tournaments', JSON.stringify(tournaments));
+    return savedTournament;
+  } catch (error) {
+    console.error("Error saving tournament:", error);
+    throw new Error("Falha ao salvar o torneio");
   }
-  
-  return savedTournament;
 };
 
 // Finalize tournament
 export const finalizeTournament = async (id: number): Promise<Tournament> => {
-  // Simulating API delay
-  await new Promise((resolve) => setTimeout(resolve, 800));
-  
-  const storedTournaments = localStorage.getItem('karate_tournaments');
-  const tournaments = storedTournaments ? JSON.parse(storedTournaments) : MOCK_TOURNAMENTS;
-  
-  const tournament = tournaments.find((t: Tournament) => t.id === id);
-  if (!tournament) {
-    throw new Error("Tournament not found");
+  try {
+    // Simulating API delay
+    await new Promise((resolve) => setTimeout(resolve, 800));
+    
+    const storedTournaments = localStorage.getItem('karate_tournaments');
+    const tournaments = storedTournaments ? JSON.parse(storedTournaments) : MOCK_TOURNAMENTS;
+    
+    const tournament = tournaments.find((t: Tournament) => t.id === id);
+    if (!tournament) {
+      throw new Error("Tournament not found");
+    }
+    
+    const updatedTournament = {
+      ...tournament,
+      status: 'completed' as const
+    };
+    
+    const updatedTournaments = tournaments.map((t: Tournament) => 
+      t.id === id ? updatedTournament : t
+    );
+    
+    localStorage.setItem('karate_tournaments', JSON.stringify(updatedTournaments));
+    
+    return updatedTournament;
+  } catch (error) {
+    console.error("Error finalizing tournament:", error);
+    throw new Error("Falha ao finalizar o torneio");
   }
-  
-  const updatedTournament = {
-    ...tournament,
-    status: 'completed' as const
-  };
-  
-  const updatedTournaments = tournaments.map((t: Tournament) => 
-    t.id === id ? updatedTournament : t
-  );
-  
-  localStorage.setItem('karate_tournaments', JSON.stringify(updatedTournaments));
-  
-  return updatedTournament;
 };

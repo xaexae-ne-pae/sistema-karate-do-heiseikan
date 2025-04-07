@@ -61,7 +61,7 @@ export function Sidebar() {
 
       {/* Sidebar */}
       <div 
-        className={`fixed inset-y-0 left-0 z-50 w-64 transform transition-transform duration-300 ease-in-out bg-sidebar-background border-r border-border ${
+        className={`fixed inset-y-0 left-0 z-50 w-64 transform transition-transform duration-300 ease-in-out bg-sidebar-background border-r border-border flex flex-col ${
           isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
         }`}
       >
@@ -81,7 +81,7 @@ export function Sidebar() {
           </div>
         </div>
 
-        <div className="border-t border-border/30 p-4">
+        <div className="border-t border-border/30 p-4 mt-auto">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <Avatar className="h-9 w-9 shrink-0 transition-opacity duration-200 hover:opacity-90">

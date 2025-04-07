@@ -11,10 +11,11 @@ import { useToast } from "@/hooks/use-toast";
 import { getAllTournaments } from "@/services/tournamentService";
 import { AddTournamentDialog } from "@/components/tournament/AddTournamentDialog";
 import { ConfirmationDialog } from "@/components/ConfirmationDialog";
+import { useLocalStorage } from "@/hooks/useLocalStorage";
 
 const Tournaments = () => {
   const navigate = useNavigate();
-  const [tournaments, setTournaments] = useState<Tournament[]>([]);
+  const [tournaments, setTournaments] = useLocalStorage<Tournament[]>('karate_tournaments', []);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [isAddTournamentDialogOpen, setIsAddTournamentDialogOpen] = useState(false);
@@ -33,11 +34,8 @@ const Tournaments = () => {
       setIsLoading(false);
     } catch (error) {
       console.error("Error fetching tournaments:", error);
-      toast({
-        title: "Erro ao carregar torneios",
-        description: "Não foi possível carregar a lista de torneios.",
-        variant: "destructive",
-      });
+      // Don't show error toast when there are no tournaments, just set empty array
+      setTournaments([]);
       setIsLoading(false);
     }
   };
@@ -61,13 +59,13 @@ const Tournaments = () => {
   const confirmFinalizeTournament = () => {
     if (!tournamentToFinalize) return;
 
-    setTournaments(prevTournaments => 
-      prevTournaments.map(t => 
-        t.id === tournamentToFinalize.id 
-          ? { ...t, status: 'completed' as const } 
-          : t
-      )
+    const updatedTournaments = tournaments.map(t => 
+      t.id === tournamentToFinalize.id 
+        ? { ...t, status: 'completed' as const } 
+        : t
     );
+    
+    setTournaments(updatedTournaments);
 
     toast({
       title: "Torneio finalizado",
@@ -183,8 +181,8 @@ const Tournaments = () => {
     <div className="flex min-h-screen bg-background">
       <Sidebar />
       
-      <div className="flex-1 ml-64">
-        <header className="sticky top-0 z-40 flex items-center justify-between gap-4 border-b bg-background/95 px-8 py-4 backdrop-blur">
+      <div className="flex-1 ml-0 md:ml-64">
+        <header className="sticky top-0 z-40 flex items-center justify-between gap-4 border-b bg-background/95 px-4 md:px-8 py-4 backdrop-blur">
           <div>
             <h1 className="text-2xl font-semibold tracking-tight">Torneios</h1>
             <p className="text-muted-foreground">
@@ -198,14 +196,14 @@ const Tournaments = () => {
               onClick={handleAddTournament}
             >
               <Trophy className="h-4 w-4" />
-              <span>Novo Torneio</span>
+              <span className="hidden sm:inline">Novo Torneio</span>
             </Button>
           </div>
         </header>
         
-        <main className="px-8 py-6">
-          <div className="flex justify-between mb-8">
-            <div className="relative w-96">
+        <main className="px-4 md:px-8 py-6">
+          <div className="flex flex-col sm:flex-row justify-between gap-4 mb-8">
+            <div className="relative w-full sm:w-96">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input 
                 placeholder="Buscar torneios..." 
@@ -215,7 +213,7 @@ const Tournaments = () => {
               />
             </div>
             
-            <Button variant="outline" className="gap-2">
+            <Button variant="outline" className="gap-2 w-full sm:w-auto">
               <Calendar className="h-4 w-4" />
               <span>Calendário</span>
             </Button>
@@ -241,27 +239,10 @@ const Tournaments = () => {
                   Eventos em andamento que você pode gerenciar
                 </p>
                 
-                {activeTournaments.length === 0 ? (
-                  <div className="text-center py-12 border border-dashed rounded-lg">
-                    <Trophy className="h-8 w-8 text-muted-foreground mx-auto mb-3" />
-                    <h3 className="text-lg font-medium mb-1">Nenhum torneio ativo</h3>
-                    <p className="text-muted-foreground mb-4">
-                      Crie um novo torneio para começar a gerenciar.
-                    </p>
-                    <Button 
-                      onClick={handleAddTournament}
-                      className="gap-2"
-                    >
-                      <Plus className="h-4 w-4" />
-                      <span>Adicionar Torneio</span>
-                    </Button>
-                  </div>
-                ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {activeTournaments.map(tournament => renderTournamentCard(tournament))}
-                    {renderAddTournamentCard()}
-                  </div>
-                )}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {activeTournaments.map(tournament => renderTournamentCard(tournament))}
+                  {renderAddTournamentCard()}
+                </div>
               </div>
               
               <div className="mb-10">
@@ -273,28 +254,10 @@ const Tournaments = () => {
                   Próximos torneios agendados
                 </p>
                 
-                {upcomingTournaments.length === 0 ? (
-                  <div className="text-center py-12 border border-dashed rounded-lg">
-                    <Calendar className="h-8 w-8 text-muted-foreground mx-auto mb-3" />
-                    <h3 className="text-lg font-medium mb-1">Nenhum torneio agendado</h3>
-                    <p className="text-muted-foreground mb-4">
-                      Agende novos torneios para o futuro.
-                    </p>
-                    <Button
-                      variant="outline"
-                      onClick={handleAddTournament}
-                      className="gap-2"
-                    >
-                      <Plus className="h-4 w-4" />
-                      <span>Agendar Torneio</span>
-                    </Button>
-                  </div>
-                ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {upcomingTournaments.map(tournament => renderTournamentCard(tournament))}
-                    {upcomingTournaments.length > 0 && upcomingTournaments.length < 3 && renderAddTournamentCard()}
-                  </div>
-                )}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {upcomingTournaments.map(tournament => renderTournamentCard(tournament))}
+                  {upcomingTournaments.length < 3 && renderAddTournamentCard()}
+                </div>
               </div>
               
               {/* Completed Tournaments Section */}
@@ -307,19 +270,9 @@ const Tournaments = () => {
                   Torneios que já foram concluídos
                 </p>
                 
-                {completedTournaments.length === 0 ? (
-                  <div className="text-center py-12 border border-dashed rounded-lg">
-                    <CheckCircle className="h-8 w-8 text-muted-foreground mx-auto mb-3" />
-                    <h3 className="text-lg font-medium mb-1">Nenhum torneio finalizado</h3>
-                    <p className="text-muted-foreground mb-4">
-                      Os torneios finalizados aparecerão aqui.
-                    </p>
-                  </div>
-                ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {completedTournaments.map(tournament => renderTournamentCard(tournament))}
-                  </div>
-                )}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {completedTournaments.map(tournament => renderTournamentCard(tournament))}
+                </div>
               </div>
             </>
           )}
