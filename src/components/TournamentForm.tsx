@@ -4,11 +4,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { DialogFooter } from "@/components/ui/dialog";
-import { CalendarIcon } from "lucide-react";
-import { format } from "date-fns";
+import { CalendarIcon, Clock } from "lucide-react";
+import { format, isToday, isPast, isFuture } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
 import { ptBR } from "date-fns/locale";
 import {
@@ -17,13 +16,40 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
-import { Tournament, TournamentFormData, TournamentStatus } from "@/types/tournament";
+import { Tournament, TournamentFormData } from "@/types/tournament";
 import { saveTournament } from "@/services/tournamentService";
 
 interface TournamentFormProps {
   initialData?: Partial<Tournament>;
   onSuccess: (formData: Tournament) => void;
 }
+
+// Helper function to determine tournament status based on date and time
+const determineTournamentStatus = (date: Date, timeString: string): "upcoming" | "active" | "completed" => {
+  const now = new Date();
+  
+  if (isPast(date) && !isToday(date)) {
+    return "completed";
+  }
+  
+  if (isToday(date)) {
+    // Convert time string to hours and minutes
+    const [hours, minutes] = timeString.split(':').map(Number);
+    
+    // Create date objects for comparison
+    const tournamentDateTime = new Date(date);
+    tournamentDateTime.setHours(hours, minutes, 0, 0);
+    
+    const currentTime = new Date();
+    
+    // If tournament date is today and current time is past the tournament time
+    if (currentTime >= tournamentDateTime) {
+      return "active";
+    }
+  }
+  
+  return "upcoming";
+};
 
 // Extracted form handler functions
 const useFormHandlers = (
@@ -33,14 +59,15 @@ const useFormHandlers = (
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [date, setDate] = useState<Date | undefined>(
-    initialData?.date ? new Date(initialData.date) : undefined
+    initialData?.date ? new Date(initialData.date.split('/').reverse().join('-')) : undefined
   );
   
-  const [formData, setFormData] = useState<TournamentFormData & { status?: TournamentStatus }>({
+  const [time, setTime] = useState<string>(initialData?.time || "08:00");
+  
+  const [formData, setFormData] = useState<TournamentFormData>({
     name: initialData?.name || "",
     location: initialData?.location || "",
     description: initialData?.description || "",
-    status: initialData?.status || "upcoming",
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -51,11 +78,8 @@ const useFormHandlers = (
     }));
   };
   
-  const handleStatusChange = (value: TournamentStatus) => {
-    setFormData(prev => ({
-      ...prev,
-      status: value
-    }));
+  const handleTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setTime(e.target.value);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -73,12 +97,18 @@ const useFormHandlers = (
     setIsSubmitting(true);
     
     try {
+      // Determine tournament status based on date and time
+      const status = initialData?.status === "completed" 
+        ? "completed" 
+        : determineTournamentStatus(date, time);
+      
       // Using our mock API service
       const savedTournament = await saveTournament({
         ...formData,
         date: format(date, "dd/MM/yyyy"),
+        time,
         id: initialData?.id || Math.floor(Math.random() * 10000),
-        status: formData.status || "upcoming",
+        status,
         categoriesCount: initialData?.categoriesCount || 0,
         athletesCount: initialData?.athletesCount || 0,
       });
@@ -105,10 +135,11 @@ const useFormHandlers = (
   return {
     date,
     setDate,
+    time,
     formData,
     isSubmitting,
     handleChange,
-    handleStatusChange,
+    handleTimeChange,
     handleSubmit
   };
 };
@@ -117,10 +148,11 @@ export function TournamentForm({ initialData, onSuccess }: TournamentFormProps) 
   const {
     date,
     setDate,
+    time,
     formData,
     isSubmitting,
     handleChange,
-    handleStatusChange,
+    handleTimeChange,
     handleSubmit
   } = useFormHandlers(initialData, onSuccess);
 
@@ -169,33 +201,32 @@ export function TournamentForm({ initialData, onSuccess }: TournamentFormProps) 
           </div>
           
           <div className="space-y-2">
-            <Label htmlFor="location">Local</Label>
-            <Input
-              id="location"
-              name="location"
-              value={formData.location}
-              onChange={handleChange}
-              placeholder="Ex: Ginásio Municipal"
-              required
-            />
+            <Label htmlFor="time">Hora do Evento</Label>
+            <div className="flex items-center">
+              <Clock className="mr-2 h-4 w-4 text-muted-foreground" />
+              <Input
+                id="time"
+                name="time"
+                type="time"
+                value={time}
+                onChange={handleTimeChange}
+                className="flex-1"
+                required
+              />
+            </div>
           </div>
         </div>
         
         <div className="space-y-2">
-          <Label htmlFor="status">Status</Label>
-          <Select 
-            value={formData.status} 
-            onValueChange={(value) => handleStatusChange(value as TournamentStatus)}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Selecione um status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="upcoming">Próximo</SelectItem>
-              <SelectItem value="active">Em Andamento</SelectItem>
-              <SelectItem value="completed">Concluído</SelectItem>
-            </SelectContent>
-          </Select>
+          <Label htmlFor="location">Local</Label>
+          <Input
+            id="location"
+            name="location"
+            value={formData.location}
+            onChange={handleChange}
+            placeholder="Ex: Ginásio Municipal"
+            required
+          />
         </div>
         
         <div className="space-y-2">

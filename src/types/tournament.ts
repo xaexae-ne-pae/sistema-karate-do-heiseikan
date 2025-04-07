@@ -5,6 +5,7 @@ export interface Tournament {
   id: number;
   name: string;
   date: string;
+  time: string;
   location: string;
   status: TournamentStatus;
   categoriesCount: number;
@@ -17,5 +18,5 @@ export interface TournamentFormData {
   location: string;
   description: string;
   date?: Date;
-  status?: TournamentStatus;
+  time?: string;
 }

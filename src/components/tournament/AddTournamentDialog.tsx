@@ -28,7 +28,7 @@ export function AddTournamentDialog({ isOpen, onClose, onTournamentAdded }: AddT
         <DialogHeader>
           <DialogTitle>Adicionar Novo Torneio</DialogTitle>
           <DialogDescription>
-            Preencha as informações para criar um novo torneio.
+            Preencha as informações para criar um novo torneio. O status será determinado automaticamente com base na data e hora.
           </DialogDescription>
         </DialogHeader>
         <TournamentForm onSuccess={handleSuccess} />
