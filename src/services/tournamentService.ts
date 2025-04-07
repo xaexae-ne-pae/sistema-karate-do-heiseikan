@@ -62,14 +62,14 @@ export const saveTournament = async (tournamentData: Partial<Tournament>): Promi
   
   let savedTournament: Tournament;
   
-  if (tournamentData.id) {
+  if (tournamentData.id && tournaments.some((t: Tournament) => t.id === tournamentData.id)) {
     // Update existing tournament
     savedTournament = {
-      ...tournaments.find(t => t.id === tournamentData.id),
+      ...tournaments.find((t: Tournament) => t.id === tournamentData.id),
       ...tournamentData
     } as Tournament;
     
-    const updatedTournaments = tournaments.map(t => 
+    const updatedTournaments = tournaments.map((t: Tournament) => 
       t.id === tournamentData.id ? savedTournament : t
     );
     
@@ -77,7 +77,7 @@ export const saveTournament = async (tournamentData: Partial<Tournament>): Promi
   } else {
     // Create new tournament
     savedTournament = {
-      id: Math.max(0, ...tournaments.map(t => t.id)) + 1,
+      id: Math.max(0, ...tournaments.map((t: Tournament) => t.id)) + 1,
       name: tournamentData.name || "Unnamed Tournament",
       date: tournamentData.date || new Date().toISOString(),
       location: tournamentData.location || "No location set",
@@ -102,7 +102,7 @@ export const finalizeTournament = async (id: number): Promise<Tournament> => {
   const storedTournaments = localStorage.getItem('karate_tournaments');
   const tournaments = storedTournaments ? JSON.parse(storedTournaments) : MOCK_TOURNAMENTS;
   
-  const tournament = tournaments.find(t => t.id === id);
+  const tournament = tournaments.find((t: Tournament) => t.id === id);
   if (!tournament) {
     throw new Error("Tournament not found");
   }
@@ -112,7 +112,7 @@ export const finalizeTournament = async (id: number): Promise<Tournament> => {
     status: 'completed' as const
   };
   
-  const updatedTournaments = tournaments.map(t => 
+  const updatedTournaments = tournaments.map((t: Tournament) => 
     t.id === id ? updatedTournament : t
   );
   

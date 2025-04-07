@@ -5,6 +5,48 @@
 
 @layer base {
   :root {
+    /* Light mode variables */
+    --background: 0 0% 100%;
+    --foreground: 222 14% 10%;
+    
+    --card: 0 0% 98%;
+    --card-foreground: 222 14% 10%;
+    
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 14% 10%;
+    
+    --primary: 357 86% 55%;
+    --primary-foreground: 0 0% 100%;
+    
+    --secondary: 220 14% 90%;
+    --secondary-foreground: 222 14% 10%;
+    
+    --muted: 220 14% 90%;
+    --muted-foreground: 220 8% 46%;
+    
+    --accent: 220 14% 94%;
+    --accent-foreground: 222 14% 10%;
+    
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    
+    --border: 220 13% 85%;
+    --input: 220 13% 85%;
+    --ring: 357 86% 55%;
+    
+    --radius: 0.8rem;
+
+    --sidebar-background: 220 14% 96%;
+    --sidebar-foreground: 222 14% 10%;
+    --sidebar-primary: 357 86% 55%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 220 14% 90%;
+    --sidebar-accent-foreground: 222 14% 10%;
+    --sidebar-border: 220 14% 88%;
+    --sidebar-ring: 357 86% 55%;
+  }
+
+  .dark {
     --background: 225 15% 8%;
     --foreground: 213 31% 91%;
     
@@ -32,8 +74,6 @@
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
     --ring: 357 86% 55%;
-    
-    --radius: 0.8rem;
 
     --sidebar-background: 225 22% 6%;
     --sidebar-foreground: 213 31% 91%;
@@ -67,6 +107,15 @@
   
   ::selection {
     @apply bg-primary/20 text-foreground;
+  }
+
+  /* Apply theme for the app */
+  html.light body {
+    @apply bg-background text-foreground;
+  }
+
+  html.dark body {
+    @apply bg-background text-foreground;
   }
 }
 
@@ -106,6 +155,16 @@
   
   .hover-glow {
     @apply transition-shadow duration-300 hover:shadow-md hover:shadow-primary/10;
+  }
+  
+  /* Light mode glass card variant */
+  .light .glass-card {
+    @apply bg-card/90 backdrop-blur-sm border border-border/30 shadow-sm;
+  }
+
+  /* Light mode background styles */
+  .light .bg-karate-pattern {
+    @apply opacity-10;
   }
   
   @keyframes pulse-slow {

@@ -3,7 +3,6 @@ import { useState } from "react";
 import { Calendar, MapPin, Users, Tag, ChevronRight, CheckCircle, Timer, History } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
 import { ConfirmationDialog } from "@/components/ConfirmationDialog";
 import { useNavigate } from "react-router-dom";
 
@@ -68,10 +67,10 @@ export function TournamentCard({ tournament, onFinishTournament, isAdmin, isJudg
     e.preventDefault();
     
     if (tournament.status === 'completed') {
-      // Para torneios finalizados, mostrar uma mensagem ou redirecionar para uma página específica
+      // For completed tournaments, redirect to results page
       navigate(`/torneios/${tournament.id}/resultados`);
     } else {
-      // Para torneios ativos ou futuros, redirecionar para a página do torneio
+      // For active or upcoming tournaments, redirect to tournament page
       navigate(`/torneios/${tournament.id}`);
     }
   };
