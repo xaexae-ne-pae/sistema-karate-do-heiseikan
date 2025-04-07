@@ -7,6 +7,9 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { TournamentSidebar } from "@/components/TournamentSidebar";
 import { TournamentHeader } from "@/components/tournament/TournamentHeader";
+import { Calendar, MapPin, Users, Tag, Shield } from "lucide-react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 
 export default function TournamentDetails() {
   const { id } = useParams<{ id: string }>();
@@ -107,26 +110,111 @@ export default function TournamentDetails() {
     <div className="flex h-screen overflow-hidden">
       <TournamentSidebar />
       <div className="flex-1 overflow-y-auto">
-        <div className="container py-6 h-full">
-          <TournamentHeader 
-            title={tournament.name} 
-            description={`${tournament.location} • ${tournament.date} às ${tournament.time}`}
-          >
-            {tournament.status === "active" && (
-              <Button 
-                onClick={handleFinalizeTournament}
-                variant="outline"
-                className="bg-primary/10 text-primary hover:bg-primary/20"
-              >
-                Finalizar Torneio
-              </Button>
-            )}
-          </TournamentHeader>
-          
-          <div className="mt-6 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            <div className="col-span-full flex justify-end">
-              {/* Additional content can be added here */}
-            </div>
+        <TournamentHeader 
+          title={tournament.name} 
+          description={`${tournament.location} • ${tournament.date} às ${tournament.time}`}
+        >
+          {tournament.status === "active" && (
+            <Button 
+              onClick={handleFinalizeTournament}
+              variant="outline"
+              className="bg-primary/10 text-primary hover:bg-primary/20"
+            >
+              Finalizar Torneio
+            </Button>
+          )}
+        </TournamentHeader>
+        
+        <div className="container py-6">
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {/* Informações Gerais do Torneio */}
+            <Card className="col-span-2">
+              <CardHeader className="pb-2">
+                <CardTitle>Informações do Torneio</CardTitle>
+                <CardDescription>Detalhes e configurações gerais</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                      <Calendar className="h-5 w-5 text-primary" />
+                    </div>
+                    <div>
+                      <p className="text-sm text-muted-foreground">Data e Hora</p>
+                      <p className="font-medium">{tournament.date} às {tournament.time}</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                      <MapPin className="h-5 w-5 text-primary" />
+                    </div>
+                    <div>
+                      <p className="text-sm text-muted-foreground">Local</p>
+                      <p className="font-medium">{tournament.location}</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                      <Shield className="h-5 w-5 text-primary" />
+                    </div>
+                    <div>
+                      <p className="text-sm text-muted-foreground">Status</p>
+                      <div>
+                        {tournament.status === 'active' && (
+                          <Badge className="bg-green-500 text-white">Em Andamento</Badge>
+                        )}
+                        {tournament.status === 'upcoming' && (
+                          <Badge variant="outline">Próximo</Badge>
+                        )}
+                        {tournament.status === 'completed' && (
+                          <Badge variant="secondary">Concluído</Badge>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  {tournament.description && (
+                    <div className="mt-6 border-t pt-4">
+                      <h3 className="text-sm font-medium mb-2">Descrição</h3>
+                      <p className="text-sm text-muted-foreground">{tournament.description}</p>
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Estatísticas do Torneio */}
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle>Estatísticas</CardTitle>
+                <CardDescription>Resumo de participantes</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                      <Users className="h-5 w-5 text-primary" />
+                    </div>
+                    <div>
+                      <p className="text-sm text-muted-foreground">Atletas</p>
+                      <p className="font-medium">{tournament.athletesCount} participantes</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                      <Tag className="h-5 w-5 text-primary" />
+                    </div>
+                    <div>
+                      <p className="text-sm text-muted-foreground">Categorias</p>
+                      <p className="font-medium">{tournament.categoriesCount} categorias</p>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </div>
