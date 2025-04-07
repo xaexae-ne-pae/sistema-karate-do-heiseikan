@@ -3,11 +3,10 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Tournament } from "@/types/tournament";
 import { finalizeTournament } from "@/services/tournamentService";
-import { DashboardLayout } from "@/components/DashboardLayout";
-import { TournamentHeader } from "@/components/tournament/TournamentHeader";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { TournamentSidebar } from "@/components/TournamentSidebar";
+import { TournamentHeader } from "@/components/tournament/TournamentHeader";
 
 export default function TournamentDetails() {
   const { id } = useParams<{ id: string }>();
@@ -75,22 +74,32 @@ export default function TournamentDetails() {
 
   if (loading) {
     return (
-      <DashboardLayout>
-        <div className="flex items-center justify-center h-full">
-          <div className="animate-pulse text-lg">Carregando...</div>
+      <div className="flex h-screen overflow-hidden">
+        <TournamentSidebar />
+        <div className="flex-1 overflow-y-auto">
+          <div className="container py-6 h-full">
+            <div className="flex items-center justify-center h-full">
+              <div className="animate-pulse text-lg">Carregando...</div>
+            </div>
+          </div>
         </div>
-      </DashboardLayout>
+      </div>
     );
   }
 
   if (!tournament) {
     return (
-      <DashboardLayout>
-        <div className="flex flex-col items-center justify-center h-full gap-4">
-          <h2 className="text-xl">Torneio não encontrado</h2>
-          <Button onClick={() => navigate("/torneios")}>Voltar para Torneios</Button>
+      <div className="flex h-screen overflow-hidden">
+        <TournamentSidebar />
+        <div className="flex-1 overflow-y-auto">
+          <div className="container py-6 h-full">
+            <div className="flex flex-col items-center justify-center h-full gap-4">
+              <h2 className="text-xl">Torneio não encontrado</h2>
+              <Button onClick={() => navigate("/torneios")}>Voltar para Torneios</Button>
+            </div>
+          </div>
         </div>
-      </DashboardLayout>
+      </div>
     );
   }
 
@@ -99,19 +108,24 @@ export default function TournamentDetails() {
       <TournamentSidebar />
       <div className="flex-1 overflow-y-auto">
         <div className="container py-6 h-full">
-          <TournamentHeader tournament={tournament} />
+          <TournamentHeader 
+            title={tournament.name} 
+            description={`${tournament.location} • ${tournament.date} às ${tournament.time}`}
+          >
+            {tournament.status === "active" && (
+              <Button 
+                onClick={handleFinalizeTournament}
+                variant="outline"
+                className="bg-primary/10 text-primary hover:bg-primary/20"
+              >
+                Finalizar Torneio
+              </Button>
+            )}
+          </TournamentHeader>
           
           <div className="mt-6 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             <div className="col-span-full flex justify-end">
-              {tournament.status === "active" && (
-                <Button 
-                  onClick={handleFinalizeTournament}
-                  variant="outline"
-                  className="bg-primary/10 text-primary hover:bg-primary/20"
-                >
-                  Finalizar Torneio
-                </Button>
-              )}
+              {/* Additional content can be added here */}
             </div>
           </div>
         </div>

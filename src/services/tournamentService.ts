@@ -115,8 +115,10 @@ export const saveTournament = async (tournamentData: Partial<Tournament>): Promi
   } else {
     // Format date if needed
     let dateStr = tournamentData.date || new Date().toLocaleDateString('pt-BR');
-    if (dateStr instanceof Date) {
-      dateStr = dateStr.toLocaleDateString('pt-BR');
+    
+    // Check if dateStr is a Date object and convert to string if needed
+    if (typeof dateStr !== 'string') {
+      dateStr = new Date(dateStr).toLocaleDateString('pt-BR');
     }
     
     // Determine status based on date and time
