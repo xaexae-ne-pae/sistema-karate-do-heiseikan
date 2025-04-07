@@ -77,9 +77,9 @@ export default function TournamentDetails() {
 
   if (loading) {
     return (
-      <div className="flex h-screen overflow-hidden">
+      <div className="flex h-screen">
         <TournamentSidebar />
-        <div className="flex-1 overflow-y-auto">
+        <div className="flex-1 md:ml-64"> {/* Added margin to prevent content from entering sidebar */}
           <div className="container py-6 h-full">
             <div className="flex items-center justify-center h-full">
               <div className="animate-pulse text-lg">Carregando...</div>
@@ -92,9 +92,9 @@ export default function TournamentDetails() {
 
   if (!tournament) {
     return (
-      <div className="flex h-screen overflow-hidden">
+      <div className="flex h-screen">
         <TournamentSidebar />
-        <div className="flex-1 overflow-y-auto">
+        <div className="flex-1 md:ml-64"> {/* Added margin to prevent content from entering sidebar */}
           <div className="container py-6 h-full">
             <div className="flex flex-col items-center justify-center h-full gap-4">
               <h2 className="text-xl">Torneio não encontrado</h2>
@@ -107,9 +107,9 @@ export default function TournamentDetails() {
   }
 
   return (
-    <div className="flex h-screen overflow-hidden">
+    <div className="flex h-screen">
       <TournamentSidebar />
-      <div className="flex-1 overflow-y-auto">
+      <div className="flex-1 md:ml-64"> {/* Added margin to prevent content from entering sidebar */}
         <TournamentHeader 
           title={tournament.name} 
           description={`${tournament.location} • ${tournament.date} às ${tournament.time}`}
