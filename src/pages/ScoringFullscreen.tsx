@@ -243,6 +243,7 @@ const ScoringFullscreen = () => {
           ${winner === 'athlete1' 
             ? 'bg-gradient-to-b from-red-950/70 to-red-900/30 border-red-500/50 shadow-[0_0_15px_rgba(239,68,68,0.3)]' 
             : 'bg-gradient-to-b from-red-950/50 to-red-900/20 border-white/10'}
+          w-full
         `}>
           <div className="bg-gradient-to-r from-red-800/40 to-red-800/20 py-4 px-6 rounded-lg mb-6 border border-red-700/30 shadow-md">
             <div className="flex items-center justify-between">
@@ -287,6 +288,7 @@ const ScoringFullscreen = () => {
           ${winner === 'athlete2' 
             ? 'bg-gradient-to-b from-blue-950/70 to-blue-900/30 border-blue-500/50 shadow-[0_0_15px_rgba(59,130,246,0.3)]' 
             : 'bg-gradient-to-b from-blue-950/50 to-blue-900/20 border-white/10'}
+          w-full
         `}>
           <div className="bg-gradient-to-r from-blue-800/40 to-blue-800/20 py-4 px-6 rounded-lg mb-6 border border-blue-700/30 shadow-md">
             <div className="flex items-center justify-between">
