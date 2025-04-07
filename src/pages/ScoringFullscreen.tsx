@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from "react";
 import { useParams, useSearchParams } from "react-router-dom";
 import { Timer, Trophy, AlertTriangle, Flag, Minus, Clock, Award, Zap } from "lucide-react";
@@ -21,24 +20,20 @@ const ScoringFullscreen = () => {
   const [matchPaused, setMatchPaused] = useState(false);
   const [showPenalty, setShowPenalty] = useState<{visible: boolean, athlete: string, type: string} | null>(null);
   
-  // Audio refs for sound effects
   const startSoundRef = useRef<HTMLAudioElement | null>(null);
   const countdownSoundRef = useRef<HTMLAudioElement | null>(null);
   const penaltySoundRef = useRef<HTMLAudioElement | null>(null);
   const pointSoundRef = useRef<HTMLAudioElement | null>(null);
   
-  // Log initial state
   useEffect(() => {
     console.log("ScoringFullscreen mounted. ID:", id, "Type:", matchType);
     
-    // Initialize audio elements
     startSoundRef.current = new Audio("/sounds/match-start.mp3");
     countdownSoundRef.current = new Audio("/sounds/countdown.mp3");
     penaltySoundRef.current = new Audio("/sounds/penalty.mp3");
     pointSoundRef.current = new Audio("/sounds/point.mp3");
     
     return () => {
-      // Clean up audio resources
       startSoundRef.current = null;
       countdownSoundRef.current = null;
       penaltySoundRef.current = null;
@@ -46,34 +41,27 @@ const ScoringFullscreen = () => {
     };
   }, [id, matchType]);
   
-  // Watch for match start to play sound
   useEffect(() => {
     if (matchStarted && !matchPaused) {
-      // Play start sound when match begins
       startSoundRef.current?.play();
     }
   }, [matchStarted, matchPaused]);
   
-  // Watch for countdown to play countdown sound
   useEffect(() => {
     if (matchStarted && !matchPaused && time <= 10 && time > 0) {
       countdownSoundRef.current?.play();
     }
   }, [time, matchStarted, matchPaused]);
   
-  // Formatar o tempo em MM:SS
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${mins}:${secs < 10 ? "0" : ""}${secs}`;
   };
   
-  // Simular carregamento de dados do combate
   useEffect(() => {
-    // Em uma aplicação real, buscaria os dados da API
     const fetchMatch = () => {
       console.log("Fetching match data for ID:", id, "Type:", matchType);
-      // Simulando dados
       if (matchType === "kumite") {
         const kumiteMatches = [
           {
@@ -123,18 +111,14 @@ const ScoringFullscreen = () => {
     
     fetchMatch();
   }, [id, matchType]);
-
-  // Compare previous penalties with current to detect changes
+  
   const prevPenaltiesRef = useRef(penalties);
   
   useEffect(() => {
-    // Check if penalties changed
     const prevPenalties = prevPenaltiesRef.current;
     
-    // Check athlete1 penalties
     for (const type of ['jogai', 'chukoku', 'keikoku'] as const) {
       if (penalties.athlete1[type] > prevPenalties.athlete1[type]) {
-        // Show penalty notification for athlete1
         setShowPenalty({
           visible: true,
           athlete: match?.athlete1.name || 'Atleta AKA',
@@ -142,7 +126,6 @@ const ScoringFullscreen = () => {
         });
         penaltySoundRef.current?.play();
         
-        // Hide notification after 3 seconds
         setTimeout(() => {
           setShowPenalty(null);
         }, 3000);
@@ -150,10 +133,8 @@ const ScoringFullscreen = () => {
       }
     }
     
-    // Check athlete2 penalties
     for (const type of ['jogai', 'chukoku', 'keikoku'] as const) {
       if (penalties.athlete2[type] > prevPenalties.athlete2[type]) {
-        // Show penalty notification for athlete2
         setShowPenalty({
           visible: true,
           athlete: match?.athlete2.name || 'Atleta AO',
@@ -161,7 +142,6 @@ const ScoringFullscreen = () => {
         });
         penaltySoundRef.current?.play();
         
-        // Hide notification after 3 seconds
         setTimeout(() => {
           setShowPenalty(null);
         }, 3000);
@@ -169,29 +149,22 @@ const ScoringFullscreen = () => {
       }
     }
     
-    // Update ref with current penalties
     prevPenaltiesRef.current = penalties;
   }, [penalties, match]);
   
-  // Compare previous scores with current to detect changes
   const prevScoresRef = useRef(scores);
   
   useEffect(() => {
-    // Check if scores changed
     const prevScores = prevScoresRef.current;
     
-    // Check if total score changed
     if (scores.athlete1.total > prevScores.athlete1.total || 
         scores.athlete2.total > prevScores.athlete2.total) {
-      // Play point sound
       pointSoundRef.current?.play();
     }
     
-    // Update ref with current scores
     prevScoresRef.current = scores;
   }, [scores]);
-
-  // Get penalty name in Portuguese
+  
   const getPenaltyName = (penaltyType: string): string => {
     switch (penaltyType) {
       case 'jogai': return 'Jogai (Saída da Área)';
@@ -200,8 +173,7 @@ const ScoringFullscreen = () => {
       default: return 'Penalidade';
     }
   };
-
-  // Atualização dos pontos e tempo via mensagens
+  
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
       const data = event.data;
@@ -225,7 +197,6 @@ const ScoringFullscreen = () => {
 
     window.addEventListener('message', handleMessage);
     
-    // Solicitar estado atual
     if (window.opener) {
       console.log("Requesting state from opener");
       window.opener.postMessage({ type: 'REQUEST_STATE', matchId: id }, '*');
@@ -244,16 +215,13 @@ const ScoringFullscreen = () => {
     );
   }
   
-  // Cálculo de pontuação total - usando os valores já calculados vindos da tela principal
   const totalPoints1 = scores.athlete1.total || 0;
   const totalPoints2 = scores.athlete2.total || 0;
   
-  // Determinar o vencedor atual
   const winner = totalPoints1 > totalPoints2 ? 'athlete1' : totalPoints1 < totalPoints2 ? 'athlete2' : null;
   
   return (
     <div className="min-h-screen w-full bg-gradient-to-br from-gray-900 to-black overflow-hidden text-white flex flex-col">
-      {/* Cabeçalho com informações do combate */}
       <header className="bg-gradient-to-r from-primary/90 to-primary/60 py-4 px-6 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <Trophy className="h-6 w-6" />
@@ -270,15 +238,12 @@ const ScoringFullscreen = () => {
         </div>
       </header>
       
-      {/* Área principal com a pontuação */}
       <main className="flex-1 flex items-stretch p-4 gap-4">
-        {/* Painel do Atleta 1 (AKA) */}
         <div className={`flex-1 p-5 rounded-xl border flex flex-col transition-all duration-300
           ${winner === 'athlete1' 
             ? 'bg-gradient-to-b from-red-950/70 to-red-900/30 border-red-500/50 shadow-[0_0_15px_rgba(239,68,68,0.3)]' 
             : 'bg-gradient-to-b from-red-950/50 to-red-900/20 border-white/10'}
         `}>
-          {/* Cabeçalho do Atleta */}
           <div className="bg-gradient-to-r from-red-800/40 to-red-800/20 py-4 px-6 rounded-lg mb-6 border border-red-700/30 shadow-md">
             <div className="flex items-center justify-between">
               <h2 className="text-3xl font-bold">{match.athlete1.name}</h2>
@@ -286,7 +251,6 @@ const ScoringFullscreen = () => {
             </div>
           </div>
           
-          {/* Seção de Pontuação */}
           <div className="mb-6">
             <h3 className="text-xl font-semibold mb-3 flex items-center gap-2">
               <Award className="h-5 w-5 text-red-400" /> Pontos
@@ -298,20 +262,17 @@ const ScoringFullscreen = () => {
             </div>
           </div>
           
-          {/* Seção de Penalidades */}
           <div className="mb-6">
             <h3 className="text-xl font-semibold mb-3 flex items-center gap-2">
               <AlertTriangle className="h-5 w-5 text-yellow-500" /> Penalidades
             </h3>
             <div className="grid grid-cols-3 gap-4 mt-2">
-              {/* Sempre mostrar todos os tipos de penalidades, mesmo com valor 0 */}
               <PenaltyIndicator type="Jogai" count={penalties.athlete1.jogai} />
               <PenaltyIndicator type="Chukoku" count={penalties.athlete1.chukoku} />
               <PenaltyIndicator type="Keikoku" count={penalties.athlete1.keikoku} />
             </div>
           </div>
           
-          {/* Total de Pontos */}
           <div className="mt-auto">
             <div className="flex justify-between items-center bg-gradient-to-r from-black/60 to-red-950/40 rounded-lg p-4 border border-red-900/30 shadow-md">
               <span className="text-xl">Total de Pontos</span>
@@ -322,13 +283,11 @@ const ScoringFullscreen = () => {
           </div>
         </div>
         
-        {/* Painel do Atleta 2 (AO) */}
         <div className={`flex-1 p-5 rounded-xl border flex flex-col transition-all duration-300
           ${winner === 'athlete2' 
             ? 'bg-gradient-to-b from-blue-950/70 to-blue-900/30 border-blue-500/50 shadow-[0_0_15px_rgba(59,130,246,0.3)]' 
             : 'bg-gradient-to-b from-blue-950/50 to-blue-900/20 border-white/10'}
         `}>
-          {/* Cabeçalho do Atleta */}
           <div className="bg-gradient-to-r from-blue-800/40 to-blue-800/20 py-4 px-6 rounded-lg mb-6 border border-blue-700/30 shadow-md">
             <div className="flex items-center justify-between">
               <h2 className="text-3xl font-bold">{match.athlete2.name}</h2>
@@ -336,7 +295,6 @@ const ScoringFullscreen = () => {
             </div>
           </div>
           
-          {/* Seção de Pontuação */}
           <div className="mb-6">
             <h3 className="text-xl font-semibold mb-3 flex items-center gap-2">
               <Award className="h-5 w-5 text-blue-400" /> Pontos
@@ -348,20 +306,17 @@ const ScoringFullscreen = () => {
             </div>
           </div>
           
-          {/* Seção de Penalidades */}
           <div className="mb-6">
             <h3 className="text-xl font-semibold mb-3 flex items-center gap-2">
               <AlertTriangle className="h-5 w-5 text-yellow-500" /> Penalidades
             </h3>
             <div className="grid grid-cols-3 gap-4 mt-2">
-              {/* Sempre mostrar todos os tipos de penalidades, mesmo com valor 0 */}
               <PenaltyIndicator type="Jogai" count={penalties.athlete2.jogai} />
               <PenaltyIndicator type="Chukoku" count={penalties.athlete2.chukoku} />
               <PenaltyIndicator type="Keikoku" count={penalties.athlete2.keikoku} />
             </div>
           </div>
           
-          {/* Total de Pontos */}
           <div className="mt-auto">
             <div className="flex justify-between items-center bg-gradient-to-r from-black/60 to-blue-950/40 rounded-lg p-4 border border-blue-900/30 shadow-md">
               <span className="text-xl">Total de Pontos</span>
@@ -373,7 +328,6 @@ const ScoringFullscreen = () => {
         </div>
       </main>
       
-      {/* Status do jogo */}
       <div className="py-3 px-6 bg-gradient-to-r from-black/80 to-black/60 text-center border-t border-b border-white/10">
         {!matchStarted ? (
           <div className="flex items-center justify-center gap-2 text-yellow-400 font-medium">
@@ -393,7 +347,6 @@ const ScoringFullscreen = () => {
         )}
       </div>
       
-      {/* Informações de rodapé */}
       <footer className="py-4 px-6 bg-gradient-to-r from-black to-black/80 flex justify-between items-center border-t border-white/5">
         <div className="text-lg text-white/70">
           Dojo Heiseikan - Campeonato de Karatê 2025
@@ -403,7 +356,6 @@ const ScoringFullscreen = () => {
         </div>
       </footer>
       
-      {/* Notification for penalties */}
       {showPenalty && showPenalty.visible && (
         <div className="fixed inset-0 flex items-center justify-center z-50 pointer-events-none">
           <div className="bg-red-600/90 text-white px-8 py-6 rounded-lg shadow-lg animate-pulse backdrop-blur-sm border border-red-500/50">
@@ -417,7 +369,6 @@ const ScoringFullscreen = () => {
         </div>
       )}
       
-      {/* Hidden audio elements */}
       <audio src="/sounds/match-start.mp3" preload="auto" />
       <audio src="/sounds/countdown.mp3" preload="auto" />
       <audio src="/sounds/penalty.mp3" preload="auto" />
@@ -426,7 +377,6 @@ const ScoringFullscreen = () => {
   );
 };
 
-// Componente para exibir os blocos de pontuação
 const ScoreBlock = ({ label, points, value, color }: { label: string, points: string, value: number, color: "red" | "blue" }) => {
   const bgGradient = color === "red" 
     ? "bg-gradient-to-br from-red-900/50 to-red-800/30" 
@@ -443,7 +393,13 @@ const ScoreBlock = ({ label, points, value, color }: { label: string, points: st
   const valueSize = value > 9 ? "text-4xl" : "text-5xl";
   
   return (
-    <div className={`rounded-lg ${bgGradient} border ${borderColor} p-4 text-center shadow-md transition-all duration-200 hover:scale-105`}>
+    <div 
+      className={`
+        rounded-lg ${bgGradient} border ${borderColor} 
+        p-4 text-center shadow-md transition-all duration-200 
+        hover:scale-105 w-full min-w-[120px]
+      `}
+    >
       <div className="text-xl font-medium mb-1">{label}</div>
       <div className="text-sm mb-3 opacity-70">{points} ponto{Number(points) > 1 ? "s" : ""}</div>
       <div className={`${valueSize} font-bold ${value > 0 ? valueColor : "text-white/80"}`}>
@@ -453,7 +409,6 @@ const ScoreBlock = ({ label, points, value, color }: { label: string, points: st
   );
 };
 
-// Component for displaying penalties
 const PenaltyIndicator = ({ type, count }: { type: string, count: number }) => {
   const getIcon = () => {
     switch (type.toLowerCase()) {
@@ -464,7 +419,6 @@ const PenaltyIndicator = ({ type, count }: { type: string, count: number }) => {
     }
   };
   
-  // Sempre mostrar, mesmo com contagem zero, mas com estilo diferente
   const isActive = count > 0;
   
   return (
