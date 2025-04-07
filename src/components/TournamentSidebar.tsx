@@ -14,7 +14,7 @@ export function TournamentSidebar() {
   const { id: tournamentId } = useParams<{ id: string }>();
   const [username, setUsername] = useState("");
   const [userRole, setUserRole] = useState("");
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   
   useEffect(() => {
     const savedUsername = localStorage.getItem('karate_username') || '';
@@ -34,30 +34,36 @@ export function TournamentSidebar() {
     navigate('/');
   };
 
-  const toggleMobileMenu = () => {
-    setMobileMenuOpen(!mobileMenuOpen);
-  };
-
   // Get first letter of username for avatar
   const avatarInitial = username ? username.charAt(0).toUpperCase() : '';
   const isAdmin = userRole === 'admin' || username === 'Francivaldo';
 
+  // Toggle mobile menu
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
+  };
+
   return (
     <>
-      {/* Mobile hamburger button */}
-      <Button 
-        variant="outline" 
-        size="icon" 
-        className="fixed top-4 right-4 z-[100] md:hidden"
-        onClick={toggleMobileMenu}
-      >
-        {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-      </Button>
+      {/* Mobile menu button */}
+      <div className="fixed top-4 left-4 z-50 md:hidden">
+        <Button variant="outline" size="icon" onClick={toggleMobileMenu}>
+          {isMobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+        </Button>
+      </div>
 
-      {/* Sidebar for desktop and mobile */}
+      {/* Mobile menu overlay */}
+      {isMobileMenuOpen && (
+        <div 
+          className="fixed inset-0 bg-black/60 z-40 md:hidden" 
+          onClick={() => setIsMobileMenuOpen(false)}
+        />
+      )}
+
+      {/* Sidebar */}
       <div 
-        className={`fixed inset-y-0 left-0 z-50 flex w-64 flex-col border-r bg-sidebar-background border-border transition-transform duration-300 ease-in-out ${
-          mobileMenuOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
+        className={`fixed inset-y-0 left-0 z-50 w-64 transform transition-transform duration-300 ease-in-out bg-sidebar-background border-r border-border ${
+          isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
         }`}
       >
         <div className="flex shrink-0 items-center p-5 border-b border-border/30">
@@ -100,13 +106,8 @@ export function TournamentSidebar() {
         </div>
       </div>
 
-      {/* Overlay for mobile menu */}
-      {mobileMenuOpen && (
-        <div 
-          className="fixed inset-0 bg-black/50 z-40 md:hidden" 
-          onClick={() => setMobileMenuOpen(false)}
-        />
-      )}
+      {/* Content margin adjustment for mobile */}
+      <div className="md:hidden h-16"></div>
     </>
   );
 }

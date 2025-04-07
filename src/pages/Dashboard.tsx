@@ -47,31 +47,32 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="flex min-h-screen bg-background">
+    <div className="flex min-h-screen overflow-hidden bg-background">
       <Sidebar />
       
-      <div className="flex-1 ml-64">
-        <header className="sticky top-0 z-40 flex items-center justify-between gap-4 border-b bg-background/95 px-8 py-4 backdrop-blur">
+      <div className="flex-1 md:ml-64 w-full transition-all duration-300">
+        <header className="sticky top-0 z-30 flex items-center justify-between gap-4 border-b bg-background/95 px-4 md:px-8 py-4 backdrop-blur">
           <div>
             <h1 className="text-2xl font-semibold tracking-tight">Visão Geral</h1>
             <p className="text-muted-foreground">Bem-vindo ao seu centro de gerenciamento de torneios de karatê</p>
           </div>
           
           <div className="flex items-center gap-3">
-            <Button variant="outline" className="gap-2" onClick={handleTournamentClick}>
+            <Button variant="outline" className="gap-2 hidden sm:flex" onClick={handleTournamentClick}>
               <Trophy className="h-4 w-4" />
               <span>Torneios</span>
             </Button>
             <Button className="gap-2" onClick={handleTournamentClick}>
-              <span>Gerenciar Torneios</span>
+              <span className="hidden sm:inline">Gerenciar Torneios</span>
+              <span className="sm:hidden">Torneios</span>
               <span className="text-lg">+</span>
             </Button>
           </div>
         </header>
         
-        <main className="px-8 py-6">
+        <main className="px-4 md:px-8 py-6">
           {/* Estatísticas */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8">
             {STAT_CARDS.map(({ title, value, icon, iconColor }) => (
               <StatCard 
                 key={title}
@@ -84,7 +85,7 @@ const Dashboard = () => {
           </div>
           
           {/* Lutas e Ações Rápidas */}
-          <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 md:gap-8">
             <div className="lg:col-span-3 space-y-4">
               <div className="flex items-center justify-between mb-2">
                 <div>
@@ -103,7 +104,7 @@ const Dashboard = () => {
               </div>
               
               {/* Lutas com o design atualizado */}
-              <div className="space-y-5 pr-2">
+              <div className="space-y-4 md:space-y-5 pr-0 md:pr-2">
                 <MatchCard 
                   category="Male Kumite -75kg" 
                   time="10:30 AM" 

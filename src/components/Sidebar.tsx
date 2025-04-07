@@ -1,5 +1,5 @@
 
-import { Home, LogOut, Settings, Shield, Users, Clipboard, Trophy, Menu, X, BookOpen, Award, Heart } from "lucide-react";
+import { Home, LogOut, Settings, Shield, Users, Clipboard, Trophy, Menu, X } from "lucide-react";
 import Logo from "./Logo";
 import { SidebarLink } from "./SidebarLink";
 import { ThemeToggle } from "./ThemeToggle";
@@ -8,13 +8,12 @@ import { Avatar, AvatarFallback } from "./ui/avatar";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { Button } from "./ui/button";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "./ui/accordion";
 
 export function Sidebar() {
   const navigate = useNavigate();
   const [username, setUsername] = useState("");
   const [userRole, setUserRole] = useState("");
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   
   useEffect(() => {
     const savedUsername = localStorage.getItem('karate_username') || '';
@@ -34,38 +33,43 @@ export function Sidebar() {
     navigate('/');
   };
 
-  const toggleMobileMenu = () => {
-    setMobileMenuOpen(!mobileMenuOpen);
-  };
-
   // Get first letter of username for avatar
   const avatarInitial = username ? username.charAt(0).toUpperCase() : '';
   const isAdmin = userRole === 'admin' || username === 'Francivaldo';
 
+  // Toggle mobile menu
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
+  };
+
   return (
     <>
-      {/* Mobile hamburger button */}
-      <Button 
-        variant="outline" 
-        size="icon" 
-        className="fixed top-4 right-4 z-[100] md:hidden"
-        onClick={toggleMobileMenu}
-      >
-        {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-      </Button>
+      {/* Mobile menu button */}
+      <div className="fixed top-4 left-4 z-50 md:hidden">
+        <Button variant="outline" size="icon" onClick={toggleMobileMenu}>
+          {isMobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+        </Button>
+      </div>
 
-      {/* Sidebar for desktop and mobile */}
+      {/* Mobile menu overlay */}
+      {isMobileMenuOpen && (
+        <div 
+          className="fixed inset-0 bg-black/60 z-40 md:hidden" 
+          onClick={() => setIsMobileMenuOpen(false)}
+        />
+      )}
+
+      {/* Sidebar */}
       <div 
-        className={`fixed inset-y-0 left-0 z-50 flex w-64 flex-col border-r bg-sidebar-background border-border transition-transform duration-300 ease-in-out ${
-          mobileMenuOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
+        className={`fixed inset-y-0 left-0 z-50 w-64 transform transition-transform duration-300 ease-in-out bg-sidebar-background border-r border-border ${
+          isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
         }`}
       >
         <div className="flex shrink-0 items-center p-5 border-b border-border/30">
           <Logo variant="dashboard" />
         </div>
         
-        <div className="flex flex-1 flex-col px-4 py-4 gap-1 overflow-y-auto">
-          {/* Main Navigation */}
+        <div className="flex flex-1 flex-col px-4 py-4 gap-2 overflow-y-auto">
           <div className="mb-6">
             <p className="px-3 text-xs font-semibold text-muted-foreground mb-2 uppercase tracking-wider">
               Menu Principal
@@ -74,88 +78,6 @@ export function Sidebar() {
             <SidebarLink icon={Trophy} label="Torneios" to="/torneios" />
             <SidebarLink icon={Clipboard} label="Inscrições" to="/inscricoes" />
             <SidebarLink icon={Settings} label="Configurações" to="/configuracoes" />
-          </div>
-          
-          {/* Academy Section */}
-          <div className="mb-6">
-            <p className="px-3 text-xs font-semibold text-muted-foreground mb-2 uppercase tracking-wider">
-              Nossa Academia
-            </p>
-            <Accordion type="single" collapsible className="w-full">
-              <AccordionItem value="about" className="border-none">
-                <AccordionTrigger className="py-2 px-3 hover:bg-muted rounded-md text-sm font-medium flex gap-x-3">
-                  <BookOpen className="h-5 w-5 shrink-0 text-foreground/70" />
-                  <span className="text-left">Sobre Nós</span>
-                </AccordionTrigger>
-                <AccordionContent className="pb-0 px-3">
-                  <ul className="space-y-1 pl-6">
-                    <li className="py-1 text-sm text-muted-foreground hover:text-foreground cursor-pointer">
-                      História
-                    </li>
-                    <li className="py-1 text-sm text-muted-foreground hover:text-foreground cursor-pointer">
-                      Instrutores
-                    </li>
-                    <li className="py-1 text-sm text-muted-foreground hover:text-foreground cursor-pointer">
-                      Filosofia
-                    </li>
-                  </ul>
-                </AccordionContent>
-              </AccordionItem>
-              
-              <AccordionItem value="classes" className="border-none">
-                <AccordionTrigger className="py-2 px-3 hover:bg-muted rounded-md text-sm font-medium flex gap-x-3">
-                  <Shield className="h-5 w-5 shrink-0 text-foreground/70" />
-                  <span className="text-left">Aulas e Horários</span>
-                </AccordionTrigger>
-                <AccordionContent className="pb-0 px-3">
-                  <ul className="space-y-1 pl-6">
-                    <li className="py-1 text-sm text-muted-foreground hover:text-foreground cursor-pointer">
-                      Caratê Infantil
-                    </li>
-                    <li className="py-1 text-sm text-muted-foreground hover:text-foreground cursor-pointer">
-                      Caratê Adulto
-                    </li>
-                    <li className="py-1 text-sm text-muted-foreground hover:text-foreground cursor-pointer">
-                      Horários
-                    </li>
-                  </ul>
-                </AccordionContent>
-              </AccordionItem>
-              
-              <AccordionItem value="achievements" className="border-none">
-                <AccordionTrigger className="py-2 px-3 hover:bg-muted rounded-md text-sm font-medium flex gap-x-3">
-                  <Award className="h-5 w-5 shrink-0 text-foreground/70" />
-                  <span className="text-left">Conquistas</span>
-                </AccordionTrigger>
-                <AccordionContent className="pb-0 px-3">
-                  <ul className="space-y-1 pl-6">
-                    <li className="py-1 text-sm text-muted-foreground hover:text-foreground cursor-pointer">
-                      Medalhas
-                    </li>
-                    <li className="py-1 text-sm text-muted-foreground hover:text-foreground cursor-pointer">
-                      Graduações
-                    </li>
-                  </ul>
-                </AccordionContent>
-              </AccordionItem>
-              
-              <AccordionItem value="community" className="border-none">
-                <AccordionTrigger className="py-2 px-3 hover:bg-muted rounded-md text-sm font-medium flex gap-x-3">
-                  <Heart className="h-5 w-5 shrink-0 text-foreground/70" />
-                  <span className="text-left">Comunidade</span>
-                </AccordionTrigger>
-                <AccordionContent className="pb-0 px-3">
-                  <ul className="space-y-1 pl-6">
-                    <li className="py-1 text-sm text-muted-foreground hover:text-foreground cursor-pointer">
-                      Eventos
-                    </li>
-                    <li className="py-1 text-sm text-muted-foreground hover:text-foreground cursor-pointer">
-                      Projetos Sociais
-                    </li>
-                  </ul>
-                </AccordionContent>
-              </AccordionItem>
-            </Accordion>
           </div>
         </div>
 
@@ -187,13 +109,8 @@ export function Sidebar() {
         </div>
       </div>
 
-      {/* Overlay for mobile menu */}
-      {mobileMenuOpen && (
-        <div 
-          className="fixed inset-0 bg-black/50 z-40 md:hidden" 
-          onClick={() => setMobileMenuOpen(false)}
-        />
-      )}
+      {/* Content margin adjustment for mobile */}
+      <div className="md:hidden h-16"></div>
     </>
   );
 }
