@@ -45,7 +45,9 @@ const Tournaments = () => {
   };
   
   const handleTournamentAdded = (newTournament: Tournament) => {
-    setTournaments(prevTournaments => [...prevTournaments, newTournament]);
+    // Fixed: properly type the function to match what useLocalStorage expects
+    const updatedTournaments = [...tournaments, newTournament];
+    setTournaments(updatedTournaments);
   };
   
   const handleEnterTournament = (id: number) => {
@@ -59,6 +61,7 @@ const Tournaments = () => {
   const confirmFinalizeTournament = () => {
     if (!tournamentToFinalize) return;
 
+    // Fixed: properly type the function to match what useLocalStorage expects
     const updatedTournaments = tournaments.map(t => 
       t.id === tournamentToFinalize.id 
         ? { ...t, status: 'completed' as const } 
