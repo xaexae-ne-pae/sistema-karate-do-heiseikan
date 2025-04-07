@@ -1,7 +1,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useParams, useSearchParams } from "react-router-dom";
-import { Timer, Trophy, AlertTriangle, Flag, Minus } from "lucide-react";
+import { Timer, Trophy, AlertTriangle, Flag, Minus, Clock, Award, Zap } from "lucide-react";
 
 const ScoringFullscreen = () => {
   const { id } = useParams<{ id: string }>();
@@ -252,111 +252,149 @@ const ScoringFullscreen = () => {
   const winner = totalPoints1 > totalPoints2 ? 'athlete1' : totalPoints1 < totalPoints2 ? 'athlete2' : null;
   
   return (
-    <div className="min-h-screen w-full bg-black overflow-hidden text-white flex flex-col">
+    <div className="min-h-screen w-full bg-gradient-to-br from-gray-900 to-black overflow-hidden text-white flex flex-col">
       {/* Cabeçalho com informações do combate */}
-      <header className="bg-gradient-to-r from-primary/80 to-primary/50 py-4 px-6 flex items-center justify-between">
+      <header className="bg-gradient-to-r from-primary/90 to-primary/60 py-4 px-6 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <Trophy className="h-6 w-6" />
           <h1 className="text-2xl font-bold">{match.category}</h1>
         </div>
         
         <div className={`flex items-center justify-center gap-2 px-5 py-2 rounded-lg font-mono text-2xl
-          ${time <= 10 ? "bg-red-500/30 text-red-500" : "bg-black/30"}
+          ${time <= 10 ? "bg-red-500/40 text-red-300" : "bg-black/40 border border-white/10"}
           ${!matchStarted || matchPaused ? "animate-pulse" : ""}
+          shadow-lg
         `}>
-          <Timer className={`h-5 w-5 ${time <= 10 ? "text-red-500" : "text-white"}`} />
+          <Clock className={`h-5 w-5 ${time <= 10 ? "text-red-300" : "text-white"}`} />
           <span>{formatTime(time)}</span>
         </div>
       </header>
       
       {/* Área principal com a pontuação */}
-      <main className="flex-1 flex items-stretch p-6">
-        <div className={`flex-1 p-6 bg-gradient-to-b from-red-900/20 to-red-900/5 rounded-l-xl border-r border-white/10 flex flex-col ${winner === 'athlete1' ? 'ring-2 ring-red-500/50' : ''}`}>
-          <div className="bg-gradient-to-r from-red-700/30 to-red-700/10 py-6 px-8 rounded-lg mb-8">
-            <h2 className="text-4xl font-bold mb-2">{match.athlete1.name}</h2>
-            <div className="flex items-center gap-2">
-              <div className="w-4 h-4 rounded-full bg-red-500"></div>
-              <span className="text-xl text-red-200">Atleta AKA</span>
+      <main className="flex-1 flex items-stretch p-4 gap-4">
+        {/* Painel do Atleta 1 (AKA) */}
+        <div className={`flex-1 p-5 rounded-xl border flex flex-col transition-all duration-300
+          ${winner === 'athlete1' 
+            ? 'bg-gradient-to-b from-red-950/70 to-red-900/30 border-red-500/50 shadow-[0_0_15px_rgba(239,68,68,0.3)]' 
+            : 'bg-gradient-to-b from-red-950/50 to-red-900/20 border-white/10'}
+        `}>
+          {/* Cabeçalho do Atleta */}
+          <div className="bg-gradient-to-r from-red-800/40 to-red-800/20 py-4 px-6 rounded-lg mb-6 border border-red-700/30 shadow-md">
+            <div className="flex items-center justify-between">
+              <h2 className="text-3xl font-bold">{match.athlete1.name}</h2>
+              <span className="bg-red-600 text-white px-3 py-1 rounded-full text-sm font-medium shadow-md">AKA</span>
             </div>
           </div>
           
-          <div className="grid grid-cols-3 gap-8 mt-4">
-            <ScoreBlock label="YUKO" points="1" value={scores.athlete1.yuko} color="red" />
-            <ScoreBlock label="WAZARI" points="2" value={scores.athlete1.wazari} color="red" />
-            <ScoreBlock label="IPPON" points="4" value={scores.athlete1.ippon} color="red" />
+          {/* Seção de Pontuação */}
+          <div className="mb-6">
+            <h3 className="text-xl font-semibold mb-3 flex items-center gap-2">
+              <Award className="h-5 w-5 text-red-400" /> Pontos
+            </h3>
+            <div className="grid grid-cols-3 gap-4 mt-2">
+              <ScoreBlock label="YUKO" points="1" value={scores.athlete1.yuko} color="red" />
+              <ScoreBlock label="WAZARI" points="2" value={scores.athlete1.wazari} color="red" />
+              <ScoreBlock label="IPPON" points="4" value={scores.athlete1.ippon} color="red" />
+            </div>
           </div>
           
-          {/* Penalties display */}
-          <div className="mt-6 grid grid-cols-3 gap-3">
-            {penalties.athlete1.jogai > 0 && (
+          {/* Seção de Penalidades */}
+          <div className="mb-6">
+            <h3 className="text-xl font-semibold mb-3 flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5 text-yellow-500" /> Penalidades
+            </h3>
+            <div className="grid grid-cols-3 gap-4 mt-2">
+              {/* Sempre mostrar todos os tipos de penalidades, mesmo com valor 0 */}
               <PenaltyIndicator type="Jogai" count={penalties.athlete1.jogai} />
-            )}
-            {penalties.athlete1.chukoku > 0 && (
               <PenaltyIndicator type="Chukoku" count={penalties.athlete1.chukoku} />
-            )}
-            {penalties.athlete1.keikoku > 0 && (
               <PenaltyIndicator type="Keikoku" count={penalties.athlete1.keikoku} />
-            )}
+            </div>
           </div>
           
+          {/* Total de Pontos */}
           <div className="mt-auto">
-            <div className="flex justify-between items-center bg-black/40 rounded-lg p-4">
+            <div className="flex justify-between items-center bg-gradient-to-r from-black/60 to-red-950/40 rounded-lg p-4 border border-red-900/30 shadow-md">
               <span className="text-xl">Total de Pontos</span>
-              <span className="text-5xl font-bold">{totalPoints1}</span>
+              <span className={`text-5xl font-bold ${totalPoints1 > 0 ? 'text-red-300' : 'text-white'}`}>
+                {totalPoints1}
+              </span>
             </div>
           </div>
         </div>
         
-        <div className={`flex-1 p-6 bg-gradient-to-b from-blue-900/20 to-blue-900/5 rounded-r-xl border-l border-white/10 flex flex-col ${winner === 'athlete2' ? 'ring-2 ring-blue-500/50' : ''}`}>
-          <div className="bg-gradient-to-r from-blue-700/30 to-blue-700/10 py-6 px-8 rounded-lg mb-8">
-            <h2 className="text-4xl font-bold mb-2">{match.athlete2.name}</h2>
-            <div className="flex items-center gap-2">
-              <div className="w-4 h-4 rounded-full bg-blue-500"></div>
-              <span className="text-xl text-blue-200">Atleta AO</span>
+        {/* Painel do Atleta 2 (AO) */}
+        <div className={`flex-1 p-5 rounded-xl border flex flex-col transition-all duration-300
+          ${winner === 'athlete2' 
+            ? 'bg-gradient-to-b from-blue-950/70 to-blue-900/30 border-blue-500/50 shadow-[0_0_15px_rgba(59,130,246,0.3)]' 
+            : 'bg-gradient-to-b from-blue-950/50 to-blue-900/20 border-white/10'}
+        `}>
+          {/* Cabeçalho do Atleta */}
+          <div className="bg-gradient-to-r from-blue-800/40 to-blue-800/20 py-4 px-6 rounded-lg mb-6 border border-blue-700/30 shadow-md">
+            <div className="flex items-center justify-between">
+              <h2 className="text-3xl font-bold">{match.athlete2.name}</h2>
+              <span className="bg-blue-600 text-white px-3 py-1 rounded-full text-sm font-medium shadow-md">AO</span>
             </div>
           </div>
           
-          <div className="grid grid-cols-3 gap-8 mt-4">
-            <ScoreBlock label="YUKO" points="1" value={scores.athlete2.yuko} color="blue" />
-            <ScoreBlock label="WAZARI" points="2" value={scores.athlete2.wazari} color="blue" />
-            <ScoreBlock label="IPPON" points="4" value={scores.athlete2.ippon} color="blue" />
+          {/* Seção de Pontuação */}
+          <div className="mb-6">
+            <h3 className="text-xl font-semibold mb-3 flex items-center gap-2">
+              <Award className="h-5 w-5 text-blue-400" /> Pontos
+            </h3>
+            <div className="grid grid-cols-3 gap-4 mt-2">
+              <ScoreBlock label="YUKO" points="1" value={scores.athlete2.yuko} color="blue" />
+              <ScoreBlock label="WAZARI" points="2" value={scores.athlete2.wazari} color="blue" />
+              <ScoreBlock label="IPPON" points="4" value={scores.athlete2.ippon} color="blue" />
+            </div>
           </div>
           
-          {/* Penalties display */}
-          <div className="mt-6 grid grid-cols-3 gap-3">
-            {penalties.athlete2.jogai > 0 && (
+          {/* Seção de Penalidades */}
+          <div className="mb-6">
+            <h3 className="text-xl font-semibold mb-3 flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5 text-yellow-500" /> Penalidades
+            </h3>
+            <div className="grid grid-cols-3 gap-4 mt-2">
+              {/* Sempre mostrar todos os tipos de penalidades, mesmo com valor 0 */}
               <PenaltyIndicator type="Jogai" count={penalties.athlete2.jogai} />
-            )}
-            {penalties.athlete2.chukoku > 0 && (
               <PenaltyIndicator type="Chukoku" count={penalties.athlete2.chukoku} />
-            )}
-            {penalties.athlete2.keikoku > 0 && (
               <PenaltyIndicator type="Keikoku" count={penalties.athlete2.keikoku} />
-            )}
+            </div>
           </div>
           
+          {/* Total de Pontos */}
           <div className="mt-auto">
-            <div className="flex justify-between items-center bg-black/40 rounded-lg p-4">
+            <div className="flex justify-between items-center bg-gradient-to-r from-black/60 to-blue-950/40 rounded-lg p-4 border border-blue-900/30 shadow-md">
               <span className="text-xl">Total de Pontos</span>
-              <span className="text-5xl font-bold">{totalPoints2}</span>
+              <span className={`text-5xl font-bold ${totalPoints2 > 0 ? 'text-blue-300' : 'text-white'}`}>
+                {totalPoints2}
+              </span>
             </div>
           </div>
         </div>
       </main>
       
       {/* Status do jogo */}
-      <div className="py-2 px-6 bg-black/60 text-center">
+      <div className="py-3 px-6 bg-gradient-to-r from-black/80 to-black/60 text-center border-t border-b border-white/10">
         {!matchStarted ? (
-          <span className="text-yellow-400 font-medium">Aguardando início da luta</span>
+          <div className="flex items-center justify-center gap-2 text-yellow-400 font-medium">
+            <Timer className="h-5 w-5 animate-pulse" />
+            <span>Aguardando início da luta</span>
+          </div>
         ) : matchPaused ? (
-          <span className="text-yellow-400 font-medium">Luta pausada</span>
+          <div className="flex items-center justify-center gap-2 text-yellow-400 font-medium">
+            <Timer className="h-5 w-5 animate-pulse" />
+            <span>Luta pausada</span>
+          </div>
         ) : (
-          <span className="text-green-400 font-medium">Luta em andamento</span>
+          <div className="flex items-center justify-center gap-2 text-green-400 font-medium">
+            <Zap className="h-5 w-5" />
+            <span>Luta em andamento</span>
+          </div>
         )}
       </div>
       
       {/* Informações de rodapé */}
-      <footer className="py-4 px-6 bg-black/50 flex justify-between items-center">
+      <footer className="py-4 px-6 bg-gradient-to-r from-black to-black/80 flex justify-between items-center border-t border-white/5">
         <div className="text-lg text-white/70">
           Dojo Heiseikan - Campeonato de Karatê 2025
         </div>
@@ -368,7 +406,7 @@ const ScoringFullscreen = () => {
       {/* Notification for penalties */}
       {showPenalty && showPenalty.visible && (
         <div className="fixed inset-0 flex items-center justify-center z-50 pointer-events-none">
-          <div className="bg-red-500/80 text-white px-8 py-6 rounded-lg shadow-lg animate-pulse backdrop-blur-sm">
+          <div className="bg-red-600/90 text-white px-8 py-6 rounded-lg shadow-lg animate-pulse backdrop-blur-sm border border-red-500/50">
             <div className="flex items-center gap-3 text-2xl font-bold mb-2">
               <AlertTriangle className="h-8 w-8" />
               <h3>Penalidade</h3>
@@ -390,15 +428,25 @@ const ScoringFullscreen = () => {
 
 // Componente para exibir os blocos de pontuação
 const ScoreBlock = ({ label, points, value, color }: { label: string, points: string, value: number, color: "red" | "blue" }) => {
-  const bgColor = color === "red" 
-    ? "bg-red-900/30 border-red-700/50" 
-    : "bg-blue-900/30 border-blue-700/50";
+  const bgGradient = color === "red" 
+    ? "bg-gradient-to-br from-red-900/50 to-red-800/30" 
+    : "bg-gradient-to-br from-blue-900/50 to-blue-800/30";
+    
+  const borderColor = color === "red" 
+    ? "border-red-700/40" 
+    : "border-blue-700/40";
+    
+  const valueColor = color === "red" 
+    ? "text-red-300" 
+    : "text-blue-300";
+    
+  const valueSize = value > 9 ? "text-4xl" : "text-5xl";
   
   return (
-    <div className={`rounded-lg ${bgColor} border p-4 text-center`}>
-      <div className="text-xl mb-1">{label}</div>
-      <div className="text-sm mb-4 opacity-70">{points} ponto{Number(points) > 1 ? "s" : ""}</div>
-      <div className={`text-5xl font-bold ${color === "red" ? "text-red-300" : "text-blue-300"}`}>
+    <div className={`rounded-lg ${bgGradient} border ${borderColor} p-4 text-center shadow-md transition-all duration-200 hover:scale-105`}>
+      <div className="text-xl font-medium mb-1">{label}</div>
+      <div className="text-sm mb-3 opacity-70">{points} ponto{Number(points) > 1 ? "s" : ""}</div>
+      <div className={`${valueSize} font-bold ${value > 0 ? valueColor : "text-white/80"}`}>
         {value}
       </div>
     </div>
@@ -407,8 +455,6 @@ const ScoreBlock = ({ label, points, value, color }: { label: string, points: st
 
 // Component for displaying penalties
 const PenaltyIndicator = ({ type, count }: { type: string, count: number }) => {
-  if (count <= 0) return null;
-  
   const getIcon = () => {
     switch (type.toLowerCase()) {
       case 'jogai': return <Flag className="h-4 w-4" />;
@@ -418,13 +464,20 @@ const PenaltyIndicator = ({ type, count }: { type: string, count: number }) => {
     }
   };
   
+  // Sempre mostrar, mesmo com contagem zero, mas com estilo diferente
+  const isActive = count > 0;
+  
   return (
-    <div className="bg-yellow-600/30 border border-yellow-500/50 rounded px-3 py-2 text-center">
-      <div className="flex items-center justify-center gap-1">
+    <div className={`border rounded px-3 py-2 text-center shadow-md transition-all duration-200 ${
+      isActive 
+        ? "bg-gradient-to-br from-yellow-800/50 to-yellow-900/30 border-yellow-600/50" 
+        : "bg-black/30 border-gray-700/30 opacity-70"
+    }`}>
+      <div className="flex items-center justify-center gap-1 mb-1">
         {getIcon()}
-        <span>{type}</span>
+        <span className="font-medium">{type}</span>
       </div>
-      <div className="text-xl font-bold mt-1">{count}</div>
+      <div className={`text-xl font-bold mt-1 ${isActive ? "text-yellow-400" : "text-white/60"}`}>{count}</div>
     </div>
   );
 };
