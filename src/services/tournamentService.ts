@@ -1,6 +1,27 @@
 
 import { Tournament, TournamentFormData } from "@/types/tournament";
 
+// Helper function to determine tournament status based on date and time
+export const determineTournamentStatus = (dateStr: string, timeStr: string): "upcoming" | "active" | "completed" => {
+  const today = new Date();
+  const [day, month, year] = dateStr.split('/').map(Number);
+  const [hours, minutes] = timeStr.split(':').map(Number);
+  
+  // Create tournament date object (note: month is 0-indexed in JavaScript Date)
+  const tournamentDate = new Date(year, month - 1, day, hours, minutes);
+  
+  // Compare with current date and time
+  if (tournamentDate > today) {
+    return "upcoming";
+  } else if (tournamentDate.getDate() === today.getDate() && 
+             tournamentDate.getMonth() === today.getMonth() && 
+             tournamentDate.getFullYear() === today.getFullYear()) {
+    return "active";
+  } else {
+    return "completed";
+  }
+};
+
 // Mock data for tournaments
 const MOCK_TOURNAMENTS: Tournament[] = [
   {
@@ -43,7 +64,21 @@ export const getAllTournaments = async (): Promise<Tournament[]> => {
   // Get tournaments from localStorage if available, otherwise use mock data
   const storedTournaments = localStorage.getItem('karate_tournaments');
   if (storedTournaments) {
-    return JSON.parse(storedTournaments);
+    const tournaments = JSON.parse(storedTournaments);
+    
+    // Update status based on date and time for each tournament
+    const updatedTournaments = tournaments.map((t: Tournament) => {
+      // Skip completed tournaments
+      if (t.status === "completed") return t;
+      
+      // Determine current status based on date and time
+      const currentStatus = determineTournamentStatus(t.date, t.time);
+      return { ...t, status: currentStatus };
+    });
+    
+    // Save updated statuses
+    localStorage.setItem('karate_tournaments', JSON.stringify(updatedTournaments));
+    return updatedTournaments;
   }
 
   // Simulating API delay
@@ -78,15 +113,25 @@ export const saveTournament = async (tournamentData: Partial<Tournament>): Promi
     
     localStorage.setItem('karate_tournaments', JSON.stringify(updatedTournaments));
   } else {
+    // Format date if needed
+    let dateStr = tournamentData.date || new Date().toLocaleDateString('pt-BR');
+    if (dateStr instanceof Date) {
+      dateStr = dateStr.toLocaleDateString('pt-BR');
+    }
+    
+    // Determine status based on date and time
+    const timeStr = tournamentData.time || "08:00";
+    const status = determineTournamentStatus(dateStr, timeStr);
+    
     // Create new tournament
     savedTournament = {
       id: Math.max(0, ...tournaments.map((t: Tournament) => t.id)) + 1,
       name: tournamentData.name || "Unnamed Tournament",
-      date: tournamentData.date || new Date().toISOString(),
-      time: tournamentData.time || "08:00",
+      date: dateStr,
+      time: timeStr,
       location: tournamentData.location || "No location set",
       description: tournamentData.description || "",
-      status: tournamentData.status || "upcoming",
+      status: status,
       categoriesCount: tournamentData.categoriesCount || 0,
       athletesCount: tournamentData.athletesCount || 0
     };
