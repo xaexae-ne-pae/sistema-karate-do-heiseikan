@@ -14,6 +14,7 @@ import TournamentAthletes from "./pages/TournamentAthletes";
 import TournamentCategories from "./pages/TournamentCategories";
 import TournamentResults from "./pages/TournamentResults";
 import TournamentScoring from "./pages/TournamentScoring";
+import ScoringFullscreen from "./pages/ScoringFullscreen";
 import AllMatches from "./pages/AllMatches";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
@@ -85,6 +86,13 @@ const App = () => (
           <Route path="/torneios/:id/resultados" element={
             <ProtectedRoute>
               <TournamentResults />
+            </ProtectedRoute>
+          } />
+          
+          {/* Fullscreen Scoring Page */}
+          <Route path="/torneios/:id/pontuacao/fullscreen" element={
+            <ProtectedRoute>
+              <ScoringFullscreen />
             </ProtectedRoute>
           } />
           
