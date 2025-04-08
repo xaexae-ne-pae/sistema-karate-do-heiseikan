@@ -62,8 +62,8 @@ const TournamentScoring = () => {
           </div>
         </header>
         
-        <main className="flex-1 p-6 overflow-hidden">
-          <div className="h-full flex flex-col">
+        <main className="flex-1 p-6 overflow-hidden flex justify-center">
+          <div className="w-4/5 max-w-6xl">
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
@@ -81,13 +81,13 @@ const TournamentScoring = () => {
               </Badge>
             </div>
             
-            <div className="bg-gradient-to-r from-primary/5 to-secondary/5 rounded-xl p-1 h-full">
+            <div className="bg-gradient-to-r from-primary/5 to-secondary/5 rounded-xl p-6 shadow-sm border border-border/30">
               <Tabs 
                 defaultValue="kata" 
                 onValueChange={setActiveTab} 
                 className="h-full"
               >
-                <TabsList className="grid grid-cols-2 mb-4 bg-background/50 p-1 w-64">
+                <TabsList className="grid grid-cols-2 mb-6 bg-background/50 p-1 w-64">
                   <TabsTrigger 
                     value="kata" 
                     className={`text-sm rounded-md font-medium py-2 ${activeTab === "kata" ? "bg-secondary/20" : ""}`}
@@ -102,119 +102,117 @@ const TournamentScoring = () => {
                   </TabsTrigger>
                 </TabsList>
                 
-                <div className="h-[calc(100vh-260px)]">
-                  <TabsContent value="kata" className="h-full animate-fade-in">
-                    <div className="grid grid-cols-3 gap-5 h-full">
-                      {kataMatches.map((match) => (
-                        <Card 
-                          key={match.id} 
-                          className="overflow-hidden border-0 shadow-md hover:shadow-lg transition-all duration-300 hover:translate-y-[-2px] flex flex-col"
-                        >
-                          <div className="bg-gradient-to-r from-secondary/20 to-secondary/5 p-4">
-                            <div className="flex justify-between items-center mb-2">
-                              <Badge variant="secondary" className="capitalize text-xs px-2 py-0.5 rounded-md">
-                                Kata
-                              </Badge>
-                              <div className="flex items-center gap-1 text-xs font-medium bg-background/40 px-2 py-1 rounded-full">
-                                {match.time}
-                              </div>
+                <TabsContent value="kata" className="animate-fade-in">
+                  <div className="grid grid-cols-3 gap-6">
+                    {kataMatches.map((match) => (
+                      <Card 
+                        key={match.id} 
+                        className="overflow-hidden border-0 shadow-md hover:shadow-lg transition-all duration-300 hover:translate-y-[-2px] flex flex-col hover-glow"
+                      >
+                        <div className="bg-gradient-to-r from-secondary/20 to-secondary/5 p-4">
+                          <div className="flex justify-between items-center mb-2">
+                            <Badge variant="secondary" className="capitalize text-xs px-2 py-0.5 rounded-md">
+                              Kata
+                            </Badge>
+                            <div className="flex items-center gap-1 text-xs font-medium bg-background/40 px-2 py-1 rounded-full">
+                              {match.time}
                             </div>
-                            <h3 className="font-semibold text-sm">{match.category}</h3>
                           </div>
-                          
-                          <div className="p-4 flex-1 flex flex-col">
-                            <div className="grid grid-cols-5 items-center gap-2 bg-muted/20 p-3 rounded-lg mb-auto">
-                              <div className="col-span-2 flex flex-col items-center text-center">
-                                <div className="w-12 h-12 rounded-full bg-secondary/10 flex items-center justify-center mb-2">
-                                  <User className="h-5 w-5 text-secondary" />
-                                </div>
-                                <span className="font-medium text-sm">{match.athlete1}</span>
+                          <h3 className="font-semibold text-sm">{match.category}</h3>
+                        </div>
+                        
+                        <div className="p-4 flex-1 flex flex-col">
+                          <div className="grid grid-cols-5 items-center gap-2 bg-muted/20 p-3 rounded-lg mb-auto">
+                            <div className="col-span-2 flex flex-col items-center text-center">
+                              <div className="w-12 h-12 rounded-full bg-secondary/10 flex items-center justify-center mb-2">
+                                <User className="h-5 w-5 text-secondary" />
                               </div>
-                              
-                              <div className="flex items-center justify-center">
-                                <div className="w-8 h-8 rounded-full flex items-center justify-center bg-muted/50 font-semibold text-xs text-muted-foreground">
-                                  VS
-                                </div>
-                              </div>
-                              
-                              <div className="col-span-2 flex flex-col items-center text-center">
-                                <div className="w-12 h-12 rounded-full bg-secondary/10 flex items-center justify-center mb-2">
-                                  <User className="h-5 w-5 text-secondary" />
-                                </div>
-                                <span className="font-medium text-sm">{match.athlete2}</span>
+                              <span className="font-medium text-sm">{match.athlete1}</span>
+                            </div>
+                            
+                            <div className="flex items-center justify-center">
+                              <div className="w-8 h-8 rounded-full flex items-center justify-center bg-muted/50 font-semibold text-xs text-muted-foreground">
+                                VS
                               </div>
                             </div>
                             
-                            <Button 
-                              className="mt-4 gap-2 bg-secondary/90 hover:bg-secondary shadow-sm rounded-full py-2.5 text-sm font-medium group"
-                              onClick={() => handleStartMatch(match.id)}
-                            >
-                              <Timer className="h-4 w-4" />
-                              <span>Iniciar Pontuação</span>
-                              <ArrowRight className="h-4 w-4 ml-1 transition-transform group-hover:translate-x-1" />
-                            </Button>
-                          </div>
-                        </Card>
-                      ))}
-                    </div>
-                  </TabsContent>
-                  
-                  <TabsContent value="kumite" className="h-full animate-fade-in">
-                    <div className="grid grid-cols-3 gap-5 h-full">
-                      {kumiteMatches.map((match) => (
-                        <Card 
-                          key={match.id} 
-                          className="overflow-hidden border-0 shadow-md hover:shadow-lg transition-all duration-300 hover:translate-y-[-2px] flex flex-col"
-                        >
-                          <div className="bg-gradient-to-r from-primary/20 to-primary/5 p-4">
-                            <div className="flex justify-between items-center mb-2">
-                              <Badge className="capitalize text-xs px-2 py-0.5 rounded-md">
-                                Kumite
-                              </Badge>
-                              <div className="flex items-center gap-1 text-xs font-medium bg-background/40 px-2 py-1 rounded-full">
-                                {match.time}
+                            <div className="col-span-2 flex flex-col items-center text-center">
+                              <div className="w-12 h-12 rounded-full bg-secondary/10 flex items-center justify-center mb-2">
+                                <User className="h-5 w-5 text-secondary" />
                               </div>
+                              <span className="font-medium text-sm">{match.athlete2}</span>
                             </div>
-                            <h3 className="font-semibold text-sm">{match.category}</h3>
                           </div>
                           
-                          <div className="p-4 flex-1 flex flex-col">
-                            <div className="grid grid-cols-5 items-center gap-2 bg-muted/20 p-3 rounded-lg mb-auto">
-                              <div className="col-span-2 flex flex-col items-center text-center">
-                                <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-2">
-                                  <User className="h-5 w-5 text-primary" />
-                                </div>
-                                <span className="font-medium text-sm">{match.athlete1}</span>
+                          <Button 
+                            className="mt-4 gap-2 bg-secondary/90 hover:bg-secondary shadow-sm rounded-full py-2.5 text-sm font-medium group"
+                            onClick={() => handleStartMatch(match.id)}
+                          >
+                            <Timer className="h-4 w-4" />
+                            <span>Iniciar Pontuação</span>
+                            <ArrowRight className="h-4 w-4 ml-1 transition-transform group-hover:translate-x-1" />
+                          </Button>
+                        </div>
+                      </Card>
+                    ))}
+                  </div>
+                </TabsContent>
+                
+                <TabsContent value="kumite" className="animate-fade-in">
+                  <div className="grid grid-cols-3 gap-6">
+                    {kumiteMatches.map((match) => (
+                      <Card 
+                        key={match.id} 
+                        className="overflow-hidden border-0 shadow-md hover:shadow-lg transition-all duration-300 hover:translate-y-[-2px] flex flex-col hover-glow"
+                      >
+                        <div className="bg-gradient-to-r from-primary/20 to-primary/5 p-4">
+                          <div className="flex justify-between items-center mb-2">
+                            <Badge className="capitalize text-xs px-2 py-0.5 rounded-md">
+                              Kumite
+                            </Badge>
+                            <div className="flex items-center gap-1 text-xs font-medium bg-background/40 px-2 py-1 rounded-full">
+                              {match.time}
+                            </div>
+                          </div>
+                          <h3 className="font-semibold text-sm">{match.category}</h3>
+                        </div>
+                        
+                        <div className="p-4 flex-1 flex flex-col">
+                          <div className="grid grid-cols-5 items-center gap-2 bg-muted/20 p-3 rounded-lg mb-auto">
+                            <div className="col-span-2 flex flex-col items-center text-center">
+                              <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-2">
+                                <User className="h-5 w-5 text-primary" />
                               </div>
-                              
-                              <div className="flex items-center justify-center">
-                                <div className="w-8 h-8 rounded-full flex items-center justify-center bg-muted/50 font-semibold text-xs text-muted-foreground">
-                                  VS
-                                </div>
-                              </div>
-                              
-                              <div className="col-span-2 flex flex-col items-center text-center">
-                                <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-2">
-                                  <User className="h-5 w-5 text-primary" />
-                                </div>
-                                <span className="font-medium text-sm">{match.athlete2}</span>
+                              <span className="font-medium text-sm">{match.athlete1}</span>
+                            </div>
+                            
+                            <div className="flex items-center justify-center">
+                              <div className="w-8 h-8 rounded-full flex items-center justify-center bg-muted/50 font-semibold text-xs text-muted-foreground">
+                                VS
                               </div>
                             </div>
                             
-                            <Button 
-                              className="mt-4 gap-2 shadow-sm rounded-full py-2.5 text-sm font-medium group"
-                              onClick={() => handleStartMatch(match.id)}
-                            >
-                              <Timer className="h-4 w-4" />
-                              <span>Iniciar Pontuação</span>
-                              <ArrowRight className="h-4 w-4 ml-1 transition-transform group-hover:translate-x-1" />
-                            </Button>
+                            <div className="col-span-2 flex flex-col items-center text-center">
+                              <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-2">
+                                <User className="h-5 w-5 text-primary" />
+                              </div>
+                              <span className="font-medium text-sm">{match.athlete2}</span>
+                            </div>
                           </div>
-                        </Card>
-                      ))}
-                    </div>
-                  </TabsContent>
-                </div>
+                          
+                          <Button 
+                            className="mt-4 gap-2 shadow-sm rounded-full py-2.5 text-sm font-medium group"
+                            onClick={() => handleStartMatch(match.id)}
+                          >
+                            <Timer className="h-4 w-4" />
+                            <span>Iniciar Pontuação</span>
+                            <ArrowRight className="h-4 w-4 ml-1 transition-transform group-hover:translate-x-1" />
+                          </Button>
+                        </div>
+                      </Card>
+                    ))}
+                  </div>
+                </TabsContent>
               </Tabs>
             </div>
           </div>
