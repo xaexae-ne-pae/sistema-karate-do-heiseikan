@@ -12,6 +12,7 @@ import { getAllTournaments } from "@/services/tournamentService";
 import { AddTournamentDialog } from "@/components/tournament/AddTournamentDialog";
 import { ConfirmationDialog } from "@/components/ConfirmationDialog";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
+import { TournamentCard } from "@/components/TournamentCard";
 
 const Tournaments = () => {
   const navigate = useNavigate();
@@ -35,7 +36,6 @@ const Tournaments = () => {
     } catch (error) {
       console.error("Error fetching tournaments:", error);
       // Don't show error toast when there are no tournaments, just set empty array
-      setTournaments([]);
       setIsLoading(false);
     }
   };
@@ -45,9 +45,8 @@ const Tournaments = () => {
   };
   
   const handleTournamentAdded = (newTournament: Tournament) => {
-    // Fixed: properly type the function to match what useLocalStorage expects
-    const updatedTournaments = [...tournaments, newTournament];
-    setTournaments(updatedTournaments);
+    // Fix: properly handle the Tournament[] type
+    setTournaments([...tournaments, newTournament]);
   };
   
   const handleEnterTournament = (id: number) => {
@@ -61,7 +60,7 @@ const Tournaments = () => {
   const confirmFinalizeTournament = () => {
     if (!tournamentToFinalize) return;
 
-    // Fixed: properly type the function to match what useLocalStorage expects
+    // Fix: properly handle the Tournament[] type
     const updatedTournaments = tournaments.map(t => 
       t.id === tournamentToFinalize.id 
         ? { ...t, status: 'completed' as const } 
