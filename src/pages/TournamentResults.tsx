@@ -1,7 +1,7 @@
 
 import { TournamentSidebar } from "@/components/TournamentSidebar";
 import { Button } from "@/components/ui/button";
-import { Medal, Download, Filter, Trophy } from "lucide-react";
+import { Download, Filter, Trophy } from "lucide-react";
 import { useParams } from "react-router-dom";
 
 const TournamentResults = () => {
