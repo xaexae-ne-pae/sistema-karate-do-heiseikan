@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useParams, useSearchParams } from "react-router-dom";
-import { Timer, Trophy, AlertTriangle, Flag, Minus, Clock, Award, Zap } from "lucide-react";
+import { Play, RefreshCcw, X, Check, Timer, ExternalLink, Trophy, AlertTriangle, Flag, Minus, Clock, Award, Zap } from "lucide-react";
 
 const ScoringFullscreen = () => {
   const { id } = useParams<{ id: string }>();
@@ -17,8 +17,7 @@ const ScoringFullscreen = () => {
     athlete2: { jogai: 0, chukoku: 0, keikoku: 0 }
   });
   const [matchStarted, setMatchStarted] = useState(false);
-  const [matchPaused, setMatchPaused] = useState(false);
-  const [showPenalty, setShowPenalty] = useState<{visible: boolean, athlete: string, type: string} | null>(null);
+  const [matchPaused, setMatchPaused] = useState(true);
   
   const startSoundRef = useRef<HTMLAudioElement | null>(null);
   const countdownSoundRef = useRef<HTMLAudioElement | null>(null);
@@ -52,6 +51,23 @@ const ScoringFullscreen = () => {
       countdownSoundRef.current?.play();
     }
   }, [time, matchStarted, matchPaused]);
+  
+  // Timer logic
+  useEffect(() => {
+    let interval: number | undefined;
+    
+    if (matchStarted && !matchPaused && time > 0) {
+      interval = window.setInterval(() => {
+        setTime(prevTime => prevTime - 1);
+      }, 1000);
+    } else if (time === 0) {
+      setMatchPaused(true);
+    }
+    
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [matchStarted, matchPaused, time]);
   
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -112,100 +128,92 @@ const ScoringFullscreen = () => {
     fetchMatch();
   }, [id, matchType]);
   
-  const prevPenaltiesRef = useRef(penalties);
-  
-  useEffect(() => {
-    const prevPenalties = prevPenaltiesRef.current;
+  // Function to add score
+  const addScore = (athlete: 'athlete1' | 'athlete2', scoreType: 'yuko' | 'wazari' | 'ippon') => {
+    const scoreValues = { yuko: 1, wazari: 2, ippon: 4 };
     
-    for (const type of ['jogai', 'chukoku', 'keikoku'] as const) {
-      if (penalties.athlete1[type] > prevPenalties.athlete1[type]) {
-        setShowPenalty({
-          visible: true,
-          athlete: match?.athlete1.name || 'Atleta AKA',
-          type: getPenaltyName(type)
-        });
-        penaltySoundRef.current?.play();
+    setScores(prev => {
+      const newScore = { ...prev };
+      newScore[athlete][scoreType] += 1;
+      
+      // Recalculate total
+      newScore[athlete].total = (
+        newScore[athlete].yuko * scoreValues.yuko +
+        newScore[athlete].wazari * scoreValues.wazari +
+        newScore[athlete].ippon * scoreValues.ippon
+      );
+      
+      return newScore;
+    });
+    
+    pointSoundRef.current?.play();
+  };
+
+  // Function to subtract score
+  const subtractScore = (athlete: 'athlete1' | 'athlete2', scoreType: 'yuko' | 'wazari' | 'ippon') => {
+    const scoreValues = { yuko: 1, wazari: 2, ippon: 4 };
+    
+    setScores(prev => {
+      const newScore = { ...prev };
+      if (newScore[athlete][scoreType] > 0) {
+        newScore[athlete][scoreType] -= 1;
         
-        setTimeout(() => {
-          setShowPenalty(null);
-        }, 3000);
-        break;
+        // Recalculate total
+        newScore[athlete].total = (
+          newScore[athlete].yuko * scoreValues.yuko +
+          newScore[athlete].wazari * scoreValues.wazari +
+          newScore[athlete].ippon * scoreValues.ippon
+        );
       }
-    }
+      return newScore;
+    });
+  };
+
+  // Function to add penalty
+  const addPenalty = (athlete: 'athlete1' | 'athlete2', penaltyType: 'jogai' | 'chukoku' | 'keikoku') => {
+    setPenalties(prev => {
+      const newPenalties = { ...prev };
+      newPenalties[athlete][penaltyType] += 1;
+      return newPenalties;
+    });
     
-    for (const type of ['jogai', 'chukoku', 'keikoku'] as const) {
-      if (penalties.athlete2[type] > prevPenalties.athlete2[type]) {
-        setShowPenalty({
-          visible: true,
-          athlete: match?.athlete2.name || 'Atleta AO',
-          type: getPenaltyName(type)
-        });
-        penaltySoundRef.current?.play();
-        
-        setTimeout(() => {
-          setShowPenalty(null);
-        }, 3000);
-        break;
+    penaltySoundRef.current?.play();
+  };
+
+  // Function to subtract penalty
+  const subtractPenalty = (athlete: 'athlete1' | 'athlete2', penaltyType: 'jogai' | 'chukoku' | 'keikoku') => {
+    setPenalties(prev => {
+      const newPenalties = { ...prev };
+      if (newPenalties[athlete][penaltyType] > 0) {
+        newPenalties[athlete][penaltyType] -= 1;
       }
-    }
-    
-    prevPenaltiesRef.current = penalties;
-  }, [penalties, match]);
-  
-  const prevScoresRef = useRef(scores);
-  
-  useEffect(() => {
-    const prevScores = prevScoresRef.current;
-    
-    if (scores.athlete1.total > prevScores.athlete1.total || 
-        scores.athlete2.total > prevScores.athlete2.total) {
-      pointSoundRef.current?.play();
-    }
-    
-    prevScoresRef.current = scores;
-  }, [scores]);
-  
-  const getPenaltyName = (penaltyType: string): string => {
-    switch (penaltyType) {
-      case 'jogai': return 'Jogai (Saída da Área)';
-      case 'chukoku': return 'Chukoku (Advertência)';
-      case 'keikoku': return 'Keikoku (Penalidade)';
-      default: return 'Penalidade';
-    }
+      return newPenalties;
+    });
   };
   
-  useEffect(() => {
-    const handleMessage = (event: MessageEvent) => {
-      const data = event.data;
-      console.log("Received message in fullscreen:", data);
-      
-      if (data.type === 'UPDATE_SCORES') {
-        console.log("Updating scores:", data.scores);
-        setScores(data.scores);
-      } else if (data.type === 'UPDATE_TIME') {
-        console.log("Updating time:", data.time, "Started:", data.matchStarted, "Paused:", data.matchPaused);
-        setTime(data.time);
-        setMatchStarted(data.matchStarted);
-        setMatchPaused(data.matchPaused);
-      } else if (data.type === 'UPDATE_PENALTIES') {
-        console.log("Updating penalties:", data.penalties);
-        setPenalties(data.penalties);
-      } else if (data.type === 'REQUEST_STATE') {
-        console.log("Main window requested state");
-      }
-    };
-
-    window.addEventListener('message', handleMessage);
-    
-    if (window.opener) {
-      console.log("Requesting state from opener");
-      window.opener.postMessage({ type: 'REQUEST_STATE', matchId: id }, '*');
-    }
-
-    return () => {
-      window.removeEventListener('message', handleMessage);
-    };
-  }, [id]);
+  // Match control functions
+  const startMatch = () => {
+    setMatchStarted(true);
+    setMatchPaused(false);
+  };
+  
+  const pauseMatch = () => {
+    setMatchPaused(true);
+  };
+  
+  const resetMatch = () => {
+    setTime(120);
+    setScores({
+      athlete1: { yuko: 0, wazari: 0, ippon: 0, total: 0 },
+      athlete2: { yuko: 0, wazari: 0, ippon: 0, total: 0 }
+    });
+    setPenalties({
+      athlete1: { jogai: 0, chukoku: 0, keikoku: 0 },
+      athlete2: { jogai: 0, chukoku: 0, keikoku: 0 }
+    });
+    setMatchStarted(false);
+    setMatchPaused(true);
+  };
   
   if (!match) {
     return (
@@ -215,225 +223,421 @@ const ScoringFullscreen = () => {
     );
   }
   
-  const totalPoints1 = scores.athlete1.total || 0;
-  const totalPoints2 = scores.athlete2.total || 0;
-  
-  const winner = totalPoints1 > totalPoints2 ? 'athlete1' : totalPoints1 < totalPoints2 ? 'athlete2' : null;
-  
   return (
-    <div className="min-h-screen w-full bg-gradient-to-br from-gray-900 to-black overflow-hidden text-white flex flex-col">
-      <header className="bg-gradient-to-r from-primary/90 to-primary/60 py-4 px-6 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <Trophy className="h-6 w-6" />
-          <h1 className="text-2xl font-bold">{match.category}</h1>
-        </div>
-        
-        <div className={`flex items-center justify-center gap-2 px-5 py-2 rounded-lg font-mono text-2xl
-          ${time <= 10 ? "bg-red-500/40 text-red-300" : "bg-black/40 border border-white/10"}
-          ${!matchStarted || matchPaused ? "animate-pulse" : ""}
-          shadow-lg
-        `}>
-          <Clock className={`h-5 w-5 ${time <= 10 ? "text-red-300" : "text-white"}`} />
-          <span>{formatTime(time)}</span>
-        </div>
-      </header>
-      
-      <main className="flex-1 flex items-stretch p-4 gap-4">
-        <div className={`flex-1 p-5 rounded-xl border flex flex-col transition-all duration-300
-          ${winner === 'athlete1' 
-            ? 'bg-gradient-to-b from-red-950/70 to-red-900/30 border-red-500/50 shadow-[0_0_15px_rgba(239,68,68,0.3)]' 
-            : 'bg-gradient-to-b from-red-950/50 to-red-900/20 border-white/10'}
-          w-full
-        `}>
-          <div className="bg-gradient-to-r from-red-800/40 to-red-800/20 py-4 px-6 rounded-lg mb-6 border border-red-700/30 shadow-md">
-            <div className="flex items-center justify-between">
-              <h2 className="text-3xl font-bold">{match.athlete1.name}</h2>
-              <span className="bg-red-600 text-white px-3 py-1 rounded-full text-sm font-medium shadow-md">AKA</span>
+    <div className="min-h-screen bg-black text-white">
+      {/* Header with timer and controls */}
+      <div className="border-b border-gray-800">
+        <div className="container mx-auto p-4 flex justify-between items-center">
+          <div className="flex items-center gap-4">
+            <div className="text-4xl font-mono font-bold">
+              {formatTime(time)}
             </div>
+            
+            <button 
+              onClick={matchPaused ? startMatch : pauseMatch} 
+              className="bg-red-600 text-white rounded-md px-6 py-2 flex items-center gap-2 hover:bg-red-700 transition-colors"
+            >
+              <Play size={18} />
+              <span>Iniciar</span>
+            </button>
+            
+            <button 
+              onClick={resetMatch}
+              className="bg-gray-800 text-white rounded-md px-6 py-2 flex items-center gap-2 hover:bg-gray-700 transition-colors"
+            >
+              <RefreshCcw size={18} />
+              <span>Reiniciar</span>
+            </button>
           </div>
           
-          <div className="mb-6">
-            <h3 className="text-xl font-semibold mb-3 flex items-center gap-2">
-              <Award className="h-5 w-5 text-red-400" /> Pontos
-            </h3>
-            <div className="grid grid-cols-3 gap-4 mt-2">
-              <ScoreBlock label="YUKO" points="1" value={scores.athlete1.yuko} color="red" />
-              <ScoreBlock label="WAZARI" points="2" value={scores.athlete1.wazari} color="red" />
-              <ScoreBlock label="IPPON" points="4" value={scores.athlete1.ippon} color="red" />
-            </div>
+          <div className="rounded-md bg-gray-800 px-6 py-2">
+            {!matchStarted ? (
+              <span>Não iniciado</span>
+            ) : matchPaused ? (
+              <span>Pausado</span>
+            ) : (
+              <span>Em andamento</span>
+            )}
           </div>
           
-          <div className="mb-6">
-            <h3 className="text-xl font-semibold mb-3 flex items-center gap-2">
-              <AlertTriangle className="h-5 w-5 text-yellow-500" /> Penalidades
-            </h3>
-            <div className="grid grid-cols-3 gap-4 mt-2">
-              <PenaltyIndicator type="Jogai" count={penalties.athlete1.jogai} />
-              <PenaltyIndicator type="Chukoku" count={penalties.athlete1.chukoku} />
-              <PenaltyIndicator type="Keikoku" count={penalties.athlete1.keikoku} />
-            </div>
-          </div>
-          
-          <div className="mt-auto">
-            <div className="flex justify-between items-center bg-gradient-to-r from-black/60 to-red-950/40 rounded-lg p-4 border border-red-900/30 shadow-md">
-              <span className="text-xl">Total de Pontos</span>
-              <span className={`text-5xl font-bold ${totalPoints1 > 0 ? 'text-red-300' : 'text-white'}`}>
-                {totalPoints1}
-              </span>
-            </div>
+          <div className="flex items-center gap-2">
+            <button className="bg-gray-900 text-white rounded-md px-4 py-2 flex items-center gap-2 hover:bg-gray-800 transition-colors">
+              <X size={18} />
+              <span>Cancelar</span>
+            </button>
+            
+            <button className="bg-red-600 text-white rounded-md px-6 py-2 flex items-center gap-2 hover:bg-red-700 transition-colors">
+              <Check size={18} />
+              <span>Salvar</span>
+            </button>
+            
+            <button className="bg-transparent border border-gray-700 rounded-md p-2 text-gray-300 hover:bg-gray-800 transition-colors">
+              <ExternalLink size={18} />
+            </button>
           </div>
         </div>
-        
-        <div className={`flex-1 p-5 rounded-xl border flex flex-col transition-all duration-300
-          ${winner === 'athlete2' 
-            ? 'bg-gradient-to-b from-blue-950/70 to-blue-900/30 border-blue-500/50 shadow-[0_0_15px_rgba(59,130,246,0.3)]' 
-            : 'bg-gradient-to-b from-blue-950/50 to-blue-900/20 border-white/10'}
-          w-full
-        `}>
-          <div className="bg-gradient-to-r from-blue-800/40 to-blue-800/20 py-4 px-6 rounded-lg mb-6 border border-blue-700/30 shadow-md">
-            <div className="flex items-center justify-between">
-              <h2 className="text-3xl font-bold">{match.athlete2.name}</h2>
-              <span className="bg-blue-600 text-white px-3 py-1 rounded-full text-sm font-medium shadow-md">AO</span>
-            </div>
-          </div>
-          
-          <div className="mb-6">
-            <h3 className="text-xl font-semibold mb-3 flex items-center gap-2">
-              <Award className="h-5 w-5 text-blue-400" /> Pontos
-            </h3>
-            <div className="grid grid-cols-3 gap-4 mt-2">
-              <ScoreBlock label="YUKO" points="1" value={scores.athlete2.yuko} color="blue" />
-              <ScoreBlock label="WAZARI" points="2" value={scores.athlete2.wazari} color="blue" />
-              <ScoreBlock label="IPPON" points="4" value={scores.athlete2.ippon} color="blue" />
-            </div>
-          </div>
-          
-          <div className="mb-6">
-            <h3 className="text-xl font-semibold mb-3 flex items-center gap-2">
-              <AlertTriangle className="h-5 w-5 text-yellow-500" /> Penalidades
-            </h3>
-            <div className="grid grid-cols-3 gap-4 mt-2">
-              <PenaltyIndicator type="Jogai" count={penalties.athlete2.jogai} />
-              <PenaltyIndicator type="Chukoku" count={penalties.athlete2.chukoku} />
-              <PenaltyIndicator type="Keikoku" count={penalties.athlete2.keikoku} />
-            </div>
-          </div>
-          
-          <div className="mt-auto">
-            <div className="flex justify-between items-center bg-gradient-to-r from-black/60 to-blue-950/40 rounded-lg p-4 border border-blue-900/30 shadow-md">
-              <span className="text-xl">Total de Pontos</span>
-              <span className={`text-5xl font-bold ${totalPoints2 > 0 ? 'text-blue-300' : 'text-white'}`}>
-                {totalPoints2}
-              </span>
-            </div>
-          </div>
-        </div>
-      </main>
-      
-      <div className="py-3 px-6 bg-gradient-to-r from-black/80 to-black/60 text-center border-t border-b border-white/10">
-        {!matchStarted ? (
-          <div className="flex items-center justify-center gap-2 text-yellow-400 font-medium">
-            <Timer className="h-5 w-5 animate-pulse" />
-            <span>Aguardando início da luta</span>
-          </div>
-        ) : matchPaused ? (
-          <div className="flex items-center justify-center gap-2 text-yellow-400 font-medium">
-            <Timer className="h-5 w-5 animate-pulse" />
-            <span>Luta pausada</span>
-          </div>
-        ) : (
-          <div className="flex items-center justify-center gap-2 text-green-400 font-medium">
-            <Zap className="h-5 w-5" />
-            <span>Luta em andamento</span>
-          </div>
-        )}
       </div>
       
-      <footer className="py-4 px-6 bg-gradient-to-r from-black to-black/80 flex justify-between items-center border-t border-white/5">
-        <div className="text-lg text-white/70">
-          Dojo Heiseikan - Campeonato de Karatê 2025
-        </div>
-        <div className="text-lg">
-          {matchType === "kumite" ? "Combate" : "Kata"} - {match.category}
-        </div>
-      </footer>
-      
-      {showPenalty && showPenalty.visible && (
-        <div className="fixed inset-0 flex items-center justify-center z-50 pointer-events-none">
-          <div className="bg-red-600/90 text-white px-8 py-6 rounded-lg shadow-lg animate-pulse backdrop-blur-sm border border-red-500/50">
-            <div className="flex items-center gap-3 text-2xl font-bold mb-2">
-              <AlertTriangle className="h-8 w-8" />
-              <h3>Penalidade</h3>
+      {/* Main content */}
+      <div className="container mx-auto p-4">
+        <h1 className="text-2xl font-bold mb-6">Pontuação de Kumite</h1>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* AKA (Athlete 1) scoring panel */}
+          <div className="bg-[#1a0d0d] rounded-lg overflow-hidden">
+            {/* Athlete header */}
+            <div className="flex items-center justify-between p-4">
+              <div className="flex items-center gap-3">
+                <div className="h-3 w-3 rounded-full bg-red-500"></div>
+              </div>
+              <div className="bg-red-500 text-white rounded-full px-4 py-1">
+                AKA
+              </div>
             </div>
-            <p className="text-xl">{showPenalty.athlete}</p>
-            <p className="text-lg opacity-90">{showPenalty.type}</p>
+            
+            {/* Scoring section */}
+            <div className="p-4 grid grid-cols-3 gap-4">
+              {/* Yuko */}
+              <div className="bg-[#24191a] rounded-lg p-4">
+                <div className="text-lg">Yuko</div>
+                <div className="text-sm text-gray-400 mb-2">1 ponto</div>
+                <div className="flex justify-center">
+                  <div className="w-12 h-12 rounded-full bg-red-600 flex items-center justify-center text-xl font-bold mb-4">
+                    {scores.athlete1.yuko}
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <button 
+                    onClick={() => addScore('athlete1', 'yuko')}
+                    className="bg-gray-800 hover:bg-gray-700 rounded p-2 flex items-center justify-center"
+                  >
+                    +
+                  </button>
+                  <button 
+                    onClick={() => subtractScore('athlete1', 'yuko')}
+                    className="bg-gray-800 hover:bg-gray-700 rounded p-2 flex items-center justify-center"
+                  >
+                    -
+                  </button>
+                </div>
+              </div>
+              
+              {/* Wazari */}
+              <div className="bg-[#24191a] rounded-lg p-4">
+                <div className="text-lg">Wazari</div>
+                <div className="text-sm text-gray-400 mb-2">2 pontos</div>
+                <div className="flex justify-center">
+                  <div className="w-12 h-12 rounded-full bg-red-600 flex items-center justify-center text-xl font-bold mb-4">
+                    {scores.athlete1.wazari}
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <button 
+                    onClick={() => addScore('athlete1', 'wazari')}
+                    className="bg-gray-800 hover:bg-gray-700 rounded p-2 flex items-center justify-center"
+                  >
+                    +
+                  </button>
+                  <button 
+                    onClick={() => subtractScore('athlete1', 'wazari')}
+                    className="bg-gray-800 hover:bg-gray-700 rounded p-2 flex items-center justify-center"
+                  >
+                    -
+                  </button>
+                </div>
+              </div>
+              
+              {/* Ippon */}
+              <div className="bg-[#24191a] rounded-lg p-4">
+                <div className="text-lg">Ippon</div>
+                <div className="text-sm text-gray-400 mb-2">4 pontos</div>
+                <div className="flex justify-center">
+                  <div className="w-12 h-12 rounded-full bg-red-600 flex items-center justify-center text-xl font-bold mb-4">
+                    {scores.athlete1.ippon}
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <button 
+                    onClick={() => addScore('athlete1', 'ippon')}
+                    className="bg-gray-800 hover:bg-gray-700 rounded p-2 flex items-center justify-center"
+                  >
+                    +
+                  </button>
+                  <button 
+                    onClick={() => subtractScore('athlete1', 'ippon')}
+                    className="bg-gray-800 hover:bg-gray-700 rounded p-2 flex items-center justify-center"
+                  >
+                    -
+                  </button>
+                </div>
+              </div>
+            </div>
+            
+            {/* Penalty section */}
+            <div className="p-4 grid grid-cols-3 gap-4">
+              {/* Jogai */}
+              <div className="bg-[#24191a] rounded-lg p-4">
+                <div className="text-lg">Jogai</div>
+                <div className="flex justify-center">
+                  <div className="w-12 h-12 rounded-full border-2 border-yellow-500 text-yellow-500 flex items-center justify-center text-xl font-bold mb-4">
+                    {penalties.athlete1.jogai}
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <button 
+                    onClick={() => addPenalty('athlete1', 'jogai')}
+                    className="bg-gray-800 hover:bg-gray-700 rounded p-2 flex items-center justify-center border border-yellow-600/30"
+                  >
+                    +
+                  </button>
+                  <button 
+                    onClick={() => subtractPenalty('athlete1', 'jogai')}
+                    className="bg-gray-800 hover:bg-gray-700 rounded p-2 flex items-center justify-center"
+                  >
+                    -
+                  </button>
+                </div>
+              </div>
+              
+              {/* Chukoku */}
+              <div className="bg-[#24191a] rounded-lg p-4">
+                <div className="text-lg">Chukoku</div>
+                <div className="flex justify-center">
+                  <div className="w-12 h-12 rounded-full border-2 border-yellow-500 text-yellow-500 flex items-center justify-center text-xl font-bold mb-4">
+                    {penalties.athlete1.chukoku}
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <button 
+                    onClick={() => addPenalty('athlete1', 'chukoku')}
+                    className="bg-gray-800 hover:bg-gray-700 rounded p-2 flex items-center justify-center border border-yellow-600/30"
+                  >
+                    +
+                  </button>
+                  <button 
+                    onClick={() => subtractPenalty('athlete1', 'chukoku')}
+                    className="bg-gray-800 hover:bg-gray-700 rounded p-2 flex items-center justify-center"
+                  >
+                    -
+                  </button>
+                </div>
+              </div>
+              
+              {/* Keikoku */}
+              <div className="bg-[#24191a] rounded-lg p-4">
+                <div className="text-lg">Keikoku</div>
+                <div className="flex justify-center">
+                  <div className="w-12 h-12 rounded-full border-2 border-yellow-500 text-yellow-500 flex items-center justify-center text-xl font-bold mb-4">
+                    {penalties.athlete1.keikoku}
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <button 
+                    onClick={() => addPenalty('athlete1', 'keikoku')}
+                    className="bg-gray-800 hover:bg-gray-700 rounded p-2 flex items-center justify-center border border-yellow-600/30"
+                  >
+                    +
+                  </button>
+                  <button 
+                    onClick={() => subtractPenalty('athlete1', 'keikoku')}
+                    className="bg-gray-800 hover:bg-gray-700 rounded p-2 flex items-center justify-center"
+                  >
+                    -
+                  </button>
+                </div>
+              </div>
+            </div>
+            
+            {/* Total */}
+            <div className="p-4">
+              <div className="flex justify-between items-center bg-[#24191a] p-4 rounded-lg">
+                <div className="text-lg">Total de pontos</div>
+                <div className="text-4xl font-bold">{scores.athlete1.total}</div>
+              </div>
+            </div>
+          </div>
+          
+          {/* AO (Athlete 2) scoring panel */}
+          <div className="bg-[#0d1119] rounded-lg overflow-hidden">
+            {/* Athlete header */}
+            <div className="flex items-center justify-between p-4">
+              <div className="flex items-center gap-3">
+                <div className="h-3 w-3 rounded-full bg-blue-500"></div>
+              </div>
+              <div className="bg-blue-500 text-white rounded-full px-4 py-1">
+                AO
+              </div>
+            </div>
+            
+            {/* Scoring section */}
+            <div className="p-4 grid grid-cols-3 gap-4">
+              {/* Yuko */}
+              <div className="bg-[#161d29] rounded-lg p-4">
+                <div className="text-lg">Yuko</div>
+                <div className="text-sm text-gray-400 mb-2">1 ponto</div>
+                <div className="flex justify-center">
+                  <div className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center text-xl font-bold mb-4">
+                    {scores.athlete2.yuko}
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <button 
+                    onClick={() => addScore('athlete2', 'yuko')}
+                    className="bg-gray-800 hover:bg-gray-700 rounded p-2 flex items-center justify-center"
+                  >
+                    +
+                  </button>
+                  <button 
+                    onClick={() => subtractScore('athlete2', 'yuko')}
+                    className="bg-gray-800 hover:bg-gray-700 rounded p-2 flex items-center justify-center"
+                  >
+                    -
+                  </button>
+                </div>
+              </div>
+              
+              {/* Wazari */}
+              <div className="bg-[#161d29] rounded-lg p-4">
+                <div className="text-lg">Wazari</div>
+                <div className="text-sm text-gray-400 mb-2">2 pontos</div>
+                <div className="flex justify-center">
+                  <div className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center text-xl font-bold mb-4">
+                    {scores.athlete2.wazari}
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <button 
+                    onClick={() => addScore('athlete2', 'wazari')}
+                    className="bg-gray-800 hover:bg-gray-700 rounded p-2 flex items-center justify-center"
+                  >
+                    +
+                  </button>
+                  <button 
+                    onClick={() => subtractScore('athlete2', 'wazari')}
+                    className="bg-gray-800 hover:bg-gray-700 rounded p-2 flex items-center justify-center"
+                  >
+                    -
+                  </button>
+                </div>
+              </div>
+              
+              {/* Ippon */}
+              <div className="bg-[#161d29] rounded-lg p-4">
+                <div className="text-lg">Ippon</div>
+                <div className="text-sm text-gray-400 mb-2">4 pontos</div>
+                <div className="flex justify-center">
+                  <div className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center text-xl font-bold mb-4">
+                    {scores.athlete2.ippon}
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <button 
+                    onClick={() => addScore('athlete2', 'ippon')}
+                    className="bg-gray-800 hover:bg-gray-700 rounded p-2 flex items-center justify-center"
+                  >
+                    +
+                  </button>
+                  <button 
+                    onClick={() => subtractScore('athlete2', 'ippon')}
+                    className="bg-gray-800 hover:bg-gray-700 rounded p-2 flex items-center justify-center"
+                  >
+                    -
+                  </button>
+                </div>
+              </div>
+            </div>
+            
+            {/* Penalty section */}
+            <div className="p-4 grid grid-cols-3 gap-4">
+              {/* Jogai */}
+              <div className="bg-[#161d29] rounded-lg p-4">
+                <div className="text-lg">Jogai</div>
+                <div className="flex justify-center">
+                  <div className="w-12 h-12 rounded-full border-2 border-yellow-500 text-yellow-500 flex items-center justify-center text-xl font-bold mb-4">
+                    {penalties.athlete2.jogai}
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <button 
+                    onClick={() => addPenalty('athlete2', 'jogai')}
+                    className="bg-gray-800 hover:bg-gray-700 rounded p-2 flex items-center justify-center border border-yellow-600/30"
+                  >
+                    +
+                  </button>
+                  <button 
+                    onClick={() => subtractPenalty('athlete2', 'jogai')}
+                    className="bg-gray-800 hover:bg-gray-700 rounded p-2 flex items-center justify-center"
+                  >
+                    -
+                  </button>
+                </div>
+              </div>
+              
+              {/* Chukoku */}
+              <div className="bg-[#161d29] rounded-lg p-4">
+                <div className="text-lg">Chukoku</div>
+                <div className="flex justify-center">
+                  <div className="w-12 h-12 rounded-full border-2 border-yellow-500 text-yellow-500 flex items-center justify-center text-xl font-bold mb-4">
+                    {penalties.athlete2.chukoku}
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <button 
+                    onClick={() => addPenalty('athlete2', 'chukoku')}
+                    className="bg-gray-800 hover:bg-gray-700 rounded p-2 flex items-center justify-center border border-yellow-600/30"
+                  >
+                    +
+                  </button>
+                  <button 
+                    onClick={() => subtractPenalty('athlete2', 'chukoku')}
+                    className="bg-gray-800 hover:bg-gray-700 rounded p-2 flex items-center justify-center"
+                  >
+                    -
+                  </button>
+                </div>
+              </div>
+              
+              {/* Keikoku */}
+              <div className="bg-[#161d29] rounded-lg p-4">
+                <div className="text-lg">Keikoku</div>
+                <div className="flex justify-center">
+                  <div className="w-12 h-12 rounded-full border-2 border-yellow-500 text-yellow-500 flex items-center justify-center text-xl font-bold mb-4">
+                    {penalties.athlete2.keikoku}
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <button 
+                    onClick={() => addPenalty('athlete2', 'keikoku')}
+                    className="bg-gray-800 hover:bg-gray-700 rounded p-2 flex items-center justify-center border border-yellow-600/30"
+                  >
+                    +
+                  </button>
+                  <button 
+                    onClick={() => subtractPenalty('athlete2', 'keikoku')}
+                    className="bg-gray-800 hover:bg-gray-700 rounded p-2 flex items-center justify-center"
+                  >
+                    -
+                  </button>
+                </div>
+              </div>
+            </div>
+            
+            {/* Total */}
+            <div className="p-4">
+              <div className="flex justify-between items-center bg-[#161d29] p-4 rounded-lg">
+                <div className="text-lg">Total de pontos</div>
+                <div className="text-4xl font-bold">{scores.athlete2.total}</div>
+              </div>
+            </div>
           </div>
         </div>
-      )}
+      </div>
       
+      {/* Audio elements */}
       <audio src="/sounds/match-start.mp3" preload="auto" />
       <audio src="/sounds/countdown.mp3" preload="auto" />
       <audio src="/sounds/penalty.mp3" preload="auto" />
       <audio src="/sounds/point.mp3" preload="auto" />
-    </div>
-  );
-};
-
-const ScoreBlock = ({ label, points, value, color }: { label: string, points: string, value: number, color: "red" | "blue" }) => {
-  const bgGradient = color === "red" 
-    ? "bg-gradient-to-br from-red-900/50 to-red-800/30" 
-    : "bg-gradient-to-br from-blue-900/50 to-blue-800/30";
-    
-  const borderColor = color === "red" 
-    ? "border-red-700/40" 
-    : "border-blue-700/40";
-    
-  const valueColor = color === "red" 
-    ? "text-red-300" 
-    : "text-blue-300";
-    
-  const valueSize = value > 9 ? "text-4xl" : "text-5xl";
-  
-  return (
-    <div 
-      className={`
-        rounded-lg ${bgGradient} border ${borderColor} 
-        p-4 text-center shadow-md transition-all duration-200 
-        hover:scale-105 w-full min-w-[120px]
-      `}
-    >
-      <div className="text-xl font-medium mb-1">{label}</div>
-      <div className="text-sm mb-3 opacity-70">{points} ponto{Number(points) > 1 ? "s" : ""}</div>
-      <div className={`${valueSize} font-bold ${value > 0 ? valueColor : "text-white/80"}`}>
-        {value}
-      </div>
-    </div>
-  );
-};
-
-const PenaltyIndicator = ({ type, count }: { type: string, count: number }) => {
-  const getIcon = () => {
-    switch (type.toLowerCase()) {
-      case 'jogai': return <Flag className="h-4 w-4" />;
-      case 'chukoku': return <AlertTriangle className="h-4 w-4" />;
-      case 'keikoku': return <Minus className="h-4 w-4" />;
-      default: return <AlertTriangle className="h-4 w-4" />;
-    }
-  };
-  
-  const isActive = count > 0;
-  
-  return (
-    <div className={`border rounded px-3 py-2 text-center shadow-md transition-all duration-200 ${
-      isActive 
-        ? "bg-gradient-to-br from-yellow-800/50 to-yellow-900/30 border-yellow-600/50" 
-        : "bg-black/30 border-gray-700/30 opacity-70"
-    }`}>
-      <div className="flex items-center justify-center gap-1 mb-1">
-        {getIcon()}
-        <span className="font-medium">{type}</span>
-      </div>
-      <div className={`text-xl font-bold mt-1 ${isActive ? "text-yellow-400" : "text-white/60"}`}>{count}</div>
     </div>
   );
 };
