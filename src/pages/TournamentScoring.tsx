@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { TournamentSidebar } from "@/components/TournamentSidebar";
@@ -32,24 +31,30 @@ interface KataScore {
 
 interface KumiteScore {
   athlete1: {
+    yuko: number;
     wazari: number;
     ippon: number;
     penalties: number;
     jogai: number;
     mubobi: number;
-    shido: number;
+    chukoku: number;
+    keikoku: number;
     hansokuChui: number;
     hansoku: number;
+    shikkaku: number;
   };
   athlete2: {
+    yuko: number;
     wazari: number;
     ippon: number;
     penalties: number;
     jogai: number;
     mubobi: number;
-    shido: number;
+    chukoku: number;
+    keikoku: number;
     hansokuChui: number;
     hansoku: number;
+    shikkaku: number;
   };
 }
 
@@ -66,24 +71,30 @@ const TournamentScoring = () => {
   });
   const [kumiteScore, setKumiteScore] = useState<KumiteScore>({
     athlete1: { 
+      yuko: 0,
       wazari: 0, 
       ippon: 0, 
       penalties: 0,
       jogai: 0,
       mubobi: 0,
-      shido: 0,
+      chukoku: 0,
+      keikoku: 0,
       hansokuChui: 0,
-      hansoku: 0
+      hansoku: 0,
+      shikkaku: 0
     },
     athlete2: { 
+      yuko: 0,
       wazari: 0, 
       ippon: 0, 
       penalties: 0,
       jogai: 0,
       mubobi: 0,
-      shido: 0,
+      chukoku: 0,
+      keikoku: 0,
       hansokuChui: 0,
-      hansoku: 0
+      hansoku: 0,
+      shikkaku: 0
     },
   });
 
@@ -113,24 +124,30 @@ const TournamentScoring = () => {
     } else {
       setKumiteScore({
         athlete1: { 
+          yuko: 0,
           wazari: 0, 
           ippon: 0, 
           penalties: 0,
           jogai: 0,
           mubobi: 0,
-          shido: 0,
+          chukoku: 0,
+          keikoku: 0,
           hansokuChui: 0,
-          hansoku: 0
+          hansoku: 0,
+          shikkaku: 0
         },
         athlete2: { 
+          yuko: 0,
           wazari: 0, 
           ippon: 0, 
           penalties: 0,
           jogai: 0,
           mubobi: 0,
-          shido: 0,
+          chukoku: 0,
+          keikoku: 0,
           hansokuChui: 0,
-          hansoku: 0
+          hansoku: 0,
+          shikkaku: 0
         },
       });
     }
@@ -212,13 +229,8 @@ const TournamentScoring = () => {
     setKumiteScore(prev => {
       const newValue = Math.max(0, prev[athlete][scoreType] + change);
       
-      // For ippon, max is 1 per match
-      if (scoreType === 'ippon' && newValue > 1) {
-        return prev;
-      }
-      
-      // For hansoku, max is 1
-      if (scoreType === 'hansoku' && newValue > 1) {
+      // For non-penalty scores, limit to reasonable values
+      if ((scoreType === 'ippon' || scoreType === 'hansoku' || scoreType === 'shikkaku') && newValue > 1) {
         return prev;
       }
       
@@ -255,14 +267,12 @@ const TournamentScoring = () => {
     const athlete1 = kumiteScore.athlete1;
     const athlete2 = kumiteScore.athlete2;
     
-    if (athlete1.hansoku > 0) return currentMatch.athlete2;
-    if (athlete2.hansoku > 0) return currentMatch.athlete1;
+    if (athlete1.hansoku > 0 || athlete1.shikkaku > 0) return currentMatch.athlete2;
+    if (athlete2.hansoku > 0 || athlete2.shikkaku > 0) return currentMatch.athlete1;
     
-    if (athlete1.ippon > 0) return currentMatch.athlete1;
-    if (athlete2.ippon > 0) return currentMatch.athlete2;
-    
-    const athlete1Score = athlete1.wazari * 3 - athlete1.penalties;
-    const athlete2Score = athlete2.wazari * 3 - athlete2.penalties;
+    // Calculate total scores
+    const athlete1Score = athlete1.yuko + (athlete1.wazari * 2) + (athlete1.ippon * 3) - athlete1.penalties;
+    const athlete2Score = athlete2.yuko + (athlete2.wazari * 2) + (athlete2.ippon * 3) - athlete2.penalties;
     
     if (athlete1Score > athlete2Score) return currentMatch.athlete1;
     if (athlete2Score > athlete1Score) return currentMatch.athlete2;
@@ -306,10 +316,10 @@ const TournamentScoring = () => {
             </div>
           </header>
           
-          <main className="flex-1 p-6 overflow-auto">
-            <div className="w-full max-w-4xl mx-auto pb-10">
+          <main className="flex-1 overflow-auto">
+            <div className="max-w-6xl mx-auto p-6">
               {/* Timer Component */}
-              <div className="bg-gradient-to-r from-primary/5 to-secondary/5 p-6 rounded-xl shadow-sm border border-border/30 mb-8">
+              <div className="bg-gradient-to-r from-primary/5 to-secondary/5 p-6 rounded-xl shadow-sm border border-border/30 mb-6">
                 <div className="flex items-center justify-between">
                   <h3 className="font-semibold text-lg flex items-center gap-2">
                     <Timer className="h-5 w-5 text-primary" />
@@ -358,766 +368,378 @@ const TournamentScoring = () => {
               </div>
 
               {currentMatch.type === "kata" ? (
-                <ScrollArea className="max-h-[calc(100vh-220px)]">
-                  <div className="space-y-8">
-                    <div className="bg-card shadow-md rounded-xl overflow-hidden border border-border/40">
-                      <div className="bg-gradient-to-r from-primary/10 to-transparent p-6 border-b border-border/30">
-                        <div className="flex flex-col items-center mb-6">
-                          <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mb-3 border-2 border-primary/20">
-                            <User className="h-10 w-10 text-primary" />
-                          </div>
-                          <h3 className="text-xl font-semibold mb-1">{currentMatch.athlete1}</h3>
-                          <p className="text-sm text-muted-foreground">{currentMatch.category}</p>
+                <div className="space-y-6">
+                  <div className="bg-card shadow-md rounded-xl overflow-hidden border border-border/40">
+                    <div className="bg-gradient-to-r from-primary/10 to-transparent p-6 border-b border-border/30">
+                      <div className="flex flex-col items-center mb-6">
+                        <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mb-3 border-2 border-primary/20">
+                          <User className="h-10 w-10 text-primary" />
                         </div>
+                        <h3 className="text-xl font-semibold mb-1">{currentMatch.athlete1}</h3>
+                        <p className="text-sm text-muted-foreground">{currentMatch.category}</p>
                       </div>
+                    </div>
 
-                      <div className="p-6">
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                          {(['judge1', 'judge2', 'judge3'] as const).map((judge, index) => (
-                            <div key={judge} className="space-y-3">
-                              <Label htmlFor={judge} className="flex justify-between text-base">
-                                <span className="flex items-center gap-1.5">
-                                  <Star className="h-4 w-4 text-primary" />
-                                  Jurado {index + 1}
-                                </span>
-                                <span className="text-muted-foreground text-sm">
-                                  0-10
-                                </span>
-                              </Label>
-                              <Input
-                                id={judge}
-                                type="number"
-                                min="0"
-                                max="10"
-                                step="0.1"
-                                value={kataScore[judge]}
-                                onChange={(e) => handleKataScoreChange(judge, e.target.value)}
-                                className="text-center text-xl font-semibold h-14 bg-muted/20 border-primary/20 focus-visible:ring-primary/30"
-                              />
-                            </div>
-                          ))}
-                        </div>
-
-                        <div className="mt-8 pt-6 border-t border-border/30">
-                          <div className="flex justify-between items-center">
-                            <span className="text-xl font-medium">Pontuação Total:</span>
-                            <div className="bg-gradient-to-r from-primary/20 to-primary/10 px-8 py-4 rounded-lg">
-                              <span className="text-3xl font-bold text-primary">
-                                {calculateKataTotal().toFixed(1)}
+                    <div className="p-6">
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        {(['judge1', 'judge2', 'judge3'] as const).map((judge, index) => (
+                          <div key={judge} className="space-y-3">
+                            <Label htmlFor={judge} className="flex justify-between text-base">
+                              <span className="flex items-center gap-1.5">
+                                <Star className="h-4 w-4 text-primary" />
+                                Jurado {index + 1}
                               </span>
-                            </div>
+                              <span className="text-muted-foreground text-sm">
+                                0-10
+                              </span>
+                            </Label>
+                            <Input
+                              id={judge}
+                              type="number"
+                              min="0"
+                              max="10"
+                              step="0.1"
+                              value={kataScore[judge]}
+                              onChange={(e) => handleKataScoreChange(judge, e.target.value)}
+                              className="text-center text-xl font-semibold h-14 bg-muted/20 border-primary/20 focus-visible:ring-primary/30"
+                            />
+                          </div>
+                        ))}
+                      </div>
+
+                      <div className="mt-8 pt-6 border-t border-border/30">
+                        <div className="flex justify-between items-center">
+                          <span className="text-xl font-medium">Pontuação Total:</span>
+                          <div className="bg-gradient-to-r from-primary/20 to-primary/10 px-8 py-4 rounded-lg">
+                            <span className="text-3xl font-bold text-primary">
+                              {calculateKataTotal().toFixed(1)}
+                            </span>
                           </div>
                         </div>
                       </div>
                     </div>
-                    
-                    <div className="flex justify-end">
-                      <Button 
-                        onClick={handleSaveScore}
-                        className="gap-2 bg-primary hover:bg-primary/90 px-8 py-6 text-base shadow-md rounded-lg"
-                      >
-                        <Trophy className="h-5 w-5" />
-                        Salvar Pontuação
-                      </Button>
-                    </div>
                   </div>
-                </ScrollArea>
+                  
+                  <div className="flex justify-end">
+                    <Button 
+                      onClick={handleSaveScore}
+                      className="gap-2 bg-primary hover:bg-primary/90 px-8 py-6 text-base shadow-md rounded-lg"
+                    >
+                      <Trophy className="h-5 w-5" />
+                      Salvar Pontuação
+                    </Button>
+                  </div>
+                </div>
               ) : (
-                <ScrollArea className="max-h-[calc(100vh-220px)]">
-                  <div className="space-y-8">
-                    {/* Athletes header */}
-                    <div className="grid grid-cols-2 gap-6">
-                      <div className="bg-gradient-to-r from-primary/10 to-transparent rounded-xl p-5 text-center shadow-sm border border-border/30">
-                        <div className="flex justify-center mb-3">
-                          <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center border-2 border-primary/20">
-                            <User className="h-8 w-8 text-primary" />
-                          </div>
+                <div className="space-y-6">
+                  {/* Athletes header */}
+                  <div className="grid grid-cols-2 gap-6">
+                    <div className="bg-gradient-to-r from-primary/10 to-transparent rounded-xl p-5 text-center shadow-sm border border-border/30">
+                      <div className="flex justify-center mb-3">
+                        <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center border-2 border-primary/20">
+                          <User className="h-8 w-8 text-primary" />
                         </div>
-                        <h3 className="font-semibold text-lg">{currentMatch.athlete1}</h3>
                       </div>
-                      <div className="bg-gradient-to-r from-primary/10 to-transparent rounded-xl p-5 text-center shadow-sm border border-border/30">
-                        <div className="flex justify-center mb-3">
-                          <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center border-2 border-primary/20">
-                            <User className="h-8 w-8 text-primary" />
-                          </div>
-                        </div>
-                        <h3 className="font-semibold text-lg">{currentMatch.athlete2}</h3>
-                      </div>
+                      <h3 className="font-semibold text-lg">{currentMatch.athlete1}</h3>
                     </div>
-
-                    {/* Scoring section */}
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                      {/* Athlete 1 Scoring */}
-                      <div className="space-y-5 border border-border/30 rounded-xl overflow-hidden shadow-sm bg-card">
-                        <div className="bg-gradient-to-r from-primary/10 to-transparent p-4 border-b border-border/30">
-                          <h3 className="font-semibold text-lg text-center">Pontuação - {currentMatch.athlete1}</h3>
-                        </div>
-                        
-                        <div className="p-5">
-                          {/* Points section */}
-                          <div className="space-y-3 pb-4 mb-4 border-b border-border/30">
-                            <h4 className="font-medium text-sm uppercase text-muted-foreground flex items-center gap-1.5">
-                              <Trophy className="h-4 w-4 text-primary" />
-                              Pontos
-                            </h4>
-                            
-                            <div className="space-y-3">
-                              <div className="flex justify-between items-center p-2 rounded-lg bg-muted/10 hover:bg-muted/20 transition-colors">
-                                <Label className="text-base font-medium">Wazari (3pts)</Label>
-                                <div className="flex items-center gap-3">
-                                  <Button 
-                                    variant="outline" 
-                                    size="sm" 
-                                    className="h-8 w-8 p-0 border-primary/20"
-                                    onClick={() => handleKumiteScoreChange('athlete1', 'wazari', -1)}
-                                  >
-                                    <Minus className="h-3.5 w-3.5" />
-                                  </Button>
-                                  <span className="w-10 text-center font-semibold text-lg">
-                                    {kumiteScore.athlete1.wazari}
-                                  </span>
-                                  <Button 
-                                    variant="outline" 
-                                    size="sm" 
-                                    className="h-8 w-8 p-0 border-primary/20"
-                                    onClick={() => handleKumiteScoreChange('athlete1', 'wazari', 1)}
-                                  >
-                                    <Plus className="h-3.5 w-3.5" />
-                                  </Button>
-                                </div>
-                              </div>
-                            </div>
-
-                            <div className="space-y-2">
-                              <div className="flex justify-between items-center p-2 rounded-lg bg-muted/10 hover:bg-muted/20 transition-colors">
-                                <Label className="text-base font-medium">Ippon</Label>
-                                <div className="flex items-center gap-3">
-                                  <Button 
-                                    variant="outline" 
-                                    size="sm" 
-                                    className="h-8 w-8 p-0 border-primary/20"
-                                    onClick={() => handleKumiteScoreChange('athlete1', 'ippon', -1)}
-                                  >
-                                    <Minus className="h-3.5 w-3.5" />
-                                  </Button>
-                                  <span className="w-10 text-center font-semibold text-lg">
-                                    {kumiteScore.athlete1.ippon}
-                                  </span>
-                                  <Button 
-                                    variant="outline" 
-                                    size="sm" 
-                                    className="h-8 w-8 p-0 border-primary/20"
-                                    onClick={() => handleKumiteScoreChange('athlete1', 'ippon', 1)}
-                                  >
-                                    <Plus className="h-3.5 w-3.5" />
-                                  </Button>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-
-                          {/* Penalties section */}
-                          <div className="space-y-3">
-                            <h4 className="font-medium text-sm uppercase text-muted-foreground flex items-center gap-1.5">
-                              <Flag className="h-4 w-4 text-red-500" />
-                              Penalidades
-                            </h4>
-                            
-                            <div className="grid grid-cols-1 gap-2">
-                              <div className="flex justify-between items-center p-2 rounded-lg bg-muted/10 hover:bg-muted/20 transition-colors">
-                                <Label className="text-base font-medium flex items-center gap-1.5">
-                                  <Flag className="h-4 w-4 text-yellow-500" />
-                                  Jogai
-                                </Label>
-                                <div className="flex items-center gap-3">
-                                  <Button 
-                                    variant="outline" 
-                                    size="sm" 
-                                    className="h-8 w-8 p-0 border-yellow-500/20"
-                                    onClick={() => handleKumiteScoreChange('athlete1', 'jogai', -1)}
-                                  >
-                                    <Minus className="h-3.5 w-3.5" />
-                                  </Button>
-                                  <span className="w-10 text-center font-semibold text-lg">
-                                    {kumiteScore.athlete1.jogai}
-                                  </span>
-                                  <Button 
-                                    variant="outline" 
-                                    size="sm" 
-                                    className="h-8 w-8 p-0 border-yellow-500/20"
-                                    onClick={() => handleKumiteScoreChange('athlete1', 'jogai', 1)}
-                                  >
-                                    <Plus className="h-3.5 w-3.5" />
-                                  </Button>
-                                </div>
-                              </div>
-
-                              <div className="flex justify-between items-center p-2 rounded-lg bg-muted/10 hover:bg-muted/20 transition-colors">
-                                <Label className="text-base font-medium flex items-center gap-1.5">
-                                  <Flag className="h-4 w-4 text-yellow-500" />
-                                  Mubobi
-                                </Label>
-                                <div className="flex items-center gap-3">
-                                  <Button 
-                                    variant="outline" 
-                                    size="sm" 
-                                    className="h-8 w-8 p-0 border-yellow-500/20"
-                                    onClick={() => handleKumiteScoreChange('athlete1', 'mubobi', -1)}
-                                  >
-                                    <Minus className="h-3.5 w-3.5" />
-                                  </Button>
-                                  <span className="w-10 text-center font-semibold text-lg">
-                                    {kumiteScore.athlete1.mubobi}
-                                  </span>
-                                  <Button 
-                                    variant="outline" 
-                                    size="sm" 
-                                    className="h-8 w-8 p-0 border-yellow-500/20"
-                                    onClick={() => handleKumiteScoreChange('athlete1', 'mubobi', 1)}
-                                  >
-                                    <Plus className="h-3.5 w-3.5" />
-                                  </Button>
-                                </div>
-                              </div>
-
-                              <div className="flex justify-between items-center p-2 rounded-lg bg-muted/10 hover:bg-muted/20 transition-colors">
-                                <Label className="text-base font-medium flex items-center gap-1.5">
-                                  <Flag className="h-4 w-4 text-yellow-500" />
-                                  Shido
-                                </Label>
-                                <div className="flex items-center gap-3">
-                                  <Button 
-                                    variant="outline" 
-                                    size="sm" 
-                                    className="h-8 w-8 p-0 border-yellow-500/20"
-                                    onClick={() => handleKumiteScoreChange('athlete1', 'shido', -1)}
-                                  >
-                                    <Minus className="h-3.5 w-3.5" />
-                                  </Button>
-                                  <span className="w-10 text-center font-semibold text-lg">
-                                    {kumiteScore.athlete1.shido}
-                                  </span>
-                                  <Button 
-                                    variant="outline" 
-                                    size="sm" 
-                                    className="h-8 w-8 p-0 border-yellow-500/20"
-                                    onClick={() => handleKumiteScoreChange('athlete1', 'shido', 1)}
-                                  >
-                                    <Plus className="h-3.5 w-3.5" />
-                                  </Button>
-                                </div>
-                              </div>
-
-                              <div className="flex justify-between items-center p-2 rounded-lg bg-muted/10 hover:bg-muted/20 transition-colors">
-                                <Label className="text-base font-medium flex items-center gap-1.5">
-                                  <Flag className="h-4 w-4 text-orange-500" />
-                                  Hansoku Chui
-                                </Label>
-                                <div className="flex items-center gap-3">
-                                  <Button 
-                                    variant="outline" 
-                                    size="sm" 
-                                    className="h-8 w-8 p-0 border-orange-500/20"
-                                    onClick={() => handleKumiteScoreChange('athlete1', 'hansokuChui', -1)}
-                                  >
-                                    <Minus className="h-3.5 w-3.5" />
-                                  </Button>
-                                  <span className="w-10 text-center font-semibold text-lg">
-                                    {kumiteScore.athlete1.hansokuChui}
-                                  </span>
-                                  <Button 
-                                    variant="outline" 
-                                    size="sm" 
-                                    className="h-8 w-8 p-0 border-orange-500/20"
-                                    onClick={() => handleKumiteScoreChange('athlete1', 'hansokuChui', 1)}
-                                  >
-                                    <Plus className="h-3.5 w-3.5" />
-                                  </Button>
-                                </div>
-                              </div>
-
-                              <div className="flex justify-between items-center p-2 rounded-lg bg-muted/10 hover:bg-muted/20 transition-colors">
-                                <Label className="text-base font-medium flex items-center gap-1.5">
-                                  <Flag className="h-4 w-4 text-red-500" />
-                                  Hansoku
-                                </Label>
-                                <div className="flex items-center gap-3">
-                                  <Button 
-                                    variant="outline" 
-                                    size="sm" 
-                                    className="h-8 w-8 p-0 border-red-500/20"
-                                    onClick={() => handleKumiteScoreChange('athlete1', 'hansoku', -1)}
-                                  >
-                                    <Minus className="h-3.5 w-3.5" />
-                                  </Button>
-                                  <span className="w-10 text-center font-semibold text-lg">
-                                    {kumiteScore.athlete1.hansoku}
-                                  </span>
-                                  <Button 
-                                    variant="outline" 
-                                    size="sm" 
-                                    className="h-8 w-8 p-0 border-red-500/20"
-                                    onClick={() => handleKumiteScoreChange('athlete1', 'hansoku', 1)}
-                                  >
-                                    <Plus className="h-3.5 w-3.5" />
-                                  </Button>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
+                    <div className="bg-gradient-to-r from-primary/10 to-transparent rounded-xl p-5 text-center shadow-sm border border-border/30">
+                      <div className="flex justify-center mb-3">
+                        <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center border-2 border-primary/20">
+                          <User className="h-8 w-8 text-primary" />
                         </div>
                       </div>
-
-                      {/* Athlete 2 Scoring */}
-                      <div className="space-y-5 border border-border/30 rounded-xl overflow-hidden shadow-sm bg-card">
-                        <div className="bg-gradient-to-r from-primary/10 to-transparent p-4 border-b border-border/30">
-                          <h3 className="font-semibold text-lg text-center">Pontuação - {currentMatch.athlete2}</h3>
-                        </div>
-                        
-                        <div className="p-5">
-                          {/* Points section */}
-                          <div className="space-y-3 pb-4 mb-4 border-b border-border/30">
-                            <h4 className="font-medium text-sm uppercase text-muted-foreground flex items-center gap-1.5">
-                              <Trophy className="h-4 w-4 text-primary" />
-                              Pontos
-                            </h4>
-                            
-                            <div className="space-y-3">
-                              <div className="flex justify-between items-center p-2 rounded-lg bg-muted/10 hover:bg-muted/20 transition-colors">
-                                <Label className="text-base font-medium">Wazari (3pts)</Label>
-                                <div className="flex items-center gap-3">
-                                  <Button 
-                                    variant="outline" 
-                                    size="sm" 
-                                    className="h-8 w-8 p-0 border-primary/20"
-                                    onClick={() => handleKumiteScoreChange('athlete2', 'wazari', -1)}
-                                  >
-                                    <Minus className="h-3.5 w-3.5" />
-                                  </Button>
-                                  <span className="w-10 text-center font-semibold text-lg">
-                                    {kumiteScore.athlete2.wazari}
-                                  </span>
-                                  <Button 
-                                    variant="outline" 
-                                    size="sm" 
-                                    className="h-8 w-8 p-0 border-primary/20"
-                                    onClick={() => handleKumiteScoreChange('athlete2', 'wazari', 1)}
-                                  >
-                                    <Plus className="h-3.5 w-3.5" />
-                                  </Button>
-                                </div>
-                              </div>
-                            </div>
-
-                            <div className="space-y-2">
-                              <div className="flex justify-between items-center p-2 rounded-lg bg-muted/10 hover:bg-muted/20 transition-colors">
-                                <Label className="text-base font-medium">Ippon</Label>
-                                <div className="flex items-center gap-3">
-                                  <Button 
-                                    variant="outline" 
-                                    size="sm" 
-                                    className="h-8 w-8 p-0 border-primary/20"
-                                    onClick={() => handleKumiteScoreChange('athlete2', 'ippon', -1)}
-                                  >
-                                    <Minus className="h-3.5 w-3.5" />
-                                  </Button>
-                                  <span className="w-10 text-center font-semibold text-lg">
-                                    {kumiteScore.athlete2.ippon}
-                                  </span>
-                                  <Button 
-                                    variant="outline" 
-                                    size="sm" 
-                                    className="h-8 w-8 p-0 border-primary/20"
-                                    onClick={() => handleKumiteScoreChange('athlete2', 'ippon', 1)}
-                                  >
-                                    <Plus className="h-3.5 w-3.5" />
-                                  </Button>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-
-                          {/* Penalties section */}
-                          <div className="space-y-3">
-                            <h4 className="font-medium text-sm uppercase text-muted-foreground flex items-center gap-1.5">
-                              <Flag className="h-4 w-4 text-red-500" />
-                              Penalidades
-                            </h4>
-                            
-                            <div className="grid grid-cols-1 gap-2">
-                              <div className="flex justify-between items-center p-2 rounded-lg bg-muted/10 hover:bg-muted/20 transition-colors">
-                                <Label className="text-base font-medium flex items-center gap-1.5">
-                                  <Flag className="h-4 w-4 text-yellow-500" />
-                                  Jogai
-                                </Label>
-                                <div className="flex items-center gap-3">
-                                  <Button 
-                                    variant="outline" 
-                                    size="sm" 
-                                    className="h-8 w-8 p-0 border-yellow-500/20"
-                                    onClick={() => handleKumiteScoreChange('athlete2', 'jogai', -1)}
-                                  >
-                                    <Minus className="h-3.5 w-3.5" />
-                                  </Button>
-                                  <span className="w-10 text-center font-semibold text-lg">
-                                    {kumiteScore.athlete2.jogai}
-                                  </span>
-                                  <Button 
-                                    variant="outline" 
-                                    size="sm" 
-                                    className="h-8 w-8 p-0 border-yellow-500/20"
-                                    onClick={() => handleKumiteScoreChange('athlete2', 'jogai', 1)}
-                                  >
-                                    <Plus className="h-3.5 w-3.5" />
-                                  </Button>
-                                </div>
-                              </div>
-
-                              <div className="flex justify-between items-center p-2 rounded-lg bg-muted/10 hover:bg-muted/20 transition-colors">
-                                <Label className="text-base font-medium flex items-center gap-1.5">
-                                  <Flag className="h-4 w-4 text-yellow-500" />
-                                  Mubobi
-                                </Label>
-                                <div className="flex items-center gap-3">
-                                  <Button 
-                                    variant="outline" 
-                                    size="sm" 
-                                    className="h-8 w-8 p-0 border-yellow-500/20"
-                                    onClick={() => handleKumiteScoreChange('athlete2', 'mubobi', -1)}
-                                  >
-                                    <Minus className="h-3.5 w-3.5" />
-                                  </Button>
-                                  <span className="w-10 text-center font-semibold text-lg">
-                                    {kumiteScore.athlete2.mubobi}
-                                  </span>
-                                  <Button 
-                                    variant="outline" 
-                                    size="sm" 
-                                    className="h-8 w-8 p-0 border-yellow-500/20"
-                                    onClick={() => handleKumiteScoreChange('athlete2', 'mubobi', 1)}
-                                  >
-                                    <Plus className="h-3.5 w-3.5" />
-                                  </Button>
-                                </div>
-                              </div>
-
-                              <div className="flex justify-between items-center p-2 rounded-lg bg-muted/10 hover:bg-muted/20 transition-colors">
-                                <Label className="text-base font-medium flex items-center gap-1.5">
-                                  <Flag className="h-4 w-4 text-yellow-500" />
-                                  Shido
-                                </Label>
-                                <div className="flex items-center gap-3">
-                                  <Button 
-                                    variant="outline" 
-                                    size="sm" 
-                                    className="h-8 w-8 p-0 border-yellow-500/20"
-                                    onClick={() => handleKumiteScoreChange('athlete2', 'shido', -1)}
-                                  >
-                                    <Minus className="h-3.5 w-3.5" />
-                                  </Button>
-                                  <span className="w-10 text-center font-semibold text-lg">
-                                    {kumiteScore.athlete2.shido}
-                                  </span>
-                                  <Button 
-                                    variant="outline" 
-                                    size="sm" 
-                                    className="h-8 w-8 p-0 border-yellow-500/20"
-                                    onClick={() => handleKumiteScoreChange('athlete2', 'shido', 1)}
-                                  >
-                                    <Plus className="h-3.5 w-3.5" />
-                                  </Button>
-                                </div>
-                              </div>
-
-                              <div className="flex justify-between items-center p-2 rounded-lg bg-muted/10 hover:bg-muted/20 transition-colors">
-                                <Label className="text-base font-medium flex items-center gap-1.5">
-                                  <Flag className="h-4 w-4 text-orange-500" />
-                                  Hansoku Chui
-                                </Label>
-                                <div className="flex items-center gap-3">
-                                  <Button 
-                                    variant="outline" 
-                                    size="sm" 
-                                    className="h-8 w-8 p-0 border-orange-500/20"
-                                    onClick={() => handleKumiteScoreChange('athlete2', 'hansokuChui', -1)}
-                                  >
-                                    <Minus className="h-3.5 w-3.5" />
-                                  </Button>
-                                  <span className="w-10 text-center font-semibold text-lg">
-                                    {kumiteScore.athlete2.hansokuChui}
-                                  </span>
-                                  <Button 
-                                    variant="outline" 
-                                    size="sm" 
-                                    className="h-8 w-8 p-0 border-orange-500/20"
-                                    onClick={() => handleKumiteScoreChange('athlete2', 'hansokuChui', 1)}
-                                  >
-                                    <Plus className="h-3.5 w-3.5" />
-                                  </Button>
-                                </div>
-                              </div>
-
-                              <div className="flex justify-between items-center p-2 rounded-lg bg-muted/10 hover:bg-muted/20 transition-colors">
-                                <Label className="text-base font-medium flex items-center gap-1.5">
-                                  <Flag className="h-4 w-4 text-red-500" />
-                                  Hansoku
-                                </Label>
-                                <div className="flex items-center gap-3">
-                                  <Button 
-                                    variant="outline" 
-                                    size="sm" 
-                                    className="h-8 w-8 p-0 border-red-500/20"
-                                    onClick={() => handleKumiteScoreChange('athlete2', 'hansoku', -1)}
-                                  >
-                                    <Minus className="h-3.5 w-3.5" />
-                                  </Button>
-                                  <span className="w-10 text-center font-semibold text-lg">
-                                    {kumiteScore.athlete2.hansoku}
-                                  </span>
-                                  <Button 
-                                    variant="outline" 
-                                    size="sm" 
-                                    className="h-8 w-8 p-0 border-red-500/20"
-                                    onClick={() => handleKumiteScoreChange('athlete2', 'hansoku', 1)}
-                                  >
-                                    <Plus className="h-3.5 w-3.5" />
-                                  </Button>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Winner indication */}
-                    <div className="p-6 bg-gradient-to-r from-primary/5 to-secondary/5 rounded-xl shadow-sm border border-border/30">
-                      <div className="flex justify-between items-center">
-                        <span className="text-lg font-medium flex items-center gap-2">
-                          <Trophy className="h-5 w-5 text-primary" />
-                          Vencedor:
-                        </span>
-                        <div className="px-8 py-4 rounded-lg bg-primary/10 border border-primary/20">
-                          {determineWinner() ? (
-                            <span className="font-bold text-lg text-primary">{determineWinner()}</span>
-                          ) : (
-                            <span className="text-muted-foreground">Aguardando...</span>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <div className="flex justify-end">
-                      <Button 
-                        onClick={handleSaveScore}
-                        className="gap-2 bg-primary hover:bg-primary/90 px-8 py-6 text-base shadow-md rounded-lg"
-                      >
-                        <Trophy className="h-5 w-5" />
-                        Salvar Pontuação
-                      </Button>
+                      <h3 className="font-semibold text-lg">{currentMatch.athlete2}</h3>
                     </div>
                   </div>
-                </ScrollArea>
-              )}
-            </div>
-          </main>
-        </div>
-      </div>
-    );
-  }
-  
-  return (
-    <div className="flex h-screen bg-background overflow-hidden">
-      <TournamentSidebar />
-      
-      <div className="flex-1 ml-64 flex flex-col h-screen">
-        <header className="sticky top-0 z-40 border-b bg-background/95 backdrop-blur-sm px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-bold tracking-tight">Pontuação do Torneio</h1>
-              <p className="text-sm text-muted-foreground">Gerencie pontuações de katas e kumites</p>
-            </div>
-            <div className="flex items-center gap-2">
-              <Badge variant="outline" className="px-3 py-1.5 flex gap-1.5 items-center">
-                <Trophy className="h-3.5 w-3.5 text-primary" />
-                <span>Torneio #{id}</span>
-              </Badge>
-            </div>
-          </div>
-        </header>
-        
-        <main className="flex-1 p-6 overflow-auto">
-          <div className="w-full max-w-6xl mx-auto">
-            <div className="flex items-center justify-between mb-8">
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center border border-primary/20">
-                  <Calendar className="h-6 w-6 text-primary" />
-                </div>
-                <div>
-                  <h2 className="text-xl font-semibold">Próximas Lutas</h2>
-                  <p className="text-sm text-muted-foreground">Selecione uma luta para iniciar a pontuação</p>
-                </div>
-              </div>
-              
-              <Badge className="px-3 py-1.5 bg-green-500/10 text-green-600 hover:bg-green-500/20 transition-colors border border-green-500/20">
-                <Shield className="h-3.5 w-3.5 mr-1.5" />
-                Em andamento
-              </Badge>
-            </div>
-            
-            <div className="bg-gradient-to-r from-primary/5 to-secondary/5 rounded-xl p-8 shadow-sm border border-border/30">
-              <Tabs 
-                defaultValue="kata" 
-                onValueChange={setActiveTab} 
-                className="h-full"
-              >
-                <TabsList className="grid grid-cols-2 mb-8 bg-background/50 p-1 w-64 rounded-full">
-                  <TabsTrigger 
-                    value="kata" 
-                    className={`relative text-sm rounded-full font-medium py-2.5 px-4 ${
-                      activeTab === "kata" 
-                        ? "bg-primary text-primary-foreground shadow-sm" 
-                        : "hover:bg-muted/50"
-                    }`}
-                  >
-                    {activeTab === "kata" && (
-                      <span className="absolute -top-1 -right-1 flex h-3 w-3">
-                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
-                        <span className="relative inline-flex rounded-full h-3 w-3 bg-primary"></span>
-                      </span>
-                    )}
-                    Kata
-                  </TabsTrigger>
-                  <TabsTrigger 
-                    value="kumite" 
-                    className={`relative text-sm rounded-full font-medium py-2.5 px-4 ${
-                      activeTab === "kumite" 
-                        ? "bg-primary text-primary-foreground shadow-sm" 
-                        : "hover:bg-muted/50"
-                    }`}
-                  >
-                    {activeTab === "kumite" && (
-                      <span className="absolute -top-1 -right-1 flex h-3 w-3">
-                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
-                        <span className="relative inline-flex rounded-full h-3 w-3 bg-primary"></span>
-                      </span>
-                    )}
-                    Kumite
-                  </TabsTrigger>
-                </TabsList>
-                
-                <TabsContent value="kata" className="animate-fade-in">
-                  <ScrollArea className="h-[calc(100vh-300px)] pr-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                      {kataMatches.map((match) => (
-                        <Card 
-                          key={match.id} 
-                          className="overflow-hidden border-0 shadow-md hover:shadow-lg transition-all duration-300 hover:translate-y-[-2px] flex flex-col group bg-card"
-                        >
-                          <div className="bg-gradient-to-r from-primary/20 to-primary/5 p-5">
-                            <div className="flex justify-between items-center mb-2">
-                              <Badge className="capitalize text-xs px-2.5 py-0.5 rounded-full bg-primary/10 text-primary border-primary/20">
-                                Kata
-                              </Badge>
-                              <div className="flex items-center gap-1 text-xs font-medium bg-background/50 px-3 py-1 rounded-full">
-                                <Timer className="h-3 w-3 text-primary" />
-                                {match.time}
-                              </div>
-                            </div>
-                            <h3 className="font-semibold text-base">{match.category}</h3>
-                          </div>
-                          
-                          <div className="p-5 flex-1 flex flex-col">
-                            <div className="bg-muted/10 p-5 rounded-lg mb-auto flex items-center justify-center border border-border/30 group-hover:border-primary/20 transition-colors">
-                              <div className="flex flex-col items-center text-center">
-                                <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-3 border-2 border-primary/20">
-                                  <User className="h-8 w-8 text-primary" />
-                                </div>
-                                <span className="font-medium text-base">{match.athlete1}</span>
-                              </div>
-                            </div>
-                            
-                            <Button 
-                              className="mt-5 gap-2 bg-primary hover:bg-primary/90 shadow-sm rounded-lg py-2.5 text-sm font-medium group"
-                              onClick={() => handleStartMatch(match)}
-                            >
-                              <Timer className="h-4 w-4" />
-                              <span>Iniciar Pontuação</span>
-                              <ArrowRight className="h-4 w-4 ml-1 transition-transform group-hover:translate-x-1" />
-                            </Button>
-                          </div>
-                        </Card>
-                      ))}
-                    </div>
-                  </ScrollArea>
-                </TabsContent>
-                
-                <TabsContent value="kumite" className="animate-fade-in">
-                  <ScrollArea className="h-[calc(100vh-300px)] pr-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                      {kumiteMatches.map((match) => (
-                        <Card 
-                          key={match.id} 
-                          className="overflow-hidden border-0 shadow-md hover:shadow-lg transition-all duration-300 hover:translate-y-[-2px] flex flex-col group bg-card"
-                        >
-                          <div className="bg-gradient-to-r from-primary/20 to-primary/5 p-5">
-                            <div className="flex justify-between items-center mb-2">
-                              <Badge className="capitalize text-xs px-2.5 py-0.5 rounded-full bg-primary/10 text-primary border-primary/20">
-                                Kumite
-                              </Badge>
-                              <div className="flex items-center gap-1 text-xs font-medium bg-background/50 px-3 py-1 rounded-full">
-                                <Timer className="h-3 w-3 text-primary" />
-                                {match.time}
-                              </div>
-                            </div>
-                            <h3 className="font-semibold text-base">{match.category}</h3>
-                          </div>
-                          
-                          <div className="p-5 flex-1 flex flex-col">
-                            <div className="grid grid-cols-5 items-center gap-2 bg-muted/10 p-4 rounded-lg mb-auto border border-border/30 group-hover:border-primary/20 transition-colors">
-                              <div className="col-span-2 flex flex-col items-center text-center">
-                                <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-2 border-2 border-primary/20">
-                                  <User className="h-5 w-5 text-primary" />
-                                </div>
-                                <span className="font-medium text-sm">{match.athlete1}</span>
-                              </div>
-                              
-                              <div className="flex items-center justify-center">
-                                <div className="w-8 h-8 rounded-full flex items-center justify-center bg-muted/50 font-semibold text-xs text-muted-foreground">
-                                  VS
-                                </div>
-                              </div>
-                              
-                              <div className="col-span-2 flex flex-col items-center text-center">
-                                <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-2 border-2 border-primary/20">
-                                  <User className="h-5 w-5 text-primary" />
-                                </div>
-                                <span className="font-medium text-sm">{match.athlete2}</span>
-                              </div>
-                            </div>
-                            
-                            <Button 
-                              className="mt-5 gap-2 bg-primary hover:bg-primary/90 shadow-sm rounded-lg py-2.5 text-sm font-medium group"
-                              onClick={() => handleStartMatch(match)}
-                            >
-                              <Timer className="h-4 w-4" />
-                              <span>Iniciar Pontuação</span>
-                              <ArrowRight className="h-4 w-4 ml-1 transition-transform group-hover:translate-x-1" />
-                            </Button>
-                          </div>
-                        </Card>
-                      ))}
-                    </div>
-                  </ScrollArea>
-                </TabsContent>
-              </Tabs>
-            </div>
-          </div>
-        </main>
-      </div>
-    </div>
-  );
-};
 
-export default TournamentScoring;
+                  {/* Scoring section */}
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    {/* Athlete 1 Scoring */}
+                    <div className="space-y-5 border border-border/30 rounded-xl overflow-hidden shadow-sm bg-card">
+                      <div className="bg-gradient-to-r from-primary/10 to-transparent p-4 border-b border-border/30">
+                        <h3 className="font-semibold text-lg text-center">Pontuação - {currentMatch.athlete1}</h3>
+                      </div>
+                      
+                      <div className="p-5">
+                        {/* Points section */}
+                        <div className="space-y-3 pb-4 mb-4 border-b border-border/30">
+                          <h4 className="font-medium text-sm uppercase text-muted-foreground flex items-center gap-1.5">
+                            <Trophy className="h-4 w-4 text-primary" />
+                            Pontos
+                          </h4>
+                          
+                          <div className="space-y-3">
+                            <div className="flex justify-between items-center p-2 rounded-lg bg-muted/10 hover:bg-muted/20 transition-colors">
+                              <Label className="text-base font-medium">Yuko (1pt)</Label>
+                              <div className="flex items-center gap-3">
+                                <Button 
+                                  variant="outline" 
+                                  size="sm" 
+                                  className="h-8 w-8 p-0 border-primary/20"
+                                  onClick={() => handleKumiteScoreChange('athlete1', 'yuko', -1)}
+                                >
+                                  <Minus className="h-3.5 w-3.5" />
+                                </Button>
+                                <span className="w-10 text-center font-semibold text-lg">
+                                  {kumiteScore.athlete1.yuko}
+                                </span>
+                                <Button 
+                                  variant="outline" 
+                                  size="sm" 
+                                  className="h-8 w-8 p-0 border-primary/20"
+                                  onClick={() => handleKumiteScoreChange('athlete1', 'yuko', 1)}
+                                >
+                                  <Plus className="h-3.5 w-3.5" />
+                                </Button>
+                              </div>
+                            </div>
 
+                            <div className="flex justify-between items-center p-2 rounded-lg bg-muted/10 hover:bg-muted/20 transition-colors">
+                              <Label className="text-base font-medium">Waza-ari (2pts)</Label>
+                              <div className="flex items-center gap-3">
+                                <Button 
+                                  variant="outline" 
+                                  size="sm" 
+                                  className="h-8 w-8 p-0 border-primary/20"
+                                  onClick={() => handleKumiteScoreChange('athlete1', 'wazari', -1)}
+                                >
+                                  <Minus className="h-3.5 w-3.5" />
+                                </Button>
+                                <span className="w-10 text-center font-semibold text-lg">
+                                  {kumiteScore.athlete1.wazari}
+                                </span>
+                                <Button 
+                                  variant="outline" 
+                                  size="sm" 
+                                  className="h-8 w-8 p-0 border-primary/20"
+                                  onClick={() => handleKumiteScoreChange('athlete1', 'wazari', 1)}
+                                >
+                                  <Plus className="h-3.5 w-3.5" />
+                                </Button>
+                              </div>
+                            </div>
+
+                            <div className="flex justify-between items-center p-2 rounded-lg bg-muted/10 hover:bg-muted/20 transition-colors">
+                              <Label className="text-base font-medium">Ippon (3pts)</Label>
+                              <div className="flex items-center gap-3">
+                                <Button 
+                                  variant="outline" 
+                                  size="sm" 
+                                  className="h-8 w-8 p-0 border-primary/20"
+                                  onClick={() => handleKumiteScoreChange('athlete1', 'ippon', -1)}
+                                >
+                                  <Minus className="h-3.5 w-3.5" />
+                                </Button>
+                                <span className="w-10 text-center font-semibold text-lg">
+                                  {kumiteScore.athlete1.ippon}
+                                </span>
+                                <Button 
+                                  variant="outline" 
+                                  size="sm" 
+                                  className="h-8 w-8 p-0 border-primary/20"
+                                  onClick={() => handleKumiteScoreChange('athlete1', 'ippon', 1)}
+                                >
+                                  <Plus className="h-3.5 w-3.5" />
+                                </Button>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Penalties section */}
+                        <div className="space-y-3">
+                          <h4 className="font-medium text-sm uppercase text-muted-foreground flex items-center gap-1.5">
+                            <Flag className="h-4 w-4 text-red-500" />
+                            Penalidades
+                          </h4>
+                          
+                          <div className="grid grid-cols-1 gap-2">
+                            <div className="flex justify-between items-center p-2 rounded-lg bg-muted/10 hover:bg-muted/20 transition-colors">
+                              <Label className="text-base font-medium flex items-center gap-1.5">
+                                <Flag className="h-4 w-4 text-yellow-500" />
+                                Chukoku
+                              </Label>
+                              <div className="flex items-center gap-3">
+                                <Button 
+                                  variant="outline" 
+                                  size="sm" 
+                                  className="h-8 w-8 p-0 border-yellow-500/20"
+                                  onClick={() => handleKumiteScoreChange('athlete1', 'chukoku', -1)}
+                                >
+                                  <Minus className="h-3.5 w-3.5" />
+                                </Button>
+                                <span className="w-10 text-center font-semibold text-lg">
+                                  {kumiteScore.athlete1.chukoku}
+                                </span>
+                                <Button 
+                                  variant="outline" 
+                                  size="sm" 
+                                  className="h-8 w-8 p-0 border-yellow-500/20"
+                                  onClick={() => handleKumiteScoreChange('athlete1', 'chukoku', 1)}
+                                >
+                                  <Plus className="h-3.5 w-3.5" />
+                                </Button>
+                              </div>
+                            </div>
+
+                            <div className="flex justify-between items-center p-2 rounded-lg bg-muted/10 hover:bg-muted/20 transition-colors">
+                              <Label className="text-base font-medium flex items-center gap-1.5">
+                                <Flag className="h-4 w-4 text-yellow-500" />
+                                Keikoku
+                              </Label>
+                              <div className="flex items-center gap-3">
+                                <Button 
+                                  variant="outline" 
+                                  size="sm" 
+                                  className="h-8 w-8 p-0 border-yellow-500/20"
+                                  onClick={() => handleKumiteScoreChange('athlete1', 'keikoku', -1)}
+                                >
+                                  <Minus className="h-3.5 w-3.5" />
+                                </Button>
+                                <span className="w-10 text-center font-semibold text-lg">
+                                  {kumiteScore.athlete1.keikoku}
+                                </span>
+                                <Button 
+                                  variant="outline" 
+                                  size="sm" 
+                                  className="h-8 w-8 p-0 border-yellow-500/20"
+                                  onClick={() => handleKumiteScoreChange('athlete1', 'keikoku', 1)}
+                                >
+                                  <Plus className="h-3.5 w-3.5" />
+                                </Button>
+                              </div>
+                            </div>
+
+                            <div className="flex justify-between items-center p-2 rounded-lg bg-muted/10 hover:bg-muted/20 transition-colors">
+                              <Label className="text-base font-medium flex items-center gap-1.5">
+                                <Flag className="h-4 w-4 text-yellow-500" />
+                                Jogai
+                              </Label>
+                              <div className="flex items-center gap-3">
+                                <Button 
+                                  variant="outline" 
+                                  size="sm" 
+                                  className="h-8 w-8 p-0 border-yellow-500/20"
+                                  onClick={() => handleKumiteScoreChange('athlete1', 'jogai', -1)}
+                                >
+                                  <Minus className="h-3.5 w-3.5" />
+                                </Button>
+                                <span className="w-10 text-center font-semibold text-lg">
+                                  {kumiteScore.athlete1.jogai}
+                                </span>
+                                <Button 
+                                  variant="outline" 
+                                  size="sm" 
+                                  className="h-8 w-8 p-0 border-yellow-500/20"
+                                  onClick={() => handleKumiteScoreChange('athlete1', 'jogai', 1)}
+                                >
+                                  <Plus className="h-3.5 w-3.5" />
+                                </Button>
+                              </div>
+                            </div>
+
+                            <div className="flex justify-between items-center p-2 rounded-lg bg-muted/10 hover:bg-muted/20 transition-colors">
+                              <Label className="text-base font-medium flex items-center gap-1.5">
+                                <Flag className="h-4 w-4 text-yellow-500" />
+                                Mubobi
+                              </Label>
+                              <div className="flex items-center gap-3">
+                                <Button 
+                                  variant="outline" 
+                                  size="sm" 
+                                  className="h-8 w-8 p-0 border-yellow-500/20"
+                                  onClick={() => handleKumiteScoreChange('athlete1', 'mubobi', -1)}
+                                >
+                                  <Minus className="h-3.5 w-3.5" />
+                                </Button>
+                                <span className="w-10 text-center font-semibold text-lg">
+                                  {kumiteScore.athlete1.mubobi}
+                                </span>
+                                <Button 
+                                  variant="outline" 
+                                  size="sm" 
+                                  className="h-8 w-8 p-0 border-yellow-500/20"
+                                  onClick={() => handleKumiteScoreChange('athlete1', 'mubobi', 1)}
+                                >
+                                  <Plus className="h-3.5 w-3.5" />
+                                </Button>
+                              </div>
+                            </div>
+
+                            <div className="flex justify-between items-center p-2 rounded-lg bg-muted/10 hover:bg-muted/20 transition-colors">
+                              <Label className="text-base font-medium flex items-center gap-1.5">
+                                <Flag className="h-4 w-4 text-orange-500" />
+                                Hansoku-Chui
+                              </Label>
+                              <div className="flex items-center gap-3">
+                                <Button 
+                                  variant="outline" 
+                                  size="sm" 
+                                  className="h-8 w-8 p-0 border-orange-500/20"
+                                  onClick={() => handleKumiteScoreChange('athlete1', 'hansokuChui', -1)}
+                                >
+                                  <Minus className="h-3.5 w-3.5" />
+                                </Button>
+                                <span className="w-10 text-center font-semibold text-lg">
+                                  {kumiteScore.athlete1.hansokuChui}
+                                </span>
+                                <Button 
+                                  variant="outline" 
+                                  size="sm" 
+                                  className="h-8 w-8 p-0 border-orange-500/20"
+                                  onClick={() => handleKumiteScoreChange('athlete1', 'hansokuChui', 1)}
+                                >
+                                  <Plus className="h-3.5 w-3.5" />
+                                </Button>
+                              </div>
+                            </div>
+
+                            <div className="flex justify-between items-center p-2 rounded-lg bg-muted/10 hover:bg-muted/20 transition-colors">
+                              <Label className="text-base font-medium flex items-center gap-1.5">
+                                <Flag className="h-4 w-4 text-red-500" />
+                                Hansoku
+                              </Label>
+                              <div className="flex items-center gap-3">
+                                <Button 
+                                  variant="outline" 
+                                  size="sm" 
+                                  className="h-8 w-8 p-0 border-red-500/20"
+                                  onClick={() => handleKumiteScoreChange('athlete1', 'hansoku', -1)}
+                                >
+                                  <Minus className="h-3.5 w-3.5" />
+                                </Button>
+                                <span className="w-10 text-center font-semibold text-lg">
+                                  {kumiteScore.athlete1.hansoku}
+                                </span>
+                                <Button 
+                                  variant="outline" 
+                                  size="sm" 
+                                  className="h-8 w-8 p-0 border-red-500/20"
+                                  onClick={() => handleKumiteScoreChange('athlete1', 'hansoku', 1)}
+                                >
+                                  <Plus className="h-3.5 w-3.5" />
+                                </Button>
+                              </div>
+                            </div>
+
+                            <div className="flex justify-between items-center p-2 rounded-lg bg-muted/10 hover:bg-muted/20 transition-colors">
+                              <Label className="text-base font-medium flex items-center gap-1.5">
+                                <Flag className="h-4 w-4 text-red-500" />
+                                Shikkaku
+                              </Label>
+                              <div className="flex items-center gap-3">
+                                <Button 
+                                  variant="outline" 
+                                  size="sm" 
+                                  className="h-8 w-8 p-0 border-red-500/20"
+                                  onClick={() => handleKumiteScoreChange('athlete1', 'shikkaku', -1)}
+                                >
+                                  <Minus className="h-3.5 w-3.5" />
+                                </Button>
+                                <span className="w-10 text-center font-semibold text-lg">
+                                  {kumiteScore.athlete1.shikkaku}
+                                </span>
+                                <Button 
+                                  variant="outline" 
+                                  size="sm" 
+                                  className
