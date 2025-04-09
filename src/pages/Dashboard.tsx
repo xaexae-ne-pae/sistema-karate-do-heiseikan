@@ -7,6 +7,7 @@ import { ActionCard } from "@/components/ActionCard";
 import { Sidebar } from "@/components/Sidebar";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import BackgroundImage from "@/components/BackgroundImage";
 
 // Constantes para os títulos e valores
 const STAT_CARDS = [
@@ -48,6 +49,7 @@ const Dashboard = () => {
 
   return (
     <div className="flex min-h-screen overflow-hidden bg-background">
+      <BackgroundImage />
       <Sidebar />
       
       <div className="flex-1 md:ml-64 w-full transition-all duration-300">

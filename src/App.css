@@ -28,6 +28,13 @@ body:has(.min-h-screen.w-full.bg-black) #root {
   height: 100vh;
 }
 
+/* Adding new CSS for focused inputs */
+input:focus-visible {
+  border-color: var(--primary) !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
 .logo {
   height: 6em;
   padding: 1.5em;
