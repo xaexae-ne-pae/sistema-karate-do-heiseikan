@@ -90,14 +90,34 @@ const TournamentScoring = () => {
                 <TabsList className="grid grid-cols-2 mb-6 bg-background/50 p-1 w-64">
                   <TabsTrigger 
                     value="kata" 
-                    className={`text-sm rounded-md font-medium py-2 ${activeTab === "kata" ? "bg-purple-600/20 text-purple-700 dark:text-purple-300" : ""}`}
+                    className={`relative text-sm rounded-md font-medium py-2.5 px-4 ${
+                      activeTab === "kata" 
+                        ? "bg-primary text-primary-foreground shadow-sm" 
+                        : "hover:bg-muted/50"
+                    }`}
                   >
+                    {activeTab === "kata" && (
+                      <span className="absolute -top-1 -right-1 flex h-3 w-3">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+                        <span className="relative inline-flex rounded-full h-3 w-3 bg-primary"></span>
+                      </span>
+                    )}
                     Kata
                   </TabsTrigger>
                   <TabsTrigger 
                     value="kumite" 
-                    className={`text-sm rounded-md font-medium py-2 ${activeTab === "kumite" ? "bg-primary/20" : ""}`}
+                    className={`relative text-sm rounded-md font-medium py-2.5 px-4 ${
+                      activeTab === "kumite" 
+                        ? "bg-primary text-primary-foreground shadow-sm" 
+                        : "hover:bg-muted/50"
+                    }`}
                   >
+                    {activeTab === "kumite" && (
+                      <span className="absolute -top-1 -right-1 flex h-3 w-3">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+                        <span className="relative inline-flex rounded-full h-3 w-3 bg-primary"></span>
+                      </span>
+                    )}
                     Kumite
                   </TabsTrigger>
                 </TabsList>
@@ -110,9 +130,9 @@ const TournamentScoring = () => {
                           key={match.id} 
                           className="overflow-hidden border-0 shadow-md hover:shadow-lg transition-all duration-300 hover:translate-y-[-2px] flex flex-col hover-glow"
                         >
-                          <div className="bg-gradient-to-r from-purple-500/20 to-purple-300/10 p-4">
+                          <div className="bg-gradient-to-r from-primary/20 to-primary/10 p-4">
                             <div className="flex justify-between items-center mb-2">
-                              <Badge className="capitalize text-xs px-2 py-0.5 rounded-md bg-purple-100 text-purple-700 border-purple-200">
+                              <Badge className="capitalize text-xs px-2 py-0.5 rounded-md bg-primary/10 text-primary dark:text-primary-foreground border-primary/20">
                                 Kata
                               </Badge>
                               <div className="flex items-center gap-1 text-xs font-medium bg-background/40 px-2 py-1 rounded-full">
@@ -125,8 +145,8 @@ const TournamentScoring = () => {
                           <div className="p-4 flex-1 flex flex-col">
                             <div className="grid grid-cols-5 items-center gap-2 bg-muted/20 p-3 rounded-lg mb-auto">
                               <div className="col-span-2 flex flex-col items-center text-center">
-                                <div className="w-12 h-12 rounded-full bg-purple-500/10 flex items-center justify-center mb-2">
-                                  <User className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+                                <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-2">
+                                  <User className="h-5 w-5 text-primary" />
                                 </div>
                                 <span className="font-medium text-sm">{match.athlete1}</span>
                               </div>
@@ -138,15 +158,15 @@ const TournamentScoring = () => {
                               </div>
                               
                               <div className="col-span-2 flex flex-col items-center text-center">
-                                <div className="w-12 h-12 rounded-full bg-purple-500/10 flex items-center justify-center mb-2">
-                                  <User className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+                                <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-2">
+                                  <User className="h-5 w-5 text-primary" />
                                 </div>
                                 <span className="font-medium text-sm">{match.athlete2}</span>
                               </div>
                             </div>
                             
                             <Button 
-                              className="mt-4 gap-2 bg-purple-600 hover:bg-purple-700 shadow-sm rounded-full py-2.5 text-sm font-medium group"
+                              className="mt-4 gap-2 bg-primary hover:bg-primary/90 shadow-sm rounded-full py-2.5 text-sm font-medium group"
                               onClick={() => handleStartMatch(match.id)}
                             >
                               <Timer className="h-4 w-4" />
@@ -168,9 +188,9 @@ const TournamentScoring = () => {
                           key={match.id} 
                           className="overflow-hidden border-0 shadow-md hover:shadow-lg transition-all duration-300 hover:translate-y-[-2px] flex flex-col hover-glow"
                         >
-                          <div className="bg-gradient-to-r from-primary/20 to-primary/5 p-4">
+                          <div className="bg-gradient-to-r from-primary/20 to-primary/10 p-4">
                             <div className="flex justify-between items-center mb-2">
-                              <Badge className="capitalize text-xs px-2 py-0.5 rounded-md">
+                              <Badge className="capitalize text-xs px-2 py-0.5 rounded-md bg-primary/10 text-primary dark:text-primary-foreground border-primary/20">
                                 Kumite
                               </Badge>
                               <div className="flex items-center gap-1 text-xs font-medium bg-background/40 px-2 py-1 rounded-full">
@@ -204,7 +224,7 @@ const TournamentScoring = () => {
                             </div>
                             
                             <Button 
-                              className="mt-4 gap-2 shadow-sm rounded-full py-2.5 text-sm font-medium group"
+                              className="mt-4 gap-2 bg-primary hover:bg-primary/90 shadow-sm rounded-full py-2.5 text-sm font-medium group"
                               onClick={() => handleStartMatch(match.id)}
                             >
                               <Timer className="h-4 w-4" />
