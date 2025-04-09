@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { TournamentSidebar } from "@/components/TournamentSidebar";
@@ -57,6 +58,93 @@ interface KumiteScore {
     shikkaku: number;
   };
 }
+
+// Componentes auxiliares para a interface de pontuação
+const ScoreButton = ({ 
+  label, 
+  value, 
+  onIncrement, 
+  onDecrement 
+}: { 
+  label: string; 
+  value: number; 
+  onIncrement: () => void; 
+  onDecrement: () => void;
+}) => {
+  return (
+    <div className="space-y-1">
+      <Label className="text-xs">{label}</Label>
+      <div className="flex items-center justify-between bg-muted/30 rounded-md p-1.5">
+        <Button 
+          variant="outline" 
+          size="icon" 
+          className="h-6 w-6" 
+          onClick={onDecrement}
+        >
+          <Minus className="h-3 w-3" />
+        </Button>
+        <span className="font-semibold text-sm">{value}</span>
+        <Button 
+          variant="outline" 
+          size="icon" 
+          className="h-6 w-6" 
+          onClick={onIncrement}
+        >
+          <Plus className="h-3 w-3" />
+        </Button>
+      </div>
+    </div>
+  );
+};
+
+const PenaltyButton = ({ 
+  label, 
+  value, 
+  color,
+  onIncrement, 
+  onDecrement,
+  className = ""
+}: { 
+  label: string; 
+  value: number; 
+  color: "yellow" | "orange" | "red";
+  onIncrement: () => void; 
+  onDecrement: () => void;
+  className?: string;
+}) => {
+  const colorClasses = {
+    yellow: "bg-yellow-500/10 border-yellow-500/30 text-yellow-700 dark:text-yellow-400",
+    orange: "bg-orange-500/10 border-orange-500/30 text-orange-700 dark:text-orange-400",
+    red: "bg-red-500/10 border-red-500/30 text-red-700 dark:text-red-400"
+  };
+
+  return (
+    <div className={`${className} relative rounded-md p-2 border ${colorClasses[color]}`}>
+      <div className="flex items-center justify-between">
+        <span className="text-xs font-medium">{label}</span>
+        <div className="flex items-center gap-2">
+          <Button 
+            variant="outline" 
+            size="icon" 
+            className="h-6 w-6 bg-background" 
+            onClick={onDecrement}
+          >
+            <Minus className="h-3 w-3" />
+          </Button>
+          <span className="font-semibold text-sm w-5 text-center">{value}</span>
+          <Button 
+            variant="outline" 
+            size="icon" 
+            className="h-6 w-6 bg-background" 
+            onClick={onIncrement}
+          >
+            <Plus className="h-3 w-3" />
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const TournamentScoring = () => {
   const { id } = useParams<{ id: string }>();
@@ -763,3 +851,119 @@ const TournamentScoring = () => {
                         <span className="relative inline-flex rounded-full h-3 w-3 bg-primary"></span>
                       </span>
                     )}
+                    Kata
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="kumite" 
+                    className={`relative text-sm rounded-full font-medium py-2.5 px-4 ${
+                      activeTab === "kumite" 
+                        ? "bg-primary text-primary-foreground shadow-sm" 
+                        : "hover:bg-muted/50"
+                    }`}
+                  >
+                    {activeTab === "kumite" && (
+                      <span className="absolute -top-1 -right-1 flex h-3 w-3">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+                        <span className="relative inline-flex rounded-full h-3 w-3 bg-primary"></span>
+                      </span>
+                    )}
+                    Kumite
+                  </TabsTrigger>
+                </TabsList>
+                
+                <TabsContent value="kata" className="space-y-0 focus-visible:outline-none focus-visible:ring-0">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {kataMatches.map((match) => (
+                      <Card key={match.id} className="overflow-hidden">
+                        <div className="bg-gradient-to-r from-primary/10 to-transparent p-4 border-b border-border/30">
+                          <div className="flex justify-between">
+                            <Badge className="px-3 py-1 rounded-full">
+                              <Star className="h-3.5 w-3.5 mr-1.5" />
+                              Kata
+                            </Badge>
+                            <Badge variant="outline" className="flex items-center gap-1">
+                              <Timer className="h-3.5 w-3.5" />
+                              {match.time}
+                            </Badge>
+                          </div>
+                        </div>
+                        <div className="p-4">
+                          <div className="flex items-center gap-3 mb-4">
+                            <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center border border-primary/20">
+                              <User className="h-5 w-5 text-primary/80" />
+                            </div>
+                            <div>
+                              <h3 className="font-semibold">{match.athlete1}</h3>
+                              <p className="text-xs text-muted-foreground">{match.category}</p>
+                            </div>
+                          </div>
+                          <Button
+                            onClick={() => handleStartMatch(match)}
+                            className="w-full gap-2"
+                          >
+                            <Flag className="h-4 w-4" />
+                            Iniciar Pontuação
+                          </Button>
+                        </div>
+                      </Card>
+                    ))}
+                  </div>
+                </TabsContent>
+                
+                <TabsContent value="kumite" className="space-y-0 focus-visible:outline-none focus-visible:ring-0">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {kumiteMatches.map((match) => (
+                      <Card key={match.id} className="overflow-hidden">
+                        <div className="bg-gradient-to-r from-primary/10 to-transparent p-4 border-b border-border/30">
+                          <div className="flex justify-between">
+                            <Badge className="px-3 py-1 rounded-full bg-red-500/10 text-red-600 border-red-500/20">
+                              <Shield className="h-3.5 w-3.5 mr-1.5" />
+                              Kumite
+                            </Badge>
+                            <Badge variant="outline" className="flex items-center gap-1">
+                              <Timer className="h-3.5 w-3.5" />
+                              {match.time}
+                            </Badge>
+                          </div>
+                        </div>
+                        <div className="p-4">
+                          <div className="mb-3">
+                            <h3 className="font-medium text-sm mb-3">{match.category}</h3>
+                            <div className="flex justify-between items-center">
+                              <div className="flex items-center gap-2">
+                                <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center border border-primary/20">
+                                  <User className="h-4 w-4 text-primary/80" />
+                                </div>
+                                <span className="text-sm">{match.athlete1}</span>
+                              </div>
+                              <ArrowRight className="h-4 w-4 mx-2 text-muted-foreground" />
+                              <div className="flex items-center gap-2">
+                                <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center border border-primary/20">
+                                  <User className="h-4 w-4 text-primary/80" />
+                                </div>
+                                <span className="text-sm">{match.athlete2}</span>
+                              </div>
+                            </div>
+                          </div>
+                          <Button
+                            onClick={() => handleStartMatch(match)}
+                            className="w-full gap-2"
+                          >
+                            <Flag className="h-4 w-4" />
+                            Iniciar Pontuação
+                          </Button>
+                        </div>
+                      </Card>
+                    ))}
+                  </div>
+                </TabsContent>
+              </Tabs>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+  );
+};
+
+export default TournamentScoring;
