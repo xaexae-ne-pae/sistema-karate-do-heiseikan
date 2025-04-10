@@ -357,6 +357,11 @@ const TournamentScoring = () => {
     value: string
   ) => {
     const numValue = parseFloat(value);
+    if (value === "") {
+      setKataScore((prev) => ({ ...prev, [judge]: 0 }));
+      return;
+    }
+    
     if (isNaN(numValue) || numValue < 0 || numValue > 10) {
       return;
     }
@@ -574,7 +579,8 @@ const TournamentScoring = () => {
                                 min="0"
                                 max="10"
                                 step="0.1"
-                                value={kataScore[judge]}
+                                value={kataScore[judge] || ""}
+                                placeholder="0.0"
                                 onChange={(e) =>
                                   handleKataScoreChange(judge, e.target.value)
                                 }
@@ -1228,7 +1234,7 @@ const TournamentScoring = () => {
                             className="w-full gap-2 bg-red-500 hover:bg-red-600 text-white py-5 transition-all duration-300"
                           >
                             <Timer className="h-4 w-4" />
-                            Iniciar Pontuação
+                            Iniciar Pontuaç��o
                             <ArrowRight className="h-3.5 w-3.5 ml-auto" />
                           </Button>
                         </div>
