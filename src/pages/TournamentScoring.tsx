@@ -1234,7 +1234,7 @@ const TournamentScoring = () => {
                             className="w-full gap-2 bg-red-500 hover:bg-red-600 text-white py-5 transition-all duration-300"
                           >
                             <Timer className="h-4 w-4" />
-                            Iniciar Pontuaç��o
+                            Iniciar Pontuação
                             <ArrowRight className="h-3.5 w-3.5 ml-auto" />
                           </Button>
                         </div>
