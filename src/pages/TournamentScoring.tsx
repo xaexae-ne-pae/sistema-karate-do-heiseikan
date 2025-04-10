@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { TournamentSidebar } from "@/components/TournamentSidebar";
@@ -9,7 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { 
   Trophy, Timer, User, Calendar, Shield, ArrowRight, 
-  Flag, Star, Plus, Minus, X, ArrowLeft, Play, Pause, RefreshCcw
+  Flag, Star, Plus, Minus, X, ArrowLeft, Play, Pause, RefreshCcw, Clock, Circle
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -59,7 +58,6 @@ interface KumiteScore {
   };
 }
 
-// Componentes auxiliares para a interface de pontuação
 const ScoreButton = ({ 
   label, 
   value, 
@@ -186,19 +184,16 @@ const TournamentScoring = () => {
     },
   });
 
-  // Timer state
   const [timeLeft, setTimeLeft] = useState(180); // 3 minutes in seconds
   const [isRunning, setIsRunning] = useState(false);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   
-  // Mock data for upcoming kata matches
   const kataMatches: MatchData[] = [
     { id: 4, type: "kata", athlete1: "Juliana Costa", athlete2: null, category: "Adulto Feminino", time: "16:00" },
     { id: 5, type: "kata", athlete1: "Ricardo Alves", athlete2: null, category: "Adulto Masculino", time: "16:15" },
     { id: 8, type: "kata", athlete1: "Ana Pereira", athlete2: null, category: "Juvenil Feminino", time: "17:20" }
   ];
   
-  // Mock data for upcoming kumite matches
   const kumiteMatches: MatchData[] = [
     { id: 6, type: "kumite", athlete1: "Marcos Paulo", athlete2: "Gabriel Souza", category: "Adulto Masculino -84kg", time: "16:30" },
     { id: 7, type: "kumite", athlete1: "Camila Ferreira", athlete2: "Patrícia Ramos", category: "Adulto Feminino -61kg", time: "16:45" },
@@ -239,7 +234,6 @@ const TournamentScoring = () => {
         },
       });
     }
-    // Reset and stop timer
     setTimeLeft(180);
     setIsRunning(false);
     if (timerRef.current) {
@@ -249,7 +243,6 @@ const TournamentScoring = () => {
     setScoringMode(true);
   };
 
-  // Timer functions
   const startTimer = () => {
     if (isRunning) return;
     
@@ -281,7 +274,6 @@ const TournamentScoring = () => {
     setTimeLeft(180);
   };
 
-  // Clean up timer on unmount
   useEffect(() => {
     return () => {
       if (timerRef.current) {
@@ -290,7 +282,6 @@ const TournamentScoring = () => {
     };
   }, []);
 
-  // Format time to MM:SS
   const formatTime = (seconds: number): string => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
@@ -353,7 +344,6 @@ const TournamentScoring = () => {
     if (athlete1.hansoku > 0 || athlete1.shikkaku > 0) return currentMatch.athlete2;
     if (athlete2.hansoku > 0 || athlete2.shikkaku > 0) return currentMatch.athlete1;
     
-    // Calculate total scores
     const athlete1Score = athlete1.yuko + (athlete1.wazari * 2) + (athlete1.ippon * 3) - athlete1.penalties;
     const athlete2Score = athlete2.yuko + (athlete2.wazari * 2) + (athlete2.ippon * 3) - athlete2.penalties;
     
@@ -362,7 +352,7 @@ const TournamentScoring = () => {
     
     return null;
   };
-  
+
   if (scoringMode && currentMatch) {
     return (
       <div className="flex h-screen bg-background overflow-hidden">
@@ -401,7 +391,6 @@ const TournamentScoring = () => {
           
           <main className="flex-1 overflow-hidden">
             <div className="w-[90%] mx-auto h-full flex flex-col py-4">
-              {/* Timer Component */}
               <div className="bg-gradient-to-r from-primary/5 to-secondary/5 p-4 rounded-xl shadow-sm border border-border/30 mb-4">
                 <div className="flex items-center justify-between">
                   <h3 className="font-semibold text-lg flex items-center gap-2">
@@ -517,7 +506,6 @@ const TournamentScoring = () => {
                 </div>
               ) : (
                 <div className="flex flex-col h-[calc(100%-120px)]">
-                  {/* Athletes header */}
                   <div className="grid grid-cols-2 gap-4 mb-4">
                     <div className="bg-gradient-to-r from-primary/10 to-transparent rounded-xl p-3 text-center shadow-sm border border-border/30">
                       <div className="flex items-center gap-3">
@@ -537,9 +525,7 @@ const TournamentScoring = () => {
                     </div>
                   </div>
 
-                  {/* Scoring section */}
                   <div className="grid grid-cols-2 gap-4 flex-grow overflow-hidden">
-                    {/* Athlete 1 Scoring */}
                     <div className="border border-border/30 rounded-xl overflow-hidden shadow-sm bg-card flex flex-col">
                       <div className="bg-gradient-to-r from-primary/10 to-transparent p-2 border-b border-border/30">
                         <h3 className="font-semibold text-sm text-center">Pontuação - {currentMatch.athlete1}</h3>
@@ -646,7 +632,6 @@ const TournamentScoring = () => {
                       </div>
                     </div>
 
-                    {/* Athlete 2 Scoring */}
                     <div className="border border-border/30 rounded-xl overflow-hidden shadow-sm bg-card flex flex-col">
                       <div className="bg-gradient-to-r from-primary/10 to-transparent p-2 border-b border-border/30">
                         <h3 className="font-semibold text-sm text-center">Pontuação - {currentMatch.athlete2}</h3>
@@ -754,7 +739,6 @@ const TournamentScoring = () => {
                     </div>
                   </div>
 
-                  {/* Winner indication */}
                   <div className="mt-4 grid grid-cols-1 gap-4">
                     <div className="p-3 bg-gradient-to-r from-primary/5 to-secondary/5 rounded-xl shadow-sm border border-border/30">
                       <div className="flex justify-between items-center">
@@ -792,172 +776,162 @@ const TournamentScoring = () => {
   }
   
   return (
-    <div className="flex h-screen bg-background overflow-hidden">
+    <div className="flex h-screen bg-[#222222] overflow-hidden">
       <TournamentSidebar />
       
       <div className="flex-1 ml-64 flex flex-col h-screen">
-        <header className="sticky top-0 z-40 border-b bg-background/95 backdrop-blur-sm px-6 py-4">
+        <header className="border-b border-zinc-800 bg-[#1A1F2C]/95 backdrop-blur-sm p-6">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold tracking-tight">Pontuação do Torneio</h1>
-              <p className="text-sm text-muted-foreground">Gerencie pontuações de katas e kumites</p>
+              <h1 className="text-2xl font-bold tracking-tight text-white">Pontuação do Torneio</h1>
+              <p className="text-sm text-zinc-400">Gerencie pontuações de katas e kumites</p>
             </div>
             <div className="flex items-center gap-2">
-              <Badge variant="outline" className="px-3 py-1.5 flex gap-1.5 items-center">
-                <Trophy className="h-3.5 w-3.5 text-primary" />
-                <span>Torneio #{id}</span>
+              <Badge variant="outline" className="px-3 py-1.5 flex gap-1.5 items-center border-zinc-700 bg-zinc-800/50">
+                <Trophy className="h-3.5 w-3.5 text-red-500" />
+                <span className="text-zinc-300">Torneio #{id}</span>
               </Badge>
             </div>
           </div>
         </header>
         
-        <main className="flex-1 p-6 overflow-auto">
+        <main className="flex-1 p-6 overflow-auto bg-[#222222]">
           <div className="w-full max-w-6xl mx-auto">
             <div className="flex items-center justify-between mb-8">
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center border border-primary/20">
-                  <Calendar className="h-6 w-6 text-primary" />
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-full bg-red-500/10 flex items-center justify-center border border-red-500/20">
+                  <Calendar className="h-6 w-6 text-red-500" />
                 </div>
                 <div>
-                  <h2 className="text-xl font-semibold">Próximas Lutas</h2>
-                  <p className="text-sm text-muted-foreground">Selecione uma luta para iniciar a pontuação</p>
+                  <h2 className="text-xl font-semibold text-white">Próximas Lutas</h2>
+                  <p className="text-sm text-zinc-400">Selecione uma luta para iniciar a pontuação</p>
                 </div>
               </div>
               
-              <Badge className="px-3 py-1.5 bg-green-500/10 text-green-600 hover:bg-green-500/20 transition-colors border border-green-500/20">
+              <Badge className="px-3 py-1.5 bg-green-500/10 text-green-400 hover:bg-green-500/20 transition-colors border border-green-500/20">
                 <Shield className="h-3.5 w-3.5 mr-1.5" />
                 Em andamento
               </Badge>
             </div>
             
-            <div className="bg-gradient-to-r from-primary/5 to-secondary/5 rounded-xl p-8 shadow-sm border border-border/30">
-              <Tabs 
-                defaultValue="kata" 
-                onValueChange={setActiveTab} 
-                className="h-full"
-              >
-                <TabsList className="grid grid-cols-2 mb-8 bg-background/50 p-1 w-64 rounded-full">
-                  <TabsTrigger 
-                    value="kata" 
-                    className={`relative text-sm rounded-full font-medium py-2.5 px-4 ${
-                      activeTab === "kata" 
-                        ? "bg-primary text-primary-foreground shadow-sm" 
-                        : "hover:bg-muted/50"
-                    }`}
-                  >
-                    {activeTab === "kata" && (
-                      <span className="absolute -top-1 -right-1 flex h-3 w-3">
-                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
-                        <span className="relative inline-flex rounded-full h-3 w-3 bg-primary"></span>
-                      </span>
-                    )}
-                    Kata
-                  </TabsTrigger>
-                  <TabsTrigger 
-                    value="kumite" 
-                    className={`relative text-sm rounded-full font-medium py-2.5 px-4 ${
-                      activeTab === "kumite" 
-                        ? "bg-primary text-primary-foreground shadow-sm" 
-                        : "hover:bg-muted/50"
-                    }`}
-                  >
-                    {activeTab === "kumite" && (
-                      <span className="absolute -top-1 -right-1 flex h-3 w-3">
-                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
-                        <span className="relative inline-flex rounded-full h-3 w-3 bg-primary"></span>
-                      </span>
-                    )}
-                    Kumite
-                  </TabsTrigger>
-                </TabsList>
+            <div className="bg-[#1A1F2C] rounded-xl p-8 shadow-md border border-zinc-800">
+              <div className="bg-[#1f232e] mb-8 p-1 w-64 rounded-full inline-flex">
+                <button 
+                  onClick={() => setActiveTab("kata")}
+                  className={`relative text-sm rounded-full font-medium py-2.5 px-12 transition-colors ${
+                    activeTab === "kata" 
+                      ? "bg-red-500 text-white" 
+                      : "text-zinc-400 hover:text-zinc-300"
+                  }`}
+                >
+                  {activeTab === "kata" && (
+                    <span className="absolute top-2 left-4 flex h-2 w-2">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
+                    </span>
+                  )}
+                  Kata
+                </button>
+                <button 
+                  onClick={() => setActiveTab("kumite")}
+                  className={`relative text-sm rounded-full font-medium py-2.5 px-12 transition-colors ${
+                    activeTab === "kumite" 
+                      ? "bg-red-500 text-white" 
+                      : "text-zinc-400 hover:text-zinc-300"
+                  }`}
+                >
+                  {activeTab === "kumite" && (
+                    <span className="absolute top-2 left-4 flex h-2 w-2">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
+                    </span>
+                  )}
+                  Kumite
+                </button>
+              </div>
                 
-                <TabsContent value="kata" className="space-y-0 focus-visible:outline-none focus-visible:ring-0">
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {kataMatches.map((match) => (
-                      <Card key={match.id} className="overflow-hidden">
-                        <div className="bg-gradient-to-r from-primary/10 to-transparent p-4 border-b border-border/30">
-                          <div className="flex justify-between">
-                            <Badge className="px-3 py-1 rounded-full">
-                              <Star className="h-3.5 w-3.5 mr-1.5" />
-                              Kata
-                            </Badge>
-                            <Badge variant="outline" className="flex items-center gap-1">
-                              <Timer className="h-3.5 w-3.5" />
-                              {match.time}
-                            </Badge>
-                          </div>
+              <div className={activeTab === "kata" ? "block" : "hidden"}>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {kataMatches.map((match) => (
+                    <div key={match.id} className="bg-[#141824] rounded-lg overflow-hidden">
+                      <div className="bg-[#1e2334] p-3 border-b border-zinc-800 flex justify-between items-center">
+                        <Badge className="px-3 py-1 rounded-full bg-red-500/10 text-red-400 border-red-500/20">
+                          Kata
+                        </Badge>
+                        <div className="flex items-center gap-1.5 text-zinc-400">
+                          <Clock className="h-3.5 w-3.5" />
+                          {match.time}
                         </div>
-                        <div className="p-4">
-                          <div className="flex items-center gap-3 mb-4">
-                            <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center border border-primary/20">
-                              <User className="h-5 w-5 text-primary/80" />
-                            </div>
-                            <div>
-                              <h3 className="font-semibold">{match.athlete1}</h3>
-                              <p className="text-xs text-muted-foreground">{match.category}</p>
-                            </div>
+                      </div>
+                      <div className="p-4">
+                        <h3 className="font-medium text-white text-lg mb-5">{match.category}</h3>
+                        <div className="flex flex-col items-center justify-center mb-5">
+                          <div className="bg-red-500/10 rounded-full w-16 h-16 flex items-center justify-center mb-3 border border-red-500/20">
+                            <User className="h-7 w-7 text-red-400" />
                           </div>
-                          <Button
-                            onClick={() => handleStartMatch(match)}
-                            className="w-full gap-2"
-                          >
-                            <Flag className="h-4 w-4" />
-                            Iniciar Pontuação
-                          </Button>
+                          <h3 className="text-white font-semibold text-lg">{match.athlete1}</h3>
                         </div>
-                      </Card>
-                    ))}
-                  </div>
-                </TabsContent>
+                        <Button
+                          onClick={() => handleStartMatch(match)}
+                          className="w-full gap-2 bg-red-500 hover:bg-red-600 text-white py-5"
+                        >
+                          <Circle className="h-4 w-4 fill-current" />
+                          Iniciar Pontuação
+                          <ArrowRight className="h-4 w-4 ml-auto" />
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
                 
-                <TabsContent value="kumite" className="space-y-0 focus-visible:outline-none focus-visible:ring-0">
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {kumiteMatches.map((match) => (
-                      <Card key={match.id} className="overflow-hidden">
-                        <div className="bg-gradient-to-r from-primary/10 to-transparent p-4 border-b border-border/30">
-                          <div className="flex justify-between">
-                            <Badge className="px-3 py-1 rounded-full bg-red-500/10 text-red-600 border-red-500/20">
-                              <Shield className="h-3.5 w-3.5 mr-1.5" />
-                              Kumite
-                            </Badge>
-                            <Badge variant="outline" className="flex items-center gap-1">
-                              <Timer className="h-3.5 w-3.5" />
-                              {match.time}
-                            </Badge>
-                          </div>
+              <div className={activeTab === "kumite" ? "block" : "hidden"}>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {kumiteMatches.map((match) => (
+                    <div key={match.id} className="bg-[#141824] rounded-lg overflow-hidden">
+                      <div className="bg-[#1e2334] p-3 border-b border-zinc-800 flex justify-between items-center">
+                        <Badge className="px-3 py-1 rounded-full bg-red-500/10 text-red-400 border-red-500/20">
+                          Kumite
+                        </Badge>
+                        <div className="flex items-center gap-1.5 text-zinc-400">
+                          <Clock className="h-3.5 w-3.5" />
+                          {match.time}
                         </div>
-                        <div className="p-4">
-                          <div className="mb-3">
-                            <h3 className="font-medium text-sm mb-3">{match.category}</h3>
-                            <div className="flex justify-between items-center">
-                              <div className="flex items-center gap-2">
-                                <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center border border-primary/20">
-                                  <User className="h-4 w-4 text-primary/80" />
-                                </div>
-                                <span className="text-sm">{match.athlete1}</span>
-                              </div>
-                              <ArrowRight className="h-4 w-4 mx-2 text-muted-foreground" />
-                              <div className="flex items-center gap-2">
-                                <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center border border-primary/20">
-                                  <User className="h-4 w-4 text-primary/80" />
-                                </div>
-                                <span className="text-sm">{match.athlete2}</span>
-                              </div>
+                      </div>
+                      <div className="p-4">
+                        <h3 className="font-medium text-white text-lg mb-4">{match.category}</h3>
+                        <div className="flex items-center justify-between mb-5">
+                          <div className="flex flex-col items-center">
+                            <div className="bg-red-500/10 rounded-full w-12 h-12 flex items-center justify-center mb-2 border border-red-500/20">
+                              <User className="h-6 w-6 text-red-400" />
                             </div>
+                            <span className="text-white text-sm font-medium">{match.athlete1}</span>
                           </div>
-                          <Button
-                            onClick={() => handleStartMatch(match)}
-                            className="w-full gap-2"
-                          >
-                            <Flag className="h-4 w-4" />
-                            Iniciar Pontuação
-                          </Button>
+                          
+                          <div className="bg-zinc-800 rounded-full h-8 w-8 flex items-center justify-center">
+                            <span className="font-bold text-zinc-400 text-xs">VS</span>
+                          </div>
+                          
+                          <div className="flex flex-col items-center">
+                            <div className="bg-red-500/10 rounded-full w-12 h-12 flex items-center justify-center mb-2 border border-red-500/20">
+                              <User className="h-6 w-6 text-red-400" />
+                            </div>
+                            <span className="text-white text-sm font-medium">{match.athlete2}</span>
+                          </div>
                         </div>
-                      </Card>
-                    ))}
-                  </div>
-                </TabsContent>
-              </Tabs>
+                        <Button
+                          onClick={() => handleStartMatch(match)}
+                          className="w-full gap-2 bg-red-500 hover:bg-red-600 text-white py-5"
+                        >
+                          <Circle className="h-4 w-4 fill-current" />
+                          Iniciar Pontuação
+                          <ArrowRight className="h-4 w-4 ml-auto" />
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
         </main>
