@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { TournamentSidebar } from "@/components/TournamentSidebar";
@@ -999,3 +1000,235 @@ const TournamentScoring = () => {
                                   )
                                 }
                               />
+                              
+                              <PenaltyButton
+                                label="Jogai"
+                                value={kumiteScore.athlete2.jogai}
+                                color="yellow"
+                                onIncrement={() =>
+                                  handleKumiteScoreChange(
+                                    "athlete2",
+                                    "jogai",
+                                    1
+                                  )
+                                }
+                                onDecrement={() =>
+                                  handleKumiteScoreChange(
+                                    "athlete2",
+                                    "jogai",
+                                    -1
+                                  )
+                                }
+                              />
+
+                              <PenaltyButton
+                                label="Mubobi"
+                                value={kumiteScore.athlete2.mubobi}
+                                color="yellow"
+                                onIncrement={() =>
+                                  handleKumiteScoreChange(
+                                    "athlete2",
+                                    "mubobi",
+                                    1
+                                  )
+                                }
+                                onDecrement={() =>
+                                  handleKumiteScoreChange(
+                                    "athlete2",
+                                    "mubobi",
+                                    -1
+                                  )
+                                }
+                              />
+
+                              <PenaltyButton
+                                label="Hansoku-Chui"
+                                value={kumiteScore.athlete2.hansokuChui}
+                                color="orange"
+                                onIncrement={() =>
+                                  handleKumiteScoreChange(
+                                    "athlete2",
+                                    "hansokuChui",
+                                    1
+                                  )
+                                }
+                                onDecrement={() =>
+                                  handleKumiteScoreChange(
+                                    "athlete2",
+                                    "hansokuChui",
+                                    -1
+                                  )
+                                }
+                              />
+
+                              <PenaltyButton
+                                label="Hansoku"
+                                value={kumiteScore.athlete2.hansoku}
+                                color="red"
+                                onIncrement={() =>
+                                  handleKumiteScoreChange(
+                                    "athlete2",
+                                    "hansoku",
+                                    1
+                                  )
+                                }
+                                onDecrement={() =>
+                                  handleKumiteScoreChange(
+                                    "athlete2",
+                                    "hansoku",
+                                    -1
+                                  )
+                                }
+                              />
+
+                              <PenaltyButton
+                                label="Shikkaku"
+                                value={kumiteScore.athlete2.shikkaku}
+                                color="red"
+                                onIncrement={() =>
+                                  handleKumiteScoreChange(
+                                    "athlete2",
+                                    "shikkaku",
+                                    1
+                                  )
+                                }
+                                onDecrement={() =>
+                                  handleKumiteScoreChange(
+                                    "athlete2",
+                                    "shikkaku",
+                                    -1
+                                  )
+                                }
+                                className="col-span-2"
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </main>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex h-screen bg-background overflow-hidden">
+      <TournamentSidebar />
+
+      <div className="flex-1 ml-64 flex flex-col h-screen overflow-hidden">
+        <header className="sticky top-0 z-40 border-b bg-background/95 backdrop-blur-sm px-6 py-4">
+          <h1 className="text-2xl font-bold tracking-tight">Pontuação</h1>
+        </header>
+
+        <main className="flex-1 overflow-y-auto p-6">
+          <Tabs defaultValue={activeTab} onValueChange={setActiveTab} className="w-full">
+            <TabsList className="grid w-[400px] grid-cols-2 mb-8">
+              <TabsTrigger value="kata">Kata</TabsTrigger>
+              <TabsTrigger value="kumite">Kumite</TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="kata" className="space-y-4">
+              <ScrollArea className="h-[70vh]">
+                <div className="space-y-4 pr-4">
+                  {kataMatches.map((match) => (
+                    <Card key={match.id} className="hover:shadow-md transition-all duration-300">
+                      <div className="flex items-center justify-between p-4 border-b">
+                        <div className="flex items-center gap-2">
+                          <Calendar className="h-4 w-4 text-primary" />
+                          <span className="text-base font-medium">{match.time}</span>
+                        </div>
+                        <Badge variant="outline" className="font-medium">
+                          {match.category}
+                        </Badge>
+                      </div>
+                      <div className="p-4">
+                        <div className="flex items-center gap-3 mb-4">
+                          <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                            <User className="h-5 w-5 text-primary" />
+                          </div>
+                          <div>
+                            <h3 className="font-semibold">{match.athlete1}</h3>
+                          </div>
+                        </div>
+                        <div className="flex justify-end">
+                          <Button
+                            onClick={() => handleStartMatch(match)}
+                            className="gap-2"
+                          >
+                            <Star className="h-4 w-4" />
+                            Iniciar Pontuação
+                          </Button>
+                        </div>
+                      </div>
+                    </Card>
+                  ))}
+                </div>
+              </ScrollArea>
+            </TabsContent>
+
+            <TabsContent value="kumite" className="space-y-4">
+              <ScrollArea className="h-[70vh]">
+                <div className="space-y-4 pr-4">
+                  {kumiteMatches.map((match) => (
+                    <Card key={match.id} className="hover:shadow-md transition-all duration-300">
+                      <div className="flex items-center justify-between p-4 border-b">
+                        <div className="flex items-center gap-2">
+                          <Calendar className="h-4 w-4 text-primary" />
+                          <span className="text-base font-medium">{match.time}</span>
+                        </div>
+                        <Badge variant="outline" className="font-medium">
+                          {match.category}
+                        </Badge>
+                      </div>
+                      <div className="p-4">
+                        <div className="flex items-center justify-between mb-4">
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                              <User className="h-5 w-5 text-primary" />
+                            </div>
+                            <div>
+                              <h3 className="font-semibold">{match.athlete1}</h3>
+                            </div>
+                          </div>
+                          
+                          <div className="bg-primary/10 rounded-full h-8 w-8 flex items-center justify-center">
+                            <span className="font-bold text-primary text-sm">VS</span>
+                          </div>
+                          
+                          <div className="flex items-center gap-3">
+                            <div>
+                              <h3 className="font-semibold text-right">{match.athlete2}</h3>
+                            </div>
+                            <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                              <User className="h-5 w-5 text-primary" />
+                            </div>
+                          </div>
+                        </div>
+                        <div className="flex justify-end">
+                          <Button
+                            onClick={() => handleStartMatch(match)}
+                            className="gap-2"
+                          >
+                            <Star className="h-4 w-4" />
+                            Iniciar Pontuação
+                          </Button>
+                        </div>
+                      </div>
+                    </Card>
+                  ))}
+                </div>
+              </ScrollArea>
+            </TabsContent>
+          </Tabs>
+        </main>
+      </div>
+    </div>
+  );
+};
+
+export default TournamentScoring;
