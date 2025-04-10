@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { Clock, Info, MapPin } from "lucide-react";
+import { Clock, Info, MapPin, Timer } from "lucide-react";
 import { Button } from "./ui/button";
 import { Card } from "./ui/card";
 import { MatchDetails } from "./MatchDetails";
