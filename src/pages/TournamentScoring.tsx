@@ -808,48 +808,40 @@ const TournamentScoring = () => {
                 </div>
               </div>
               
-              <Badge className="px-3 py-1.5 bg-green-500/10 text-green-400 hover:bg-green-500/20 transition-colors border border-green-500/20">
+              <Badge className="px-3 py-1.5 bg-green-500/10 text-green-500 hover:bg-green-500/20 transition-colors border border-green-500/20">
                 <Shield className="h-3.5 w-3.5 mr-1.5" />
                 Em andamento
               </Badge>
             </div>
             
-            <div className="bg-[#1A1F2C] rounded-xl p-8 shadow-md border border-zinc-800">
+            <div className="bg-card rounded-xl p-8 shadow-md border border-border">
               <Tabs 
                 defaultValue="kata" 
                 value={activeTab} 
                 onValueChange={setActiveTab}
                 className="w-full"
               >
-                <TabsList className="bg-[#1f232e] mb-8 p-1 w-64 rounded-full inline-flex">
+                <TabsList className="bg-muted mb-8 p-1 w-64 rounded-full inline-flex">
                   <TabsTrigger 
                     value="kata"
-                    className={`relative text-sm rounded-full font-medium py-2.5 px-12 transition-all duration-300 ${
-                      activeTab === "kata" 
-                        ? "bg-red-500 text-white" 
-                        : "text-zinc-400 hover:text-zinc-300"
-                    }`}
+                    className="relative text-sm rounded-full font-medium py-2.5 px-12 transition-all duration-300"
                   >
                     {activeTab === "kata" && (
                       <span className="absolute top-2 left-4 flex h-2 w-2">
-                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-75"></span>
-                        <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+                        <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
                       </span>
                     )}
                     Kata
                   </TabsTrigger>
                   <TabsTrigger 
                     value="kumite"
-                    className={`relative text-sm rounded-full font-medium py-2.5 px-12 transition-all duration-300 ${
-                      activeTab === "kumite" 
-                        ? "bg-red-500 text-white" 
-                        : "text-zinc-400 hover:text-zinc-300"
-                    }`}
+                    className="relative text-sm rounded-full font-medium py-2.5 px-12 transition-all duration-300"
                   >
                     {activeTab === "kumite" && (
                       <span className="absolute top-2 left-4 flex h-2 w-2">
-                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-75"></span>
-                        <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+                        <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
                       </span>
                     )}
                     Kumite
@@ -862,34 +854,37 @@ const TournamentScoring = () => {
                 >
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {kataMatches.map((match) => (
-                      <div key={match.id} className="bg-[#141824] rounded-lg overflow-hidden shadow-lg transform transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-xl hover:border-red-500/30 border border-zinc-800/80">
-                        <div className="bg-[#1e2334] p-3 border-b border-zinc-800 flex justify-between items-center">
-                          <Badge className="px-3 py-1 rounded-full bg-red-500/10 text-red-400 border-red-500/20">
+                      <Card 
+                        key={match.id} 
+                        className="overflow-hidden shadow-md border border-border/60 transition-all duration-200 hover:shadow-lg hover:border-primary/30"
+                      >
+                        <div className="bg-muted/80 p-3 border-b border-border flex justify-between items-center">
+                          <Badge className="px-3 py-1 rounded-full bg-primary/10 text-primary border-primary/20">
                             Kata
                           </Badge>
-                          <div className="flex items-center gap-1.5 text-zinc-400">
+                          <div className="flex items-center gap-1.5 text-muted-foreground">
                             <Clock className="h-3.5 w-3.5" />
                             {match.time}
                           </div>
                         </div>
                         <div className="p-5">
-                          <h3 className="font-medium text-white text-lg mb-5">{match.category}</h3>
+                          <h3 className="font-medium text-lg mb-5">{match.category}</h3>
                           <div className="flex flex-col items-center justify-center mb-6">
-                            <div className="bg-red-500/10 rounded-full w-20 h-20 flex items-center justify-center mb-3 border border-red-500/20">
-                              <User className="h-8 w-8 text-red-400" />
+                            <div className="bg-primary/10 rounded-full w-24 h-24 flex items-center justify-center mb-3 border border-primary/20">
+                              <User className="h-8 w-8 text-primary" />
                             </div>
-                            <h3 className="text-white font-semibold text-lg">{match.athlete1}</h3>
+                            <h3 className="font-semibold text-lg">{match.athlete1}</h3>
                           </div>
                           <Button
                             onClick={() => handleStartMatch(match)}
-                            className="w-full gap-2 bg-red-500 hover:bg-red-600 text-white py-6 transition-all duration-300"
+                            className="w-full gap-2 bg-primary hover:bg-primary/90 text-primary-foreground py-6 transition-all duration-300"
                           >
                             <Timer className="h-5 w-5" />
                             Iniciar Pontuação
                             <ArrowRight className="h-4 w-4 ml-auto" />
                           </Button>
                         </div>
-                      </div>
+                      </Card>
                     ))}
                   </div>
                 </TabsContent>
@@ -900,47 +895,50 @@ const TournamentScoring = () => {
                 >
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {kumiteMatches.map((match) => (
-                      <div key={match.id} className="bg-[#141824] rounded-lg overflow-hidden shadow-lg transform transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-xl hover:border-red-500/30 border border-zinc-800/80">
-                        <div className="bg-[#1e2334] p-3 border-b border-zinc-800 flex justify-between items-center">
-                          <Badge className="px-3 py-1 rounded-full bg-red-500/10 text-red-400 border-red-500/20">
+                      <Card 
+                        key={match.id} 
+                        className="overflow-hidden shadow-md border border-border/60 transition-all duration-200 hover:shadow-lg hover:border-primary/30"
+                      >
+                        <div className="bg-muted/80 p-3 border-b border-border flex justify-between items-center">
+                          <Badge className="px-3 py-1 rounded-full bg-primary/10 text-primary border-primary/20">
                             Kumite
                           </Badge>
-                          <div className="flex items-center gap-1.5 text-zinc-400">
+                          <div className="flex items-center gap-1.5 text-muted-foreground">
                             <Clock className="h-3.5 w-3.5" />
                             {match.time}
                           </div>
                         </div>
                         <div className="p-5">
-                          <h3 className="font-medium text-white text-lg mb-4">{match.category}</h3>
+                          <h3 className="font-medium text-lg mb-4">{match.category}</h3>
                           <div className="flex items-center justify-between mb-6">
                             <div className="flex flex-col items-center">
-                              <div className="bg-red-500/10 rounded-full w-16 h-16 flex items-center justify-center mb-2 border border-red-500/20">
-                                <User className="h-6 w-6 text-red-400" />
+                              <div className="bg-primary/10 rounded-full w-20 h-20 flex items-center justify-center mb-2 border border-primary/20">
+                                <User className="h-6 w-6 text-primary" />
                               </div>
-                              <span className="text-white text-sm font-medium">{match.athlete1}</span>
+                              <span className="text-sm font-medium">{match.athlete1}</span>
                             </div>
                             
-                            <div className="bg-zinc-800 rounded-full h-8 w-8 flex items-center justify-center">
-                              <span className="font-bold text-zinc-400 text-xs">VS</span>
+                            <div className="bg-muted rounded-full h-8 w-8 flex items-center justify-center">
+                              <span className="font-bold text-xs">VS</span>
                             </div>
                             
                             <div className="flex flex-col items-center">
-                              <div className="bg-red-500/10 rounded-full w-16 h-16 flex items-center justify-center mb-2 border border-red-500/20">
-                                <User className="h-6 w-6 text-red-400" />
+                              <div className="bg-primary/10 rounded-full w-20 h-20 flex items-center justify-center mb-2 border border-primary/20">
+                                <User className="h-6 w-6 text-primary" />
                               </div>
-                              <span className="text-white text-sm font-medium">{match.athlete2}</span>
+                              <span className="text-sm font-medium">{match.athlete2}</span>
                             </div>
                           </div>
                           <Button
                             onClick={() => handleStartMatch(match)}
-                            className="w-full gap-2 bg-red-500 hover:bg-red-600 text-white py-6 transition-all duration-300"
+                            className="w-full gap-2 bg-primary hover:bg-primary/90 text-primary-foreground py-6 transition-all duration-300"
                           >
                             <Timer className="h-5 w-5" />
                             Iniciar Pontuação
                             <ArrowRight className="h-4 w-4 ml-auto" />
                           </Button>
                         </div>
-                      </div>
+                      </Card>
                     ))}
                   </div>
                 </TabsContent>
