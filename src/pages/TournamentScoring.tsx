@@ -776,35 +776,35 @@ const TournamentScoring = () => {
   }
   
   return (
-    <div className="flex h-screen bg-[#222222] overflow-hidden">
+    <div className="flex h-screen bg-background overflow-hidden">
       <TournamentSidebar />
       
       <div className="flex-1 ml-64 flex flex-col h-screen">
-        <header className="border-b border-zinc-800 bg-[#1A1F2C]/95 backdrop-blur-sm p-6">
+        <header className="border-b bg-background/95 backdrop-blur-sm p-6">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold tracking-tight text-white">Pontua��ão do Torneio</h1>
-              <p className="text-sm text-zinc-400">Gerencie pontuações de katas e kumites</p>
+              <h1 className="text-2xl font-bold tracking-tight">Pontuação do Torneio</h1>
+              <p className="text-sm text-muted-foreground">Gerencie pontuações de katas e kumites</p>
             </div>
             <div className="flex items-center gap-2">
-              <Badge variant="outline" className="px-3 py-1.5 flex gap-1.5 items-center border-zinc-700 bg-zinc-800/50">
-                <Trophy className="h-3.5 w-3.5 text-red-500" />
-                <span className="text-zinc-300">Torneio #{id}</span>
+              <Badge variant="outline" className="px-3 py-1.5 flex gap-1.5 items-center">
+                <Trophy className="h-3.5 w-3.5 text-primary" />
+                <span>Torneio #{id}</span>
               </Badge>
             </div>
           </div>
         </header>
         
-        <main className="flex-1 p-6 overflow-auto bg-[#222222]">
+        <main className="flex-1 p-6 overflow-auto bg-background">
           <div className="w-full max-w-6xl mx-auto">
             <div className="flex items-center justify-between mb-8">
               <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-full bg-red-500/10 flex items-center justify-center border border-red-500/20">
-                  <Calendar className="h-6 w-6 text-red-500" />
+                <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center border border-primary/20">
+                  <Calendar className="h-6 w-6 text-primary" />
                 </div>
                 <div>
-                  <h2 className="text-xl font-semibold text-white">Próximas Lutas</h2>
-                  <p className="text-sm text-zinc-400">Selecione uma luta para iniciar a pontuação</p>
+                  <h2 className="text-xl font-semibold">Próximas Lutas</h2>
+                  <p className="text-sm text-muted-foreground">Selecione uma luta para iniciar a pontuação</p>
                 </div>
               </div>
               
@@ -856,7 +856,7 @@ const TournamentScoring = () => {
                     {kataMatches.map((match) => (
                       <Card 
                         key={match.id} 
-                        className="overflow-hidden shadow-md border border-border/60 transition-all duration-200 hover:shadow-lg hover:border-primary/30"
+                        className="overflow-hidden shadow-sm border border-border/60 transition-all duration-200 hover:shadow-md hover:border-primary/20"
                       >
                         <div className="bg-muted/80 p-3 border-b border-border flex justify-between items-center">
                           <Badge className="px-3 py-1 rounded-full bg-primary/10 text-primary border-primary/20">
@@ -870,8 +870,8 @@ const TournamentScoring = () => {
                         <div className="p-5">
                           <h3 className="font-medium text-lg mb-5">{match.category}</h3>
                           <div className="flex flex-col items-center justify-center mb-6">
-                            <div className="bg-primary/10 rounded-full w-24 h-24 flex items-center justify-center mb-3 border border-primary/20">
-                              <User className="h-8 w-8 text-primary" />
+                            <div className="bg-primary/10 rounded-full w-28 h-28 flex items-center justify-center mb-3 border border-primary/20">
+                              <User className="h-9 w-9 text-primary" />
                             </div>
                             <h3 className="font-semibold text-lg">{match.athlete1}</h3>
                           </div>
@@ -897,7 +897,7 @@ const TournamentScoring = () => {
                     {kumiteMatches.map((match) => (
                       <Card 
                         key={match.id} 
-                        className="overflow-hidden shadow-md border border-border/60 transition-all duration-200 hover:shadow-lg hover:border-primary/30"
+                        className="overflow-hidden shadow-sm border border-border/60 transition-all duration-200 hover:shadow-md hover:border-primary/20"
                       >
                         <div className="bg-muted/80 p-3 border-b border-border flex justify-between items-center">
                           <Badge className="px-3 py-1 rounded-full bg-primary/10 text-primary border-primary/20">
@@ -912,8 +912,8 @@ const TournamentScoring = () => {
                           <h3 className="font-medium text-lg mb-4">{match.category}</h3>
                           <div className="flex items-center justify-between mb-6">
                             <div className="flex flex-col items-center">
-                              <div className="bg-primary/10 rounded-full w-20 h-20 flex items-center justify-center mb-2 border border-primary/20">
-                                <User className="h-6 w-6 text-primary" />
+                              <div className="bg-primary/10 rounded-full w-24 h-24 flex items-center justify-center mb-2 border border-primary/20">
+                                <User className="h-7 w-7 text-primary" />
                               </div>
                               <span className="text-sm font-medium">{match.athlete1}</span>
                             </div>
@@ -923,8 +923,8 @@ const TournamentScoring = () => {
                             </div>
                             
                             <div className="flex flex-col items-center">
-                              <div className="bg-primary/10 rounded-full w-20 h-20 flex items-center justify-center mb-2 border border-primary/20">
-                                <User className="h-6 w-6 text-primary" />
+                              <div className="bg-primary/10 rounded-full w-24 h-24 flex items-center justify-center mb-2 border border-primary/20">
+                                <User className="h-7 w-7 text-primary" />
                               </div>
                               <span className="text-sm font-medium">{match.athlete2}</span>
                             </div>

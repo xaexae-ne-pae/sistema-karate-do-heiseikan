@@ -28,7 +28,7 @@ export function MatchCard({
   
   return (
     <>
-      <Card className="mb-4 overflow-hidden transition-all duration-300 hover:translate-x-1 hover:shadow-md hover:shadow-primary/10 dark:bg-card/90">
+      <Card className="mb-4 overflow-hidden transition-all duration-300 hover:translate-x-0.5 hover:shadow-md hover:shadow-primary/5 dark:bg-card/90">
         {/* Cabeçalho do card */}
         <div className="bg-muted/50 px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
