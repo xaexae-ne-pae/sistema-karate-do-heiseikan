@@ -603,14 +603,22 @@ const TournamentScoring = () => {
               ) : (
                 <div className="flex flex-col h-[calc(100%-180px)]">
                   <div className="grid grid-cols-2 gap-4 mb-4 relative">
-                    <div className="bg-gradient-to-r from-primary/10 to-transparent rounded-xl p-3 shadow-sm border border-border/30 flex justify-between items-center">
+                    <div className="bg-gradient-to-r from-primary/10 to-transparent rounded-xl p-3 shadow-sm border border-border/30 flex justify-between items-center relative">
                       <div className="flex items-center gap-3">
                         <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center border-2 border-primary/20">
                           <User className="h-6 w-6 text-primary" />
                         </div>
-                        <h3 className="font-semibold text-lg text-left">
-                          {currentMatch.athlete1}
-                        </h3>
+                        <div>
+                          <h3 className="font-semibold text-lg text-left">
+                            {currentMatch.athlete1}
+                          </h3>
+                          {determineWinner() === currentMatch.athlete1 && (
+                            <div className="flex items-center gap-1 mt-1 text-sm font-bold text-primary">
+                              <Crown className="h-4 w-4 text-amber-500" />
+                              <span>Vencedor</span>
+                            </div>
+                          )}
+                        </div>
                       </div>
                       <div className="bg-gradient-to-r from-primary/20 to-primary/10 px-4 py-2 rounded-lg">
                         <span className="text-xl font-bold text-primary">
@@ -619,23 +627,22 @@ const TournamentScoring = () => {
                       </div>
                     </div>
                     
-                    {determineWinner() && (
-                      <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10">
-                        <div className="bg-primary text-white px-3 py-2 rounded-full shadow-lg flex items-center gap-1.5 border-2 border-white dark:border-gray-800 animate-pulse">
-                          <Crown className="h-4 w-4" />
-                          <span className="font-bold text-sm">{determineWinner()}</span>
-                        </div>
-                      </div>
-                    )}
-                    
-                    <div className="bg-gradient-to-r from-primary/10 to-transparent rounded-xl p-3 shadow-sm border border-border/30 flex justify-between items-center">
+                    <div className="bg-gradient-to-r from-primary/10 to-transparent rounded-xl p-3 shadow-sm border border-border/30 flex justify-between items-center relative">
                       <div className="flex items-center gap-3">
                         <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center border-2 border-primary/20">
                           <User className="h-6 w-6 text-primary" />
                         </div>
-                        <h3 className="font-semibold text-lg text-left">
-                          {currentMatch.athlete2}
-                        </h3>
+                        <div>
+                          <h3 className="font-semibold text-lg text-left">
+                            {currentMatch.athlete2}
+                          </h3>
+                          {determineWinner() === currentMatch.athlete2 && (
+                            <div className="flex items-center gap-1 mt-1 text-sm font-bold text-primary">
+                              <Crown className="h-4 w-4 text-amber-500" />
+                              <span>Vencedor</span>
+                            </div>
+                          )}
+                        </div>
                       </div>
                       <div className="bg-gradient-to-r from-primary/20 to-primary/10 px-4 py-2 rounded-lg">
                         <span className="text-xl font-bold text-primary">
