@@ -24,6 +24,7 @@ import {
   RefreshCcw,
   Clock,
   Circle,
+  Crown,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -366,6 +367,11 @@ const TournamentScoring = () => {
     return kataScore.judge1 + kataScore.judge2 + kataScore.judge3;
   };
 
+  const calculateKumitePoints = (athlete: "athlete1" | "athlete2"): number => {
+    const scores = kumiteScore[athlete];
+    return scores.yuko + scores.wazari * 2 + scores.ippon * 3 - scores.penalties;
+  };
+
   const handleKumiteScoreChange = (
     athlete: "athlete1" | "athlete2",
     scoreType: keyof KumiteScore["athlete1"],
@@ -414,16 +420,8 @@ const TournamentScoring = () => {
     if (athlete2.hansoku > 0 || athlete2.shikkaku > 0)
       return currentMatch.athlete1;
 
-    const athlete1Score =
-      athlete1.yuko +
-      athlete1.wazari * 2 +
-      athlete1.ippon * 3 -
-      athlete1.penalties;
-    const athlete2Score =
-      athlete2.yuko +
-      athlete2.wazari * 2 +
-      athlete2.ippon * 3 -
-      athlete2.penalties;
+    const athlete1Score = calculateKumitePoints("athlete1");
+    const athlete2Score = calculateKumitePoints("athlete2");
 
     if (athlete1Score > athlete2Score) return currentMatch.athlete1;
     if (athlete2Score > athlete1Score) return currentMatch.athlete2;
@@ -535,7 +533,7 @@ const TournamentScoring = () => {
               </div>
 
               {currentMatch.type === "kata" ? (
-                <div className="grid grid-cols-1 h-[calc(100%-120px)]">
+                <div className="grid grid-cols-1 h-[calc(100%-160px)]">
                   <div className="bg-card shadow-md rounded-xl overflow-hidden border border-border/40 flex flex-col h-full">
                     <div className="bg-gradient-to-l from-primary/10 to-transparent p-4 border-b border-border/30">
                       <div className="flex items-center gap-4">
@@ -603,9 +601,9 @@ const TournamentScoring = () => {
                   </div>
                 </div>
               ) : (
-                <div className="flex flex-col h-[calc(100%-120px)]">
-                  <div className="grid grid-cols-2 gap-4 mb-4">
-                    <div className="bg-gradient-to-r from-primary/10 to-transparent rounded-xl p-3 text-center shadow-sm border border-border/30">
+                <div className="flex flex-col h-[calc(100%-180px)]">
+                  <div className="grid grid-cols-2 gap-4 mb-4 relative">
+                    <div className="bg-gradient-to-r from-primary/10 to-transparent rounded-xl p-3 shadow-sm border border-border/30 flex justify-between items-center">
                       <div className="flex items-center gap-3">
                         <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center border-2 border-primary/20">
                           <User className="h-6 w-6 text-primary" />
@@ -614,8 +612,23 @@ const TournamentScoring = () => {
                           {currentMatch.athlete1}
                         </h3>
                       </div>
+                      <div className="bg-gradient-to-r from-primary/20 to-primary/10 px-4 py-2 rounded-lg">
+                        <span className="text-xl font-bold text-primary">
+                          {calculateKumitePoints("athlete1")}
+                        </span>
+                      </div>
                     </div>
-                    <div className="bg-gradient-to-r from-primary/10 to-transparent rounded-xl p-3 text-center shadow-sm border border-border/30">
+                    
+                    {determineWinner() && (
+                      <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10">
+                        <div className="bg-primary text-white px-3 py-2 rounded-full shadow-lg flex items-center gap-1.5 border-2 border-white dark:border-gray-800 animate-pulse">
+                          <Crown className="h-4 w-4" />
+                          <span className="font-bold text-sm">{determineWinner()}</span>
+                        </div>
+                      </div>
+                    )}
+                    
+                    <div className="bg-gradient-to-r from-primary/10 to-transparent rounded-xl p-3 shadow-sm border border-border/30 flex justify-between items-center">
                       <div className="flex items-center gap-3">
                         <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center border-2 border-primary/20">
                           <User className="h-6 w-6 text-primary" />
@@ -623,6 +636,11 @@ const TournamentScoring = () => {
                         <h3 className="font-semibold text-lg text-left">
                           {currentMatch.athlete2}
                         </h3>
+                      </div>
+                      <div className="bg-gradient-to-r from-primary/20 to-primary/10 px-4 py-2 rounded-lg">
+                        <span className="text-xl font-bold text-primary">
+                          {calculateKumitePoints("athlete2")}
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -1072,28 +1090,6 @@ const TournamentScoring = () => {
                               />
                             </div>
                           </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="mt-4 grid grid-cols-1 gap-4">
-                    <div className="p-3 bg-gradient-to-r from-primary/5 to-secondary/5 rounded-xl shadow-sm border border-border/30">
-                      <div className="flex justify-between items-center">
-                        <span className="text-base font-medium flex items-center gap-2">
-                          <Trophy className="h-4 w-4 text-primary" />
-                          Vencedor:
-                        </span>
-                        <div className="px-4 py-2 rounded-lg bg-primary/10 border border-primary/20">
-                          {determineWinner() ? (
-                            <span className="font-bold text-base text-primary">
-                              {determineWinner()}
-                            </span>
-                          ) : (
-                            <span className="text-muted-foreground text-sm">
-                              Aguardando...
-                            </span>
-                          )}
                         </div>
                       </div>
                     </div>
