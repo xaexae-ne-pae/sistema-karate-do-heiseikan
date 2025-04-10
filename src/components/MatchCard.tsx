@@ -33,7 +33,7 @@ export function MatchCard({
         <div className="bg-muted/50 px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
             <Clock className="h-4 w-4 text-primary" />
-            <span className="text-sm font-medium">{time}</span>
+            <span className="text-base font-medium">{time}</span>
           </div>
           <div className="flex items-center gap-1.5">
             <MapPin className="h-3.5 w-3.5 text-muted-foreground" />

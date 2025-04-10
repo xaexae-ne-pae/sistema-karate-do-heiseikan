@@ -459,12 +459,19 @@ const TournamentScoring = () => {
                   </p>
                 </div>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-3">
+                <Button
+                  onClick={handleSaveScore}
+                  className="gap-2 bg-primary hover:bg-primary/90 px-6 py-2 text-base shadow-md rounded-lg"
+                >
+                  <Trophy className="h-5 w-5" />
+                  Salvar Pontuação
+                </Button>
                 <Badge
                   variant="outline"
-                  className="px-3 py-1.5 flex gap-1.5 items-center"
+                  className="px-4 py-2 flex gap-2 items-center text-base font-medium"
                 >
-                  <Timer className="h-3.5 w-3.5 text-primary" />
+                  <Timer className="h-4 w-4 text-primary" />
                   <span>{currentMatch.time}</span>
                 </Badge>
               </div>
@@ -593,16 +600,6 @@ const TournamentScoring = () => {
                         </div>
                       </div>
                     </div>
-                  </div>
-
-                  <div className="flex justify-end mt-4">
-                    <Button
-                      onClick={handleSaveScore}
-                      className="gap-2 bg-primary hover:bg-primary/90 px-6 py-2 text-base shadow-md rounded-lg"
-                    >
-                      <Trophy className="h-5 w-5" />
-                      Salvar Pontuação
-                    </Button>
                   </div>
                 </div>
               ) : (
@@ -1099,16 +1096,6 @@ const TournamentScoring = () => {
                           )}
                         </div>
                       </div>
-                    </div>
-
-                    <div className="flex justify-end">
-                      <Button
-                        onClick={handleSaveScore}
-                        className="gap-2 bg-primary hover:bg-primary/90 px-6 py-2 text-base shadow-md rounded-lg"
-                      >
-                        <Trophy className="h-5 w-5" />
-                        Salvar Pontuação
-                      </Button>
                     </div>
                   </div>
                 </div>
