@@ -86,9 +86,9 @@ const ScoreButton = ({
   onDecrement: () => void;
 }) => {
   return (
-    <div className="space-y-1">
-      <Label className="text-xs">{label}</Label>
-      <div className="flex items-center justify-between bg-muted/30 rounded-md p-1.5">
+    <div className="space-y-2">
+      <Label className="text-base">{label}</Label>
+      <div className="flex items-center justify-between bg-muted/30 rounded-md p-2">
         <Button
           variant="outline"
           size="icon"
@@ -136,10 +136,10 @@ const PenaltyButton = ({
 
   return (
     <div
-      className={`${className} relative rounded-md p-2 border ${colorClasses[color]}`}
+      className={`${className} relative rounded-md p-3 border mb-1 ${colorClasses[color]}`}
     >
       <div className="flex items-center justify-between">
-        <span className="text-xs font-medium">{label}</span>
+        <span className="text-base font-medium">{label}</span>
         <div className="flex items-center gap-2">
           <Button
             variant="outline"
@@ -668,7 +668,7 @@ const TournamentScoring = () => {
 
                       <div className="p-2 overflow-auto flex-grow">
                         <div className="grid grid-cols-1 gap-3 h-full">
-                          <div className="space-y-2">
+                          <div className="space-y-3.5">
                             <h4 className="font-medium text-xs uppercase text-muted-foreground flex items-center gap-1">
                               <Trophy className="h-3 w-3 text-primary" />
                               Pontos
@@ -892,7 +892,7 @@ const TournamentScoring = () => {
 
                       <div className="p-2 overflow-auto flex-grow">
                         <div className="grid grid-cols-1 gap-3 h-full">
-                          <div className="space-y-2">
+                          <div className="space-y-3.5">
                             <h4 className="font-medium text-xs uppercase text-muted-foreground flex items-center gap-1">
                               <Trophy className="h-3 w-3 text-primary" />
                               Pontos
