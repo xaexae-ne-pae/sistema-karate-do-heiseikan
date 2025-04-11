@@ -25,6 +25,7 @@ import {
   Clock,
   Circle,
   Crown,
+  ExternalLink,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -336,6 +337,21 @@ const TournamentScoring = () => {
     setTimeLeft(180);
   };
 
+  const openScoreboard = () => {
+    if (!currentMatch) return;
+    
+    const scoreboardData = {
+      match: currentMatch,
+      timeLeft,
+      kataScore: currentMatch.type === "kata" ? kataScore : null,
+      kumiteScore: currentMatch.type === "kumite" ? kumiteScore : null,
+    };
+    
+    sessionStorage.setItem("scoreboardData", JSON.stringify(scoreboardData));
+    
+    window.open(`/torneios/${id}/placar`, "_blank");
+  };
+
   useEffect(() => {
     return () => {
       if (timerRef.current) {
@@ -531,6 +547,15 @@ const TournamentScoring = () => {
                         className="h-8 w-8 p-0 hover:bg-primary/10"
                       >
                         <RefreshCcw className="h-3.5 w-3.5" />
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={openScoreboard}
+                        className="h-8 w-8 p-0 hover:bg-primary/10"
+                        title="Abrir placar em nova janela"
+                      >
+                        <ExternalLink className="h-3.5 w-3.5" />
                       </Button>
                     </div>
                   </div>
