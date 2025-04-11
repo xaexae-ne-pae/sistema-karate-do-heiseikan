@@ -93,7 +93,7 @@ const ScoreButton = ({
         <Button
           variant="outline"
           size="icon"
-          className="h-9 w-9"
+          className="h-7 w-7"
           onClick={onDecrement}
         >
           <Minus className="h-4 w-4" />
@@ -102,7 +102,7 @@ const ScoreButton = ({
         <Button
           variant="outline"
           size="icon"
-          className="h-9 w-9"
+          className="h-7 w-7"
           onClick={onIncrement}
         >
           <Plus className="h-4 w-4" />
@@ -137,7 +137,7 @@ const PenaltyButton = ({
 
   return (
     <div
-      className={`${className} relative rounded-md p-3 border mb-1 ${colorClasses[color]}`}
+      className={`${className} relative rounded-md p-2 border ${colorClasses[color]}`}
     >
       <div className="flex items-center justify-between">
         <span className="text-base font-medium">{label}</span>
