@@ -92,19 +92,19 @@ const ScoreButton = ({
         <Button
           variant="outline"
           size="icon"
-          className="h-6 w-6"
+          className="h-9 w-9"
           onClick={onDecrement}
         >
-          <Minus className="h-3 w-3" />
+          <Minus className="h-4 w-4" />
         </Button>
-        <span className="font-semibold text-sm">{value}</span>
+        <span className="font-semibold text-lg">{value}</span>
         <Button
           variant="outline"
           size="icon"
-          className="h-6 w-6"
+          className="h-9 w-9"
           onClick={onIncrement}
         >
-          <Plus className="h-3 w-3" />
+          <Plus className="h-4 w-4" />
         </Button>
       </div>
     </div>
@@ -144,19 +144,19 @@ const PenaltyButton = ({
           <Button
             variant="outline"
             size="icon"
-            className="h-6 w-6 bg-background"
+            className="h-8 w-8 bg-background"
             onClick={onDecrement}
           >
-            <Minus className="h-3 w-3" />
+            <Minus className="h-4 w-4" />
           </Button>
-          <span className="font-semibold text-sm w-5 text-center">{value}</span>
+          <span className="font-semibold text-base w-6 text-center">{value}</span>
           <Button
             variant="outline"
             size="icon"
-            className="h-6 w-6 bg-background"
+            className="h-8 w-8 bg-background"
             onClick={onIncrement}
           >
-            <Plus className="h-3 w-3" />
+            <Plus className="h-4 w-4" />
           </Button>
         </div>
       </div>
