@@ -168,6 +168,25 @@ const TournamentScoring = () => {
   const lastScoreboardDataRef = useRef<ScoreboardData | null>(null);
   const updateTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
+  const saveScoreboardData = (
+    match: MatchData,
+    timeLeft: number,
+    isRunning: boolean,
+    kataScore: KataScore | null,
+    kumiteScore: KumiteScore | null
+  ) => {
+    const scoreboardData: ScoreboardData = {
+      match,
+      timeLeft,
+      isRunning,
+      kataScore,
+      kumiteScore,
+      lastUpdate: new Date().getTime(),
+    };
+    localStorage.setItem("scoreboardData", JSON.stringify(scoreboardData));
+    window.dispatchEvent(new CustomEvent("scoreboardUpdate"));
+  };
+
   const kataMatches: MatchData[] = [
     {
       id: "4",
@@ -384,29 +403,23 @@ const TournamentScoring = () => {
   ) => {
     const numValue = parseFloat(value);
     if (value === "") {
-      setKataScore((prev) => {
-        const newScore = { ...prev, [judge]: 0 };
-        return newScore;
-      });
-      
-      updateTimeoutRef.current = setTimeout(() => {
-        updateScoreboard();
-      }, 50);
+      const newScore = { ...kataScore, [judge]: 0 };
+      setKataScore(newScore);
+      if (currentMatch) {
+        saveScoreboardData(currentMatch, timeLeft, isRunning, newScore, null);
+      }
       return;
     }
-    
+  
     if (isNaN(numValue) || numValue < 0 || numValue > 10) {
       return;
     }
-    
-    setKataScore((prev) => {
-      const newScore = { ...prev, [judge]: numValue };
-      return newScore;
-    });
-    
-    updateTimeoutRef.current = setTimeout(() => {
-      updateScoreboard();
-    }, 50);
+  
+    const newScore = { ...kataScore, [judge]: numValue };
+    setKataScore(newScore);
+    if (currentMatch) {
+      saveScoreboardData(currentMatch, timeLeft, isRunning, newScore, null);
+    }
   };
 
   const calculateKataTotal = (): number => {
@@ -423,16 +436,13 @@ const TournamentScoring = () => {
     scoreType: keyof KumiteScore["athlete1"],
     change: number
   ) => {
-    setKumiteScore((prev) => {
-      const newScore = JSON.parse(JSON.stringify(prev));
-      const currentValue = newScore[athlete][scoreType];
-      newScore[athlete][scoreType] = Math.max(0, currentValue + change);
-      return newScore;
-    });
-    
-    updateTimeoutRef.current = setTimeout(() => {
-      updateScoreboard();
-    }, 50);
+    const newScore = JSON.parse(JSON.stringify(kumiteScore));
+    const currentValue = newScore[athlete][scoreType];
+    newScore[athlete][scoreType] = Math.max(0, currentValue + change);
+    setKumiteScore(newScore);
+    if (currentMatch) {
+      saveScoreboardData(currentMatch, timeLeft, isRunning, null, newScore);
+    }
   };
 
   const handleSaveScore = () => {
