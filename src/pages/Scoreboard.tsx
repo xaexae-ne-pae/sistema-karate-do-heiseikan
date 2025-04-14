@@ -1,5 +1,6 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 import { Trophy, User, Crown, Clock } from "lucide-react";
 import { MatchData, KataScore, KumiteScore, ScoreboardData } from "@/types";
 
