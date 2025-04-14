@@ -28,7 +28,7 @@ const Tournaments = () => {
     try {
       setIsLoading(true);
       const fetchedTournaments = await getAllTournaments();
-      setTournaments(fetchedTournaments);
+      setTournaments(fetchedTournaments);.
       setIsLoading(false);
     } catch (error) {
       console.error("Error fetching tournaments:", error);
