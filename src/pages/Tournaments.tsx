@@ -25,7 +25,7 @@ const Tournaments = () => {
   
   useEffect(() => {
     fetchTournaments();
-  }, []);
+  }, [""]);
   
   const fetchTournaments = async () => {
     try {
