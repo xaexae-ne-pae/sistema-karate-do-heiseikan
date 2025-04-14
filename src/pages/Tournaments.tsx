@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Sidebar } from "@/components/Sidebar";
 import { Button } from "@/components/ui/button";
@@ -28,7 +27,7 @@ const Tournaments = () => {
     try {
       setIsLoading(true);
       const fetchedTournaments = await getAllTournaments();
-      setTournaments(fetchedTournaments);.
+      setTournaments(fetchedTournaments);
       setIsLoading(false);
     } catch (error) {
       console.error("Error fetching tournaments:", error);
@@ -128,14 +127,12 @@ const Tournaments = () => {
         </main>
       </div>
 
-      {/* Add Tournament Dialog */}
       <AddTournamentDialog 
         isOpen={isAddTournamentDialogOpen}
         onClose={() => setIsAddTournamentDialogOpen(false)}
         onTournamentAdded={handleTournamentAdded}
       />
 
-      {/* Finalize Tournament Confirmation Dialog */}
       <ConfirmationDialog
         isOpen={!!tournamentToFinalize}
         onClose={() => setTournamentToFinalize(null)}
