@@ -292,7 +292,23 @@ const TournamentScoring = () => {
     if (isRunning) return;
 
     setIsRunning(true);
-    updateScoreboard();
+    
+    if (currentMatch) {
+      const currentScoreData = currentMatch.type === "kata" 
+        ? { ...kataScore } 
+        : null;
+      const currentKumiteData = currentMatch.type === "kumite" 
+        ? { ...kumiteScore } 
+        : null;
+      
+      saveScoreboardData(
+        currentMatch,
+        timeLeft,
+        true,
+        currentScoreData,
+        currentKumiteData
+      );
+    }
 
     timerRef.current = setInterval(() => {
       setTimeLeft((prev) => {
@@ -300,8 +316,25 @@ const TournamentScoring = () => {
         if (newTime === 0) {
           if (timerRef.current) clearInterval(timerRef.current);
           setIsRunning(false);
+          
+          if (currentMatch) {
+            const currentScoreData = currentMatch.type === "kata" 
+              ? { ...kataScore } 
+              : null;
+            const currentKumiteData = currentMatch.type === "kumite" 
+              ? { ...kumiteScore } 
+              : null;
+            
+            saveScoreboardData(
+              currentMatch,
+              newTime,
+              newTime > 0,
+              currentScoreData,
+              currentKumiteData
+            );
+          }
         }
-        updateScoreboard();
+        
         return newTime;
       });
     }, 1000);
@@ -315,13 +348,45 @@ const TournamentScoring = () => {
       clearInterval(timerRef.current);
       timerRef.current = null;
     }
-    updateScoreboard();
+    
+    if (currentMatch) {
+      const currentScoreData = currentMatch.type === "kata" 
+        ? { ...kataScore } 
+        : null;
+      const currentKumiteData = currentMatch.type === "kumite" 
+        ? { ...kumiteScore } 
+        : null;
+      
+      saveScoreboardData(
+        currentMatch,
+        timeLeft,
+        false,
+        currentScoreData,
+        currentKumiteData
+      );
+    }
   };
 
   const resetTimer = () => {
     pauseTimer();
     setTimeLeft(180);
-    updateScoreboard();
+    
+    if (currentMatch) {
+      const currentScoreData = currentMatch.type === "kata" 
+        ? { ...kataScore } 
+        : null;
+      const currentKumiteData = currentMatch.type === "kumite" 
+        ? { ...kumiteScore } 
+        : null;
+      
+      saveScoreboardData(
+        currentMatch,
+        180,
+        false,
+        currentScoreData,
+        currentKumiteData
+      );
+    }
   };
 
   const openScoreboardWindow = () => {
@@ -359,11 +424,11 @@ const TournamentScoring = () => {
     }
     
     const scoreboardData: ScoreboardData = {
-      match: currentMatch,
+      match: {...currentMatch},
       timeLeft,
       isRunning,
-      kataScore: currentMatch.type === "kata" ? {...kataScore} : null,
-      kumiteScore: currentMatch.type === "kumite" ? {...kumiteScore} : null,
+      kataScore: currentMatch.type === "kata" ? JSON.parse(JSON.stringify(kataScore)) : null,
+      kumiteScore: currentMatch.type === "kumite" ? JSON.parse(JSON.stringify(kumiteScore)) : null,
       lastUpdate: new Date().getTime(),
     };
 
@@ -405,6 +470,7 @@ const TournamentScoring = () => {
     if (value === "") {
       const newScore = { ...kataScore, [judge]: 0 };
       setKataScore(newScore);
+      
       if (currentMatch) {
         saveScoreboardData(currentMatch, timeLeft, isRunning, newScore, null);
       }
@@ -417,6 +483,7 @@ const TournamentScoring = () => {
   
     const newScore = { ...kataScore, [judge]: numValue };
     setKataScore(newScore);
+    
     if (currentMatch) {
       saveScoreboardData(currentMatch, timeLeft, isRunning, newScore, null);
     }
@@ -439,7 +506,9 @@ const TournamentScoring = () => {
     const newScore = JSON.parse(JSON.stringify(kumiteScore));
     const currentValue = newScore[athlete][scoreType];
     newScore[athlete][scoreType] = Math.max(0, currentValue + change);
+    
     setKumiteScore(newScore);
+    
     if (currentMatch) {
       saveScoreboardData(currentMatch, timeLeft, isRunning, null, newScore);
     }

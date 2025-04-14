@@ -19,6 +19,7 @@ const Scoreboard = () => {
           
           // Verificar se os dados são válidos antes de atualizar o estado
           if (parsedData && parsedData.match) {
+            // Importante: atualizar o estado completo para garantir que os dados de pontuação sejam mantidos
             setScoreboardData(parsedData);
             
             // Atualiza o timer com os dados mais recentes
@@ -54,7 +55,7 @@ const Scoreboard = () => {
     // Verifica constantemente por atualizações (mais responsivo)
     const checkInterval = setInterval(() => {
       loadScoreboardData();
-    }, 50); // Verifica com mais frequência para ser mais responsivo
+    }, 100); // Verificação mais frequente para maior responsividade
 
     // Define o título da janela para facilitar a identificação
     document.title = "Placar - Karate Tournament";
