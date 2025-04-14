@@ -36,21 +36,34 @@ const Scoreboard = () => {
     // Carrega os dados iniciais
     loadScoreboardData();
 
-    // Adiciona listener para atualizações
+    // Adiciona listener para atualizações em tempo real
     const handleUpdate = () => {
       loadScoreboardData();
     };
 
     window.addEventListener("scoreboardUpdate", handleUpdate);
+    
+    // Configura listener para mensagens de storage para sincronização entre janelas
+    const handleStorageUpdate = (event: StorageEvent) => {
+      if (event.key === "scoreboardData") {
+        loadScoreboardData();
+      }
+    };
+    
+    window.addEventListener("storage", handleStorageUpdate);
 
-    // Configura um intervalo para verificar atualizações
+    // Verifica constantemente por atualizações (mais responsivo)
     const checkInterval = setInterval(() => {
       loadScoreboardData();
     }, 100); // Verifica a cada 100ms
 
+    // Define o título da janela para facilitar a identificação
+    document.title = "Placar - Karate Tournament";
+
     // Cleanup
     return () => {
       window.removeEventListener("scoreboardUpdate", handleUpdate);
+      window.removeEventListener("storage", handleStorageUpdate);
       clearInterval(checkInterval);
     };
   }, []);

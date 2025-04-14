@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { TournamentSidebar } from "@/components/TournamentSidebar";
@@ -5,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Trophy,
   Timer,
@@ -25,7 +25,7 @@ import {
   Clock,
   Circle,
   Crown,
-  ExternalLink,
+  Maximize2,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -208,6 +208,7 @@ const TournamentScoring = () => {
   const [timeLeft, setTimeLeft] = useState(180); // 3 minutes in seconds
   const [isRunning, setIsRunning] = useState(false);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const scoreboardWindowRef = useRef<Window | null>(null);
 
   const kataMatches: MatchData[] = [
     {
@@ -342,22 +343,32 @@ const TournamentScoring = () => {
     updateScoreboard();
   };
 
-  const openScoreboard = () => {
+  // Novo método para abrir o placar em uma nova janela
+  const openScoreboardWindow = () => {
     if (!currentMatch) return;
     
-    const scoreboardData = {
-      match: currentMatch,
-      timeLeft,
-      isRunning,
-      kataScore: currentMatch.type === "kata" ? kataScore : null,
-      kumiteScore: currentMatch.type === "kumite" ? kumiteScore : null,
-      lastUpdate: new Date().getTime(),
-    };
+    // Se já houver uma janela aberta, fechá-la
+    if (scoreboardWindowRef.current && !scoreboardWindowRef.current.closed) {
+      scoreboardWindowRef.current.close();
+    }
     
-    localStorage.setItem("scoreboardData", JSON.stringify(scoreboardData));
-    window.dispatchEvent(new Event("scoreboardUpdate"));
+    // Abrir uma nova janela com o tamanho ideal para um placar
+    const scoreboardURL = `/torneios/${id}/placar`;
+    const width = 1024;
+    const height = 768;
+    const left = window.screen.width / 2 - width / 2;
+    const top = window.screen.height / 2 - height / 2;
     
-    window.open(`/torneios/${id}/placar`, "_blank");
+    scoreboardWindowRef.current = window.open(
+      scoreboardURL,
+      'ScoreboardWindow',
+      `width=${width},height=${height},left=${left},top=${top},menubar=no,toolbar=no,location=no,status=no`
+    );
+    
+    // Atualizar o placar imediatamente após abrir a janela
+    updateScoreboard();
+    
+    toast.success("Placar aberto em nova janela");
   };
 
   const updateScoreboard = () => {
@@ -377,9 +388,15 @@ const TournamentScoring = () => {
   };
 
   useEffect(() => {
+    // Limpeza dos intervalos ao desmontar o componente
     return () => {
       if (timerRef.current) {
         clearInterval(timerRef.current);
+      }
+      
+      // Fechar a janela do placar se estiver aberta ao desmontar o componente
+      if (scoreboardWindowRef.current && !scoreboardWindowRef.current.closed) {
+        scoreboardWindowRef.current.close();
       }
     };
   }, []);
@@ -584,17 +601,18 @@ const TournamentScoring = () => {
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={openScoreboard}
+                        onClick={openScoreboardWindow}
                         className="h-8 w-8 p-0 hover:bg-primary/10"
                         title="Abrir placar em nova janela"
                       >
-                        <ExternalLink className="h-3.5 w-3.5" />
+                        <Maximize2 className="h-3.5 w-3.5" />
                       </Button>
                     </div>
                   </div>
                 </div>
               </div>
 
+              {/* O restante do conteúdo permanece igual */}
               {currentMatch.type === "kata" ? (
                 <div className="grid grid-cols-1 h-[calc(100%-160px)]">
                   <div className="bg-card shadow-md rounded-xl overflow-hidden border border-border/40 flex flex-col h-full">
