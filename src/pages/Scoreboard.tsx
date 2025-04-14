@@ -2,16 +2,8 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Trophy, User, Crown, Clock } from "lucide-react";
-import { MatchData, KataScore, KumiteScore } from "@/types";
-
-interface ScoreboardData {
-  match: MatchData;
-  timeLeft: number;
-  isRunning: boolean;
-  kataScore: KataScore | null;
-  kumiteScore: KumiteScore | null;
-  lastUpdate: number;
-}
+import { MatchData, KataScore, KumiteScore, ScoreboardData } from "@/types";
+import { useLocalStorage } from "@/hooks/useLocalStorage";
 
 const Scoreboard = () => {
   const { id } = useParams<{ id: string }>();
@@ -23,12 +15,16 @@ const Scoreboard = () => {
     const loadScoreboardData = () => {
       const data = localStorage.getItem("scoreboardData");
       if (data) {
-        const parsedData = JSON.parse(data);
-        setScoreboardData(parsedData);
-        
-        // Atualiza o timer com os dados mais recentes
-        if (parsedData && parsedData.timeLeft) {
-          setTimeLeft(parsedData.timeLeft);
+        try {
+          const parsedData = JSON.parse(data);
+          setScoreboardData(parsedData);
+          
+          // Atualiza o timer com os dados mais recentes
+          if (parsedData && parsedData.timeLeft) {
+            setTimeLeft(parsedData.timeLeft);
+          }
+        } catch (error) {
+          console.error("Erro ao analisar dados do placar:", error);
         }
       }
     };

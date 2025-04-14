@@ -37,3 +37,13 @@ export interface KumiteScore {
   athlete1: KumiteAthleteScore;
   athlete2: KumiteAthleteScore;
 }
+
+// Dados completos do placar
+export interface ScoreboardData {
+  match: MatchData;
+  timeLeft: number;
+  isRunning: boolean;
+  kataScore: KataScore | null;
+  kumiteScore: KumiteScore | null;
+  lastUpdate: number;
+}

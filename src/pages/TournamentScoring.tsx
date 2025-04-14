@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { TournamentSidebar } from "@/components/TournamentSidebar";
@@ -30,50 +29,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-
-interface MatchData {
-  id: number;
-  type: "kata" | "kumite";
-  athlete1: string;
-  athlete2: string | null;
-  category: string;
-  time: string;
-}
-
-interface KataScore {
-  judge1: number;
-  judge2: number;
-  judge3: number;
-}
-
-interface KumiteScore {
-  athlete1: {
-    yuko: number;
-    wazari: number;
-    ippon: number;
-    penalties: number;
-    jogai: number;
-    mubobi: number;
-    chukoku: number;
-    keikoku: number;
-    hansokuChui: number;
-    hansoku: number;
-    shikkaku: number;
-  };
-  athlete2: {
-    yuko: number;
-    wazari: number;
-    ippon: number;
-    penalties: number;
-    jogai: number;
-    mubobi: number;
-    chukoku: number;
-    keikoku: number;
-    hansokuChui: number;
-    hansoku: number;
-    shikkaku: number;
-  };
-}
+import { MatchData, KataScore, KumiteScore, ScoreboardData } from "@/types";
 
 const ScoreButton = ({
   label,
@@ -182,11 +138,6 @@ const TournamentScoring = () => {
       wazari: 0,
       ippon: 0,
       penalties: 0,
-      jogai: 0,
-      mubobi: 0,
-      chukoku: 0,
-      keikoku: 0,
-      hansokuChui: 0,
       hansoku: 0,
       shikkaku: 0,
     },
@@ -195,24 +146,20 @@ const TournamentScoring = () => {
       wazari: 0,
       ippon: 0,
       penalties: 0,
-      jogai: 0,
-      mubobi: 0,
-      chukoku: 0,
-      keikoku: 0,
-      hansokuChui: 0,
       hansoku: 0,
       shikkaku: 0,
     },
   });
 
-  const [timeLeft, setTimeLeft] = useState(180); // 3 minutes in seconds
+  const [timeLeft, setTimeLeft] = useState(180); // 3 minutos em segundos
   const [isRunning, setIsRunning] = useState(false);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const scoreboardWindowRef = useRef<Window | null>(null);
+  const lastScoreboardDataRef = useRef<ScoreboardData | null>(null);
 
   const kataMatches: MatchData[] = [
     {
-      id: 4,
+      id: "4",
       type: "kata",
       athlete1: "Juliana Costa",
       athlete2: null,
@@ -220,7 +167,7 @@ const TournamentScoring = () => {
       time: "16:00",
     },
     {
-      id: 5,
+      id: "5",
       type: "kata",
       athlete1: "Ricardo Alves",
       athlete2: null,
@@ -228,7 +175,7 @@ const TournamentScoring = () => {
       time: "16:15",
     },
     {
-      id: 8,
+      id: "8",
       type: "kata",
       athlete1: "Ana Pereira",
       athlete2: null,
@@ -239,7 +186,7 @@ const TournamentScoring = () => {
 
   const kumiteMatches: MatchData[] = [
     {
-      id: 6,
+      id: "6",
       type: "kumite",
       athlete1: "Marcos Paulo",
       athlete2: "Gabriel Souza",
@@ -247,7 +194,7 @@ const TournamentScoring = () => {
       time: "16:30",
     },
     {
-      id: 7,
+      id: "7",
       type: "kumite",
       athlete1: "Camila Ferreira",
       athlete2: "Patrícia Ramos",
@@ -255,7 +202,7 @@ const TournamentScoring = () => {
       time: "16:45",
     },
     {
-      id: 9,
+      id: "9",
       type: "kumite",
       athlete1: "Thiago Martins",
       athlete2: "Lucas Almeida",
@@ -275,11 +222,6 @@ const TournamentScoring = () => {
           wazari: 0,
           ippon: 0,
           penalties: 0,
-          jogai: 0,
-          mubobi: 0,
-          chukoku: 0,
-          keikoku: 0,
-          hansokuChui: 0,
           hansoku: 0,
           shikkaku: 0,
         },
@@ -288,11 +230,6 @@ const TournamentScoring = () => {
           wazari: 0,
           ippon: 0,
           penalties: 0,
-          jogai: 0,
-          mubobi: 0,
-          chukoku: 0,
-          keikoku: 0,
-          hansokuChui: 0,
           hansoku: 0,
           shikkaku: 0,
         },
@@ -305,6 +242,10 @@ const TournamentScoring = () => {
       timerRef.current = null;
     }
     setScoringMode(true);
+    
+    setTimeout(() => {
+      updateScoreboard();
+    }, 100);
   };
 
   const startTimer = () => {
@@ -343,16 +284,13 @@ const TournamentScoring = () => {
     updateScoreboard();
   };
 
-  // Novo método para abrir o placar em uma nova janela
   const openScoreboardWindow = () => {
     if (!currentMatch) return;
     
-    // Se já houver uma janela aberta, fechá-la
     if (scoreboardWindowRef.current && !scoreboardWindowRef.current.closed) {
       scoreboardWindowRef.current.close();
     }
     
-    // Abrir uma nova janela com o tamanho ideal para um placar
     const scoreboardURL = `/torneios/${id}/placar`;
     const width = 1024;
     const height = 768;
@@ -365,8 +303,9 @@ const TournamentScoring = () => {
       `width=${width},height=${height},left=${left},top=${top},menubar=no,toolbar=no,location=no,status=no`
     );
     
-    // Atualizar o placar imediatamente após abrir a janela
-    updateScoreboard();
+    setTimeout(() => {
+      updateScoreboard();
+    }, 300);
     
     toast.success("Placar aberto em nova janela");
   };
@@ -374,7 +313,7 @@ const TournamentScoring = () => {
   const updateScoreboard = () => {
     if (!currentMatch) return;
     
-    const scoreboardData = {
+    const scoreboardData: ScoreboardData = {
       match: currentMatch,
       timeLeft,
       isRunning,
@@ -382,19 +321,19 @@ const TournamentScoring = () => {
       kumiteScore: currentMatch.type === "kumite" ? kumiteScore : null,
       lastUpdate: new Date().getTime(),
     };
+
+    lastScoreboardDataRef.current = scoreboardData;
     
     localStorage.setItem("scoreboardData", JSON.stringify(scoreboardData));
-    window.dispatchEvent(new Event("scoreboardUpdate"));
+    window.dispatchEvent(new CustomEvent("scoreboardUpdate"));
   };
 
   useEffect(() => {
-    // Limpeza dos intervalos ao desmontar o componente
     return () => {
       if (timerRef.current) {
         clearInterval(timerRef.current);
       }
       
-      // Fechar a janela do placar se estiver aberta ao desmontar o componente
       if (scoreboardWindowRef.current && !scoreboardWindowRef.current.closed) {
         scoreboardWindowRef.current.close();
       }
@@ -426,11 +365,15 @@ const TournamentScoring = () => {
     if (isNaN(numValue) || numValue < 0 || numValue > 10) {
       return;
     }
+    
     setKataScore((prev) => {
       const newScore = { ...prev, [judge]: numValue };
       return newScore;
     });
-    updateScoreboard();
+    
+    setTimeout(() => {
+      updateScoreboard();
+    }, 50);
   };
 
   const calculateKataTotal = (): number => {
@@ -458,7 +401,10 @@ const TournamentScoring = () => {
       };
       return newScore;
     });
-    updateScoreboard();
+    
+    setTimeout(() => {
+      updateScoreboard();
+    }, 50);
   };
 
   const handleSaveScore = () => {
@@ -612,7 +558,6 @@ const TournamentScoring = () => {
                 </div>
               </div>
 
-              {/* O restante do conteúdo permanece igual */}
               {currentMatch.type === "kata" ? (
                 <div className="grid grid-cols-1 h-[calc(100%-160px)]">
                   <div className="bg-card shadow-md rounded-xl overflow-hidden border border-border/40 flex flex-col h-full">
