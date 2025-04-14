@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { TournamentSidebar } from "@/components/TournamentSidebar";
@@ -169,7 +168,6 @@ const TournamentScoring = () => {
   const lastScoreboardDataRef = useRef<ScoreboardData | null>(null);
   const updateTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const scoreUpdatePendingRef = useRef(false);
-  const shouldUpdateScoreRef = useRef(false);
 
   const saveScoreboardData = useCallback((
     match: MatchData,
@@ -306,24 +304,22 @@ const TournamentScoring = () => {
           setIsRunning(false);
         }
         
-        // Atualizar apenas o tempo no placar, sem atualizar as pontuações
-        if (currentMatch && shouldUpdateScoreRef.current) {
-          const storedData = localStorage.getItem("scoreboardData");
-          if (storedData) {
-            const parsedData = JSON.parse(storedData) as ScoreboardData;
-            parsedData.timeLeft = newTime;
-            parsedData.isRunning = newTime > 0;
-            localStorage.setItem("scoreboardData", JSON.stringify(parsedData));
-            window.dispatchEvent(new CustomEvent("scoreboardUpdate"));
+        if (currentMatch) {
+          const currentData = lastScoreboardDataRef.current;
+          if (currentData) {
+            saveScoreboardData(
+              currentMatch,
+              newTime,
+              newTime > 0,
+              currentMatch.type === "kata" ? kataScore : null,
+              currentMatch.type === "kumite" ? kumiteScore : null
+            );
           }
         }
         
         return newTime;
       });
     }, 1000);
-    
-    // Ativar atualizações de tempo após o primeiro timer
-    shouldUpdateScoreRef.current = true;
   };
 
   const pauseTimer = () => {
@@ -334,14 +330,12 @@ const TournamentScoring = () => {
       clearInterval(timerRef.current);
       timerRef.current = null;
     }
-    shouldUpdateScoreRef.current = false;
     updateScoreboard();
   };
 
   const resetTimer = () => {
     pauseTimer();
     setTimeLeft(180);
-    shouldUpdateScoreRef.current = false;
     updateScoreboard();
   };
 
@@ -410,8 +404,6 @@ const TournamentScoring = () => {
       if (scoreboardWindowRef.current && !scoreboardWindowRef.current.closed) {
         scoreboardWindowRef.current.close();
       }
-      
-      shouldUpdateScoreRef.current = false;
     };
   }, []);
 
