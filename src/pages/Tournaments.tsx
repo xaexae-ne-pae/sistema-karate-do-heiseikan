@@ -1,5 +1,4 @@
-
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Sidebar } from "@/components/Sidebar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -20,11 +19,7 @@ const Tournaments = () => {
   const [tournamentToFinalize, setTournamentToFinalize] = useState<Tournament | null>(null);
   const { toast } = useToast();
   
-  useEffect(() => {
-    fetchTournaments();
-  }, []);
-  
-  const fetchTournaments = async () => {
+  const fetchTournaments = useCallback(async () => {
     try {
       setIsLoading(true);
       const fetchedTournaments = await getAllTournaments();
@@ -34,7 +29,11 @@ const Tournaments = () => {
       console.error("Error fetching tournaments:", error);
       setIsLoading(false);
     }
-  };
+  }, [setTournaments]);
+  
+  useEffect(() => {
+    fetchTournaments();
+  }, [fetchTournaments]);
   
   const handleAddTournament = () => {
     setIsAddTournamentDialogOpen(true);
