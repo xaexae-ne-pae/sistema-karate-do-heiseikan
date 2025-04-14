@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+
+import React from 'react';
 import { Trophy, User, Crown, Clock } from "lucide-react";
 import { MatchData, KataScore, KumiteScore, ScoreboardData } from "@/types";
 
@@ -260,8 +260,8 @@ const KumiteScoreboard = ({
             <div className="relative">
               <div className={`rounded-2xl p-8 h-full flex flex-col items-center justify-center ${showCrownAthlete1 || (showWinnerBadge && winner === scoreboardData.match.athlete1) ? 'bg-blue-500/10 border-2 border-blue-500/30' : 'bg-[#111A2F]/80 border border-white/10'}`}>
                 {(showCrownAthlete1 || (showWinnerBadge && winner === scoreboardData.match.athlete1)) && (
-                  <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                    <Crown className="h-8 w-8 text-amber-400" />
+                  <div className="absolute -top-2 left-1/2 transform -translate-x-1/2 animate-bounce">
+                    <Crown className="h-12 w-12 text-amber-400 drop-shadow-lg" />
                   </div>
                 )}
                 
@@ -311,8 +311,8 @@ const KumiteScoreboard = ({
             <div className="relative">
               <div className={`rounded-2xl p-8 h-full flex flex-col items-center justify-center ${showCrownAthlete2 || (showWinnerBadge && winner === scoreboardData.match.athlete2) ? 'bg-blue-500/10 border-2 border-blue-500/30' : 'bg-[#111A2F]/80 border border-white/10'}`}>
                 {(showCrownAthlete2 || (showWinnerBadge && winner === scoreboardData.match.athlete2)) && (
-                  <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                    <Crown className="h-8 w-8 text-amber-400" />
+                  <div className="absolute -top-2 left-1/2 transform -translate-x-1/2 animate-bounce">
+                    <Crown className="h-12 w-12 text-amber-400 drop-shadow-lg" />
                   </div>
                 )}
                 
