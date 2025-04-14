@@ -310,14 +310,17 @@ const TournamentScoring = () => {
     if (isRunning) return;
 
     setIsRunning(true);
+    updateScoreboard();
+
     timerRef.current = setInterval(() => {
       setTimeLeft((prev) => {
-        if (prev <= 0) {
+        const newTime = prev <= 0 ? 0 : prev - 1;
+        if (newTime === 0) {
           if (timerRef.current) clearInterval(timerRef.current);
           setIsRunning(false);
-          return 0;
         }
-        return prev - 1;
+        updateScoreboard();
+        return newTime;
       });
     }, 1000);
   };
@@ -330,11 +333,13 @@ const TournamentScoring = () => {
       clearInterval(timerRef.current);
       timerRef.current = null;
     }
+    updateScoreboard();
   };
 
   const resetTimer = () => {
     pauseTimer();
     setTimeLeft(180);
+    updateScoreboard();
   };
 
   const openScoreboard = () => {
@@ -343,13 +348,32 @@ const TournamentScoring = () => {
     const scoreboardData = {
       match: currentMatch,
       timeLeft,
+      isRunning,
       kataScore: currentMatch.type === "kata" ? kataScore : null,
       kumiteScore: currentMatch.type === "kumite" ? kumiteScore : null,
+      lastUpdate: new Date().getTime(),
     };
     
-    sessionStorage.setItem("scoreboardData", JSON.stringify(scoreboardData));
+    localStorage.setItem("scoreboardData", JSON.stringify(scoreboardData));
+    window.dispatchEvent(new Event("scoreboardUpdate"));
     
     window.open(`/torneios/${id}/placar`, "_blank");
+  };
+
+  const updateScoreboard = () => {
+    if (!currentMatch) return;
+    
+    const scoreboardData = {
+      match: currentMatch,
+      timeLeft,
+      isRunning,
+      kataScore: currentMatch.type === "kata" ? kataScore : null,
+      kumiteScore: currentMatch.type === "kumite" ? kumiteScore : null,
+      lastUpdate: new Date().getTime(),
+    };
+    
+    localStorage.setItem("scoreboardData", JSON.stringify(scoreboardData));
+    window.dispatchEvent(new Event("scoreboardUpdate"));
   };
 
   useEffect(() => {
@@ -374,14 +398,22 @@ const TournamentScoring = () => {
   ) => {
     const numValue = parseFloat(value);
     if (value === "") {
-      setKataScore((prev) => ({ ...prev, [judge]: 0 }));
+      setKataScore((prev) => {
+        const newScore = { ...prev, [judge]: 0 };
+        return newScore;
+      });
+      updateScoreboard();
       return;
     }
     
     if (isNaN(numValue) || numValue < 0 || numValue > 10) {
       return;
     }
-    setKataScore((prev) => ({ ...prev, [judge]: numValue }));
+    setKataScore((prev) => {
+      const newScore = { ...prev, [judge]: numValue };
+      return newScore;
+    });
+    updateScoreboard();
   };
 
   const calculateKataTotal = (): number => {
@@ -400,15 +432,16 @@ const TournamentScoring = () => {
   ) => {
     setKumiteScore((prev) => {
       const newValue = Math.max(0, prev[athlete][scoreType] + change);
-
-      return {
+      const newScore = {
         ...prev,
         [athlete]: {
           ...prev[athlete],
           [scoreType]: newValue,
         },
       };
+      return newScore;
     });
+    updateScoreboard();
   };
 
   const handleSaveScore = () => {
