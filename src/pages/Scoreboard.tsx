@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Trophy, User, Crown, Clock } from "lucide-react";
@@ -12,24 +11,19 @@ const Scoreboard = () => {
   const [kumiteScore, setKumiteScore] = useState<KumiteScore | null>(null);
   
   useEffect(() => {
-    // Função para carregar dados do localStorage com tratamento de dados mais robusto
     const loadScoreboardData = () => {
       try {
         const data = localStorage.getItem("scoreboardData");
         if (data) {
           const parsedData = JSON.parse(data) as ScoreboardData;
           
-          // Verificar se os dados são válidos antes de atualizar o estado
           if (parsedData && parsedData.match) {
-            // Atualiza o objeto principal
             setScoreboardData(parsedData);
             
-            // Atualiza apenas o tempo, mantém as pontuações estáveis
             if (parsedData.timeLeft !== undefined) {
               setTimeLeft(parsedData.timeLeft);
             }
             
-            // Atualiza as pontuações apenas se houver mudanças reais
             if (parsedData.kataScore && (!kataScore || 
                 JSON.stringify(kataScore) !== JSON.stringify(parsedData.kataScore))) {
               setKataScore(parsedData.kataScore);
@@ -46,17 +40,14 @@ const Scoreboard = () => {
       }
     };
 
-    // Carrega os dados iniciais
     loadScoreboardData();
 
-    // Adiciona listener para atualizações em tempo real
     const handleUpdate = () => {
       loadScoreboardData();
     };
 
     window.addEventListener("scoreboardUpdate", handleUpdate);
     
-    // Configura listener para sincronização entre janelas
     const handleStorageUpdate = (event: StorageEvent) => {
       if (event.key === "scoreboardData") {
         loadScoreboardData();
@@ -65,14 +56,12 @@ const Scoreboard = () => {
     
     window.addEventListener("storage", handleStorageUpdate);
 
-    // Verifica constantemente por atualizações do tempo apenas
     const checkInterval = setInterval(() => {
       const data = localStorage.getItem("scoreboardData");
       if (data) {
         try {
           const parsedData = JSON.parse(data) as ScoreboardData;
           
-          // Atualiza apenas o tempo se for diferente
           if (timeLeft !== parsedData.timeLeft) {
             setTimeLeft(parsedData.timeLeft);
           }
@@ -84,7 +73,6 @@ const Scoreboard = () => {
 
     document.title = "Placar - Karate Tournament";
 
-    // Cleanup
     return () => {
       window.removeEventListener("scoreboardUpdate", handleUpdate);
       window.removeEventListener("storage", handleStorageUpdate);
@@ -135,7 +123,6 @@ const Scoreboard = () => {
     );
   }
   
-  // Renderiza o placar de Kata
   if (scoreboardData.match.type === "kata") {
     return <KataScoreboard 
       scoreboardData={scoreboardData} 
@@ -147,7 +134,6 @@ const Scoreboard = () => {
     />;
   }
   
-  // Renderiza o placar de Kumite
   return <KumiteScoreboard 
     scoreboardData={scoreboardData} 
     formatTime={formatTime} 
@@ -159,7 +145,6 @@ const Scoreboard = () => {
   />;
 };
 
-// Componente separado para o Placar de Kata
 const KataScoreboard = ({ 
   scoreboardData, 
   formatTime, 
@@ -175,23 +160,23 @@ const KataScoreboard = ({
   id: string | undefined,
   kataScore: KataScore | null
 }) => (
-  <div className="flex flex-col h-screen bg-black text-white p-4">
-    <header className="border-b border-white/20 pb-4 mb-6">
-      <h1 className="text-4xl font-bold text-center">
+  <div className="flex flex-col h-screen bg-[#0A1128] text-white p-4">
+    <header className="border-b border-white/10 pb-4 mb-6">
+      <h1 className="text-4xl font-bold text-center bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text text-transparent">
         {scoreboardData.match.category} - Kata
       </h1>
     </header>
     
     <div className="flex flex-col items-center justify-center flex-grow">
       <div className="text-center mb-8">
-        <div className="w-32 h-32 bg-primary/30 rounded-full mx-auto flex items-center justify-center mb-4">
-          <User className="h-16 w-16 text-primary" />
+        <div className="w-32 h-32 bg-blue-500/20 rounded-full mx-auto flex items-center justify-center mb-4 border border-blue-500/30 shadow-lg shadow-blue-500/10">
+          <User className="h-16 w-16 text-blue-400" />
         </div>
-        <h2 className="text-5xl font-bold mb-2">{scoreboardData.match.athlete1}</h2>
+        <h2 className="text-5xl font-bold mb-2 text-blue-100">{scoreboardData.match.athlete1}</h2>
       </div>
       
       {kataScore && (
-        <div className="bg-white/10 rounded-xl p-8 w-full max-w-2xl">
+        <div className="bg-[#111A2F]/80 backdrop-blur-sm rounded-xl p-8 w-full max-w-2xl border border-blue-500/10 shadow-xl">
           <div className="grid grid-cols-3 gap-8 mb-8">
             {[
               { label: "Jurado 1", score: kataScore.judge1 },
@@ -199,18 +184,18 @@ const KataScoreboard = ({
               { label: "Jurado 3", score: kataScore.judge3 },
             ].map((judge, index) => (
               <div key={index} className="text-center">
-                <p className="text-xl mb-2">{judge.label}</p>
-                <div className="bg-white/10 rounded-lg py-3">
-                  <p className="text-4xl font-bold">{judge.score.toFixed(1)}</p>
+                <p className="text-xl mb-2 text-blue-300">{judge.label}</p>
+                <div className="bg-blue-500/10 rounded-lg py-3 border border-blue-500/20">
+                  <p className="text-4xl font-bold text-blue-100">{judge.score.toFixed(1)}</p>
                 </div>
               </div>
             ))}
           </div>
           
           <div className="text-center">
-            <p className="text-2xl mb-2">Pontuação Total</p>
-            <div className="bg-primary/20 rounded-lg py-4">
-              <p className="text-6xl font-bold text-primary">
+            <p className="text-2xl mb-2 text-blue-300">Pontuação Total</p>
+            <div className="bg-blue-500/20 rounded-lg py-4 border border-blue-500/30">
+              <p className="text-6xl font-bold bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text text-transparent">
                 {calculateKataTotal(kataScore).toFixed(1)}
               </p>
             </div>
@@ -219,15 +204,15 @@ const KataScoreboard = ({
       )}
     </div>
     
-    <footer className="border-t border-white/20 pt-4 mt-6">
+    <footer className="border-t border-white/10 pt-4 mt-6">
       <div className="flex justify-between items-center">
         <div className="flex items-center">
-          <Trophy className="h-6 w-6 text-primary mr-2" />
-          <span className="text-2xl">Torneio #{id}</span>
+          <Trophy className="h-6 w-6 text-blue-400 mr-2" />
+          <span className="text-2xl text-blue-200">Torneio #{id}</span>
         </div>
-        <div className="flex items-center">
-          <Clock className="h-6 w-6 text-red-500 mr-2" />
-          <span className={`text-3xl font-mono ${timeLeft <= 10 ? "text-red-500 animate-pulse" : ""}`}>
+        <div className="flex items-center bg-[#111A2F] px-4 py-2 rounded-lg border border-blue-500/20">
+          <Clock className="h-6 w-6 text-blue-400 mr-2" />
+          <span className={`text-3xl font-mono ${timeLeft <= 10 ? "text-red-400 animate-pulse" : "text-blue-200"}`}>
             {formatTime(timeLeft)}
           </span>
         </div>
@@ -236,11 +221,10 @@ const KataScoreboard = ({
   </div>
 );
 
-// Componente separado para o Placar de Kumite
 const KumiteScoreboard = ({ 
   scoreboardData, 
   formatTime, 
-  calculateKumitePoints, 
+  calculateKumitePoints,
   determineWinner,
   timeLeft,
   id,
@@ -253,145 +237,147 @@ const KumiteScoreboard = ({
   timeLeft: number,
   id: string | undefined,
   kumiteScore: KumiteScore | null
-}) => (
-  <div className="flex flex-col h-screen bg-black text-white p-4">
-    <header className="border-b border-white/20 pb-4 mb-6">
-      <h1 className="text-4xl font-bold text-center">
-        {scoreboardData.match.category} - Kumite
-      </h1>
-    </header>
-    
-    <div className="flex-grow grid grid-cols-2 gap-8">
-      {kumiteScore && scoreboardData.match.athlete2 && (
-        <>
-          <div className="flex flex-col">
-            <div className={`text-center mb-8 p-6 rounded-xl ${determineWinner(scoreboardData.match, kumiteScore) === scoreboardData.match.athlete1 ? "bg-green-900/40" : ""}`}>
-              <div className="w-28 h-28 bg-primary/30 rounded-full mx-auto flex items-center justify-center mb-4">
-                <User className="h-14 w-14 text-primary" />
-              </div>
-              <h2 className="text-4xl font-bold mb-2">{scoreboardData.match.athlete1}</h2>
-              {determineWinner(scoreboardData.match, kumiteScore) === scoreboardData.match.athlete1 && (
-                <div className="flex items-center justify-center gap-2 mt-2">
-                  <Crown className="h-6 w-6 text-yellow-500" />
-                  <span className="text-xl font-bold text-yellow-500">Vencedor</span>
+}) => {
+  const isMatchEnded = timeLeft === 0;
+  const athlete1Points = kumiteScore ? calculateKumitePoints("athlete1", kumiteScore) : 0;
+  const athlete2Points = kumiteScore ? calculateKumitePoints("athlete2", kumiteScore) : 0;
+  const showCrownAthlete1 = !isMatchEnded && athlete1Points > athlete2Points;
+  const showCrownAthlete2 = !isMatchEnded && athlete2Points > athlete1Points;
+  const winner = kumiteScore ? determineWinner(scoreboardData.match, kumiteScore) : null;
+  const showWinnerBadge = isMatchEnded || (kumiteScore && (kumiteScore.athlete1.hansoku > 0 || kumiteScore.athlete1.shikkaku > 0 || kumiteScore.athlete2.hansoku > 0 || kumiteScore.athlete2.shikkaku > 0));
+
+  return (
+    <div className="flex flex-col h-screen bg-[#0A1128] text-white">
+      <header className="border-b border-white/10 p-6">
+        <h1 className="text-4xl font-bold text-center bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text text-transparent">
+          {scoreboardData.match.category}
+        </h1>
+      </header>
+
+      <main className="flex-1 grid grid-cols-2 gap-8 p-8">
+        {kumiteScore && (
+          <>
+            <div className="relative">
+              <div className={`rounded-2xl p-8 h-full flex flex-col items-center justify-center ${showCrownAthlete1 || (showWinnerBadge && winner === scoreboardData.match.athlete1) ? 'bg-blue-500/10 border-2 border-blue-500/30' : 'bg-[#111A2F]/80 border border-white/10'}`}>
+                {(showCrownAthlete1 || (showWinnerBadge && winner === scoreboardData.match.athlete1)) && (
+                  <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                    <Crown className="h-8 w-8 text-amber-400" />
+                  </div>
+                )}
+                
+                <div className="w-32 h-32 bg-blue-500/20 rounded-full flex items-center justify-center mb-4 border border-blue-500/30">
+                  <User className="h-16 w-16 text-blue-400" />
                 </div>
-              )}
+                
+                <h2 className="text-3xl font-bold mb-6 text-blue-100">{scoreboardData.match.athlete1}</h2>
+                
+                {showWinnerBadge && winner === scoreboardData.match.athlete1 && (
+                  <div className="bg-green-500/20 text-green-400 px-4 py-2 rounded-full text-sm font-bold mb-4">
+                    Vencedor
+                  </div>
+                )}
+
+                <div className="bg-blue-500/10 rounded-xl p-6 w-full border border-blue-500/20">
+                  <div className="text-center mb-6">
+                    <span className="text-6xl font-bold bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text text-transparent">
+                      {calculateKumitePoints("athlete1", kumiteScore)}
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-3 gap-4">
+                    <div className="text-center">
+                      <p className="text-sm text-blue-300 mb-2">Yuko</p>
+                      <div className="bg-blue-500/10 rounded-lg py-2 border border-blue-500/20">
+                        <p className="text-2xl font-bold text-blue-100">{kumiteScore.athlete1.yuko}</p>
+                      </div>
+                    </div>
+                    <div className="text-center">
+                      <p className="text-sm text-blue-300 mb-2">Waza-ari</p>
+                      <div className="bg-blue-500/10 rounded-lg py-2 border border-blue-500/20">
+                        <p className="text-2xl font-bold text-blue-100">{kumiteScore.athlete1.wazari}</p>
+                      </div>
+                    </div>
+                    <div className="text-center">
+                      <p className="text-sm text-blue-300 mb-2">Ippon</p>
+                      <div className="bg-blue-500/10 rounded-lg py-2 border border-blue-500/20">
+                        <p className="text-2xl font-bold text-blue-100">{kumiteScore.athlete1.ippon}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
-            
-            <div className="bg-white/10 rounded-xl p-6 flex flex-col items-center">
-              <div className="text-center mb-4">
-                <p className="text-xl mb-2">Pontuação</p>
-                <div className="bg-primary/20 rounded-lg py-3 px-10">
-                  <p className="text-6xl font-bold text-primary">
-                    {calculateKumitePoints("athlete1", kumiteScore)}
-                  </p>
+
+            <div className="relative">
+              <div className={`rounded-2xl p-8 h-full flex flex-col items-center justify-center ${showCrownAthlete2 || (showWinnerBadge && winner === scoreboardData.match.athlete2) ? 'bg-blue-500/10 border-2 border-blue-500/30' : 'bg-[#111A2F]/80 border border-white/10'}`}>
+                {(showCrownAthlete2 || (showWinnerBadge && winner === scoreboardData.match.athlete2)) && (
+                  <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                    <Crown className="h-8 w-8 text-amber-400" />
+                  </div>
+                )}
+                
+                <div className="w-32 h-32 bg-blue-500/20 rounded-full flex items-center justify-center mb-4 border border-blue-500/30">
+                  <User className="h-16 w-16 text-blue-400" />
+                </div>
+                
+                <h2 className="text-3xl font-bold mb-6 text-blue-100">{scoreboardData.match.athlete2}</h2>
+                
+                {showWinnerBadge && winner === scoreboardData.match.athlete2 && (
+                  <div className="bg-green-500/20 text-green-400 px-4 py-2 rounded-full text-sm font-bold mb-4">
+                    Vencedor
+                  </div>
+                )}
+
+                <div className="bg-blue-500/10 rounded-xl p-6 w-full border border-blue-500/20">
+                  <div className="text-center mb-6">
+                    <span className="text-6xl font-bold bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text text-transparent">
+                      {calculateKumitePoints("athlete2", kumiteScore)}
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-3 gap-4">
+                    <div className="text-center">
+                      <p className="text-sm text-blue-300 mb-2">Yuko</p>
+                      <div className="bg-blue-500/10 rounded-lg py-2 border border-blue-500/20">
+                        <p className="text-2xl font-bold text-blue-100">{kumiteScore.athlete2.yuko}</p>
+                      </div>
+                    </div>
+                    <div className="text-center">
+                      <p className="text-sm text-blue-300 mb-2">Waza-ari</p>
+                      <div className="bg-blue-500/10 rounded-lg py-2 border border-blue-500/20">
+                        <p className="text-2xl font-bold text-blue-100">{kumiteScore.athlete2.wazari}</p>
+                      </div>
+                    </div>
+                    <div className="text-center">
+                      <p className="text-sm text-blue-300 mb-2">Ippon</p>
+                      <div className="bg-blue-500/10 rounded-lg py-2 border border-blue-500/20">
+                        <p className="text-2xl font-bold text-blue-100">{kumiteScore.athlete2.ippon}</p>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
-              
-              <div className="grid grid-cols-3 gap-4 w-full mt-4">
-                <div className="text-center">
-                  <p className="text-lg mb-1">Yuko</p>
-                  <div className="bg-white/10 rounded-lg py-2">
-                    <p className="text-3xl font-bold">{kumiteScore.athlete1.yuko}</p>
-                  </div>
-                </div>
-                <div className="text-center">
-                  <p className="text-lg mb-1">Waza-ari</p>
-                  <div className="bg-white/10 rounded-lg py-2">
-                    <p className="text-3xl font-bold">{kumiteScore.athlete1.wazari}</p>
-                  </div>
-                </div>
-                <div className="text-center">
-                  <p className="text-lg mb-1">Ippon</p>
-                  <div className="bg-white/10 rounded-lg py-2">
-                    <p className="text-3xl font-bold">{kumiteScore.athlete1.ippon}</p>
-                  </div>
-                </div>
-              </div>
-              
-              {(kumiteScore.athlete1.hansoku > 0 || kumiteScore.athlete1.shikkaku > 0) && (
-                <div className="mt-4 bg-red-900/40 w-full text-center rounded-lg p-2">
-                  <p className="text-xl font-bold text-red-400">
-                    {kumiteScore.athlete1.hansoku > 0 ? "HANSOKU" : "SHIKKAKU"}
-                  </p>
-                </div>
-              )}
             </div>
+          </>
+        )}
+      </main>
+
+      <footer className="border-t border-white/10 p-6">
+        <div className="flex justify-between items-center">
+          <div className="flex items-center">
+            <Trophy className="h-6 w-6 text-blue-400 mr-2" />
+            <span className="text-2xl text-blue-200">Torneio #{id}</span>
           </div>
-          
-          <div className="flex flex-col">
-            <div className={`text-center mb-8 p-6 rounded-xl ${determineWinner(scoreboardData.match, kumiteScore) === scoreboardData.match.athlete2 ? "bg-green-900/40" : ""}`}>
-              <div className="w-28 h-28 bg-primary/30 rounded-full mx-auto flex items-center justify-center mb-4">
-                <User className="h-14 w-14 text-primary" />
-              </div>
-              <h2 className="text-4xl font-bold mb-2">{scoreboardData.match.athlete2}</h2>
-              {determineWinner(scoreboardData.match, kumiteScore) === scoreboardData.match.athlete2 && (
-                <div className="flex items-center justify-center gap-2 mt-2">
-                  <Crown className="h-6 w-6 text-yellow-500" />
-                  <span className="text-xl font-bold text-yellow-500">Vencedor</span>
-                </div>
-              )}
-            </div>
-            
-            <div className="bg-white/10 rounded-xl p-6 flex flex-col items-center">
-              <div className="text-center mb-4">
-                <p className="text-xl mb-2">Pontuação</p>
-                <div className="bg-primary/20 rounded-lg py-3 px-10">
-                  <p className="text-6xl font-bold text-primary">
-                    {calculateKumitePoints("athlete2", kumiteScore)}
-                  </p>
-                </div>
-              </div>
-              
-              <div className="grid grid-cols-3 gap-4 w-full mt-4">
-                <div className="text-center">
-                  <p className="text-lg mb-1">Yuko</p>
-                  <div className="bg-white/10 rounded-lg py-2">
-                    <p className="text-3xl font-bold">{kumiteScore.athlete2.yuko}</p>
-                  </div>
-                </div>
-                <div className="text-center">
-                  <p className="text-lg mb-1">Waza-ari</p>
-                  <div className="bg-white/10 rounded-lg py-2">
-                    <p className="text-3xl font-bold">{kumiteScore.athlete2.wazari}</p>
-                  </div>
-                </div>
-                <div className="text-center">
-                  <p className="text-lg mb-1">Ippon</p>
-                  <div className="bg-white/10 rounded-lg py-2">
-                    <p className="text-3xl font-bold">{kumiteScore.athlete2.ippon}</p>
-                  </div>
-                </div>
-              </div>
-              
-              {(kumiteScore.athlete2.hansoku > 0 || kumiteScore.athlete2.shikkaku > 0) && (
-                <div className="mt-4 bg-red-900/40 w-full text-center rounded-lg p-2">
-                  <p className="text-xl font-bold text-red-400">
-                    {kumiteScore.athlete2.hansoku > 0 ? "HANSOKU" : "SHIKKAKU"}
-                  </p>
-                </div>
-              )}
-            </div>
+          <div className="flex items-center bg-[#111A2F] px-4 py-2 rounded-lg border border-blue-500/20">
+            <Clock className="h-6 w-6 text-blue-400 mr-2" />
+            <span className={`text-3xl font-mono ${timeLeft <= 10 ? "text-red-400 animate-pulse" : "text-blue-200"}`}>
+              {formatTime(timeLeft)}
+            </span>
           </div>
-        </>
-      )}
+        </div>
+      </footer>
     </div>
-    
-    <footer className="border-t border-white/20 pt-4 mt-6">
-      <div className="flex justify-between items-center">
-        <div className="flex items-center">
-          <Trophy className="h-6 w-6 text-primary mr-2" />
-          <span className="text-2xl">Torneio #{id}</span>
-        </div>
-        <div className="flex items-center">
-          <Clock className="h-6 w-6 text-red-500 mr-2" />
-          <span className={`text-3xl font-mono ${timeLeft <= 10 ? "text-red-500 animate-pulse" : ""}`}>
-            {formatTime(timeLeft)}
-          </span>
-        </div>
-      </div>
-    </footer>
-  </div>
-);
+  );
+};
 
 export default Scoreboard;
