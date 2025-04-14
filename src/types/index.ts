@@ -30,6 +30,12 @@ export interface KumiteAthleteScore {
   penalties: number;
   hansoku: number;
   shikkaku: number;
+  // Novas propriedades para tipos específicos de penalidades
+  chukoku: number;
+  keikoku: number;
+  jogai: number;
+  mubobi: number;
+  hansokuChui: number;
 }
 
 // Pontuação para kumite (dois atletas)

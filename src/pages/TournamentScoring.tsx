@@ -140,6 +140,11 @@ const TournamentScoring = () => {
       penalties: 0,
       hansoku: 0,
       shikkaku: 0,
+      chukoku: 0,
+      keikoku: 0,
+      jogai: 0,
+      mubobi: 0,
+      hansokuChui: 0,
     },
     athlete2: {
       yuko: 0,
@@ -148,6 +153,11 @@ const TournamentScoring = () => {
       penalties: 0,
       hansoku: 0,
       shikkaku: 0,
+      chukoku: 0,
+      keikoku: 0,
+      jogai: 0,
+      mubobi: 0,
+      hansokuChui: 0,
     },
   });
 
@@ -156,6 +166,7 @@ const TournamentScoring = () => {
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const scoreboardWindowRef = useRef<Window | null>(null);
   const lastScoreboardDataRef = useRef<ScoreboardData | null>(null);
+  const updateTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const kataMatches: MatchData[] = [
     {
@@ -224,6 +235,11 @@ const TournamentScoring = () => {
           penalties: 0,
           hansoku: 0,
           shikkaku: 0,
+          chukoku: 0,
+          keikoku: 0,
+          jogai: 0,
+          mubobi: 0,
+          hansokuChui: 0,
         },
         athlete2: {
           yuko: 0,
@@ -232,6 +248,11 @@ const TournamentScoring = () => {
           penalties: 0,
           hansoku: 0,
           shikkaku: 0,
+          chukoku: 0,
+          keikoku: 0,
+          jogai: 0,
+          mubobi: 0,
+          hansokuChui: 0,
         },
       });
     }
@@ -312,13 +333,18 @@ const TournamentScoring = () => {
 
   const updateScoreboard = () => {
     if (!currentMatch) return;
+
+    if (updateTimeoutRef.current) {
+      clearTimeout(updateTimeoutRef.current);
+      updateTimeoutRef.current = null;
+    }
     
     const scoreboardData: ScoreboardData = {
       match: currentMatch,
       timeLeft,
       isRunning,
-      kataScore: currentMatch.type === "kata" ? kataScore : null,
-      kumiteScore: currentMatch.type === "kumite" ? kumiteScore : null,
+      kataScore: currentMatch.type === "kata" ? {...kataScore} : null,
+      kumiteScore: currentMatch.type === "kumite" ? {...kumiteScore} : null,
       lastUpdate: new Date().getTime(),
     };
 
@@ -332,6 +358,10 @@ const TournamentScoring = () => {
     return () => {
       if (timerRef.current) {
         clearInterval(timerRef.current);
+      }
+      
+      if (updateTimeoutRef.current) {
+        clearTimeout(updateTimeoutRef.current);
       }
       
       if (scoreboardWindowRef.current && !scoreboardWindowRef.current.closed) {
@@ -358,7 +388,10 @@ const TournamentScoring = () => {
         const newScore = { ...prev, [judge]: 0 };
         return newScore;
       });
-      updateScoreboard();
+      
+      updateTimeoutRef.current = setTimeout(() => {
+        updateScoreboard();
+      }, 50);
       return;
     }
     
@@ -371,7 +404,7 @@ const TournamentScoring = () => {
       return newScore;
     });
     
-    setTimeout(() => {
+    updateTimeoutRef.current = setTimeout(() => {
       updateScoreboard();
     }, 50);
   };
@@ -391,18 +424,13 @@ const TournamentScoring = () => {
     change: number
   ) => {
     setKumiteScore((prev) => {
-      const newValue = Math.max(0, prev[athlete][scoreType] + change);
-      const newScore = {
-        ...prev,
-        [athlete]: {
-          ...prev[athlete],
-          [scoreType]: newValue,
-        },
-      };
+      const newScore = JSON.parse(JSON.stringify(prev));
+      const currentValue = newScore[athlete][scoreType];
+      newScore[athlete][scoreType] = Math.max(0, currentValue + change);
       return newScore;
     });
     
-    setTimeout(() => {
+    updateTimeoutRef.current = setTimeout(() => {
       updateScoreboard();
     }, 50);
   };

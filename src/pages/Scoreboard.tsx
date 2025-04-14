@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Trophy, User, Crown, Clock } from "lucide-react";
 import { MatchData, KataScore, KumiteScore, ScoreboardData } from "@/types";
-import { useLocalStorage } from "@/hooks/useLocalStorage";
 
 const Scoreboard = () => {
   const { id } = useParams<{ id: string }>();
@@ -11,21 +10,25 @@ const Scoreboard = () => {
   const [timeLeft, setTimeLeft] = useState<number>(180);
   
   useEffect(() => {
-    // Função para carregar dados do localStorage
+    // Função para carregar dados do localStorage com tratamento de dados mais robusto
     const loadScoreboardData = () => {
-      const data = localStorage.getItem("scoreboardData");
-      if (data) {
-        try {
-          const parsedData = JSON.parse(data);
-          setScoreboardData(parsedData);
+      try {
+        const data = localStorage.getItem("scoreboardData");
+        if (data) {
+          const parsedData = JSON.parse(data) as ScoreboardData;
           
-          // Atualiza o timer com os dados mais recentes
-          if (parsedData && parsedData.timeLeft) {
-            setTimeLeft(parsedData.timeLeft);
+          // Verificar se os dados são válidos antes de atualizar o estado
+          if (parsedData && parsedData.match) {
+            setScoreboardData(parsedData);
+            
+            // Atualiza o timer com os dados mais recentes
+            if (parsedData.timeLeft !== undefined) {
+              setTimeLeft(parsedData.timeLeft);
+            }
           }
-        } catch (error) {
-          console.error("Erro ao analisar dados do placar:", error);
         }
+      } catch (error) {
+        console.error("Erro ao analisar dados do placar:", error);
       }
     };
 
@@ -51,7 +54,7 @@ const Scoreboard = () => {
     // Verifica constantemente por atualizações (mais responsivo)
     const checkInterval = setInterval(() => {
       loadScoreboardData();
-    }, 100); // Verifica a cada 100ms
+    }, 50); // Verifica com mais frequência para ser mais responsivo
 
     // Define o título da janela para facilitar a identificação
     document.title = "Placar - Karate Tournament";
