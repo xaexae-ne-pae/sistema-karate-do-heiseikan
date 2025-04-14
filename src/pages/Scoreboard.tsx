@@ -54,7 +54,7 @@ const Scoreboard = () => {
     // Verifica constantemente por atualizações (mais responsivo)
     const checkInterval = setInterval(() => {
       loadScoreboardData();
-    }, 50); // Verifica com mais frequência para ser mais responsivo
+    }, 200); // Verifica com mais frequência para ser mais responsivo
 
     // Define o título da janela para facilitar a identificação
     document.title = "Placar - Karate Tournament";

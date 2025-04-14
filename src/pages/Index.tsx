@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import BackgroundImage from '@/components/BackgroundImage';
@@ -16,8 +17,6 @@ const Index = () => {
     if (username) {
       navigate('/dashboard', { replace: true });
     }
-    
-    return () => setMounted(false);
   }, [navigate]);
 
   return (

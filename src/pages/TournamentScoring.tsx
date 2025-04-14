@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { TournamentSidebar } from "@/components/TournamentSidebar";
 import { Button } from "@/components/ui/button";
@@ -167,8 +167,9 @@ const TournamentScoring = () => {
   const scoreboardWindowRef = useRef<Window | null>(null);
   const lastScoreboardDataRef = useRef<ScoreboardData | null>(null);
   const updateTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const scoreUpdatePendingRef = useRef(false);
 
-  const saveScoreboardData = (
+  const saveScoreboardData = useCallback((
     match: MatchData,
     timeLeft: number,
     isRunning: boolean,
@@ -176,16 +177,17 @@ const TournamentScoring = () => {
     kumiteScore: KumiteScore | null
   ) => {
     const scoreboardData: ScoreboardData = {
-      match,
+      match: JSON.parse(JSON.stringify(match)),
       timeLeft,
       isRunning,
-      kataScore,
-      kumiteScore,
+      kataScore: kataScore ? JSON.parse(JSON.stringify(kataScore)) : null,
+      kumiteScore: kumiteScore ? JSON.parse(JSON.stringify(kumiteScore)) : null,
       lastUpdate: new Date().getTime(),
     };
+    
     localStorage.setItem("scoreboardData", JSON.stringify(scoreboardData));
     window.dispatchEvent(new CustomEvent("scoreboardUpdate"));
-  };
+  }, []);
 
   const kataMatches: MatchData[] = [
     {
@@ -301,7 +303,20 @@ const TournamentScoring = () => {
           if (timerRef.current) clearInterval(timerRef.current);
           setIsRunning(false);
         }
-        updateScoreboard();
+        
+        if (currentMatch) {
+          const currentData = lastScoreboardDataRef.current;
+          if (currentData) {
+            saveScoreboardData(
+              currentMatch,
+              newTime,
+              newTime > 0,
+              currentMatch.type === "kata" ? kataScore : null,
+              currentMatch.type === "kumite" ? kumiteScore : null
+            );
+          }
+        }
+        
         return newTime;
       });
     }, 1000);
@@ -350,7 +365,7 @@ const TournamentScoring = () => {
     toast.success("Placar aberto em nova janela");
   };
 
-  const updateScoreboard = () => {
+  const updateScoreboard = useCallback(() => {
     if (!currentMatch) return;
 
     if (updateTimeoutRef.current) {
@@ -359,19 +374,22 @@ const TournamentScoring = () => {
     }
     
     const scoreboardData: ScoreboardData = {
-      match: currentMatch,
+      match: JSON.parse(JSON.stringify(currentMatch)),
       timeLeft,
       isRunning,
-      kataScore: currentMatch.type === "kata" ? {...kataScore} : null,
-      kumiteScore: currentMatch.type === "kumite" ? {...kumiteScore} : null,
+      kataScore: currentMatch.type === "kata" ? JSON.parse(JSON.stringify(kataScore)) : null,
+      kumiteScore: currentMatch.type === "kumite" ? JSON.parse(JSON.stringify(kumiteScore)) : null,
       lastUpdate: new Date().getTime(),
     };
 
     lastScoreboardDataRef.current = scoreboardData;
     
     localStorage.setItem("scoreboardData", JSON.stringify(scoreboardData));
+    
     window.dispatchEvent(new CustomEvent("scoreboardUpdate"));
-  };
+    
+    scoreUpdatePendingRef.current = false;
+  }, [currentMatch, timeLeft, isRunning, kataScore, kumiteScore]);
 
   useEffect(() => {
     return () => {
@@ -389,6 +407,15 @@ const TournamentScoring = () => {
     };
   }, []);
 
+  useEffect(() => {
+    if (currentMatch && !scoreUpdatePendingRef.current) {
+      scoreUpdatePendingRef.current = true;
+      updateTimeoutRef.current = setTimeout(() => {
+        updateScoreboard();
+      }, 50);
+    }
+  }, [kataScore, kumiteScore, updateScoreboard, currentMatch]);
+
   const formatTime = (seconds: number): string => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
@@ -405,9 +432,6 @@ const TournamentScoring = () => {
     if (value === "") {
       const newScore = { ...kataScore, [judge]: 0 };
       setKataScore(newScore);
-      if (currentMatch) {
-        saveScoreboardData(currentMatch, timeLeft, isRunning, newScore, null);
-      }
       return;
     }
   
@@ -417,9 +441,6 @@ const TournamentScoring = () => {
   
     const newScore = { ...kataScore, [judge]: numValue };
     setKataScore(newScore);
-    if (currentMatch) {
-      saveScoreboardData(currentMatch, timeLeft, isRunning, newScore, null);
-    }
   };
 
   const calculateKataTotal = (): number => {
@@ -440,9 +461,6 @@ const TournamentScoring = () => {
     const currentValue = newScore[athlete][scoreType];
     newScore[athlete][scoreType] = Math.max(0, currentValue + change);
     setKumiteScore(newScore);
-    if (currentMatch) {
-      saveScoreboardData(currentMatch, timeLeft, isRunning, null, newScore);
-    }
   };
 
   const handleSaveScore = () => {
