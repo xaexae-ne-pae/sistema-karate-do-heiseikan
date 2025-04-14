@@ -53,3 +53,17 @@ export interface ScoreboardData {
   kumiteScore: KumiteScore | null;
   lastUpdate: number;
 }
+
+// Interface para Atleta
+export interface Athlete {
+  id: number;
+  name: string;
+  age?: number;
+  gender?: string;
+  weight?: number;
+  height?: number;
+  belt?: string;
+  team?: string;
+  country?: string;
+  categories?: string[];
+}
