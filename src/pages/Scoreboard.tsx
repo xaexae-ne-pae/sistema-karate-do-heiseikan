@@ -8,6 +8,8 @@ const Scoreboard = () => {
   const { id } = useParams<{ id: string }>();
   const [scoreboardData, setScoreboardData] = useState<ScoreboardData | null>(null);
   const [timeLeft, setTimeLeft] = useState<number>(180);
+  const [kataScore, setKataScore] = useState<KataScore | null>(null);
+  const [kumiteScore, setKumiteScore] = useState<KumiteScore | null>(null);
   
   useEffect(() => {
     // Função para carregar dados do localStorage com tratamento de dados mais robusto
@@ -19,11 +21,23 @@ const Scoreboard = () => {
           
           // Verificar se os dados são válidos antes de atualizar o estado
           if (parsedData && parsedData.match) {
+            // Atualiza o objeto principal
             setScoreboardData(parsedData);
             
             // Atualiza apenas o tempo, mantém as pontuações estáveis
             if (parsedData.timeLeft !== undefined) {
               setTimeLeft(parsedData.timeLeft);
+            }
+            
+            // Atualiza as pontuações apenas se houver mudanças reais
+            if (parsedData.kataScore && (!kataScore || 
+                JSON.stringify(kataScore) !== JSON.stringify(parsedData.kataScore))) {
+              setKataScore(parsedData.kataScore);
+            }
+            
+            if (parsedData.kumiteScore && (!kumiteScore ||
+                JSON.stringify(kumiteScore) !== JSON.stringify(parsedData.kumiteScore))) {
+              setKumiteScore(parsedData.kumiteScore);
             }
           }
         }
@@ -51,25 +65,19 @@ const Scoreboard = () => {
     
     window.addEventListener("storage", handleStorageUpdate);
 
-    // Verifica constantemente por atualizações de forma mais eficiente
+    // Verifica constantemente por atualizações do tempo apenas
     const checkInterval = setInterval(() => {
       const data = localStorage.getItem("scoreboardData");
       if (data) {
         try {
           const parsedData = JSON.parse(data) as ScoreboardData;
           
-          // Se as pontuações forem diferentes, atualiza tudo
-          // Se só o tempo for diferente, atualiza só o tempo
-          if (!scoreboardData || 
-              JSON.stringify(scoreboardData.kataScore) !== JSON.stringify(parsedData.kataScore) ||
-              JSON.stringify(scoreboardData.kumiteScore) !== JSON.stringify(parsedData.kumiteScore)) {
-            setScoreboardData(parsedData);
-            setTimeLeft(parsedData.timeLeft);
-          } else if (scoreboardData.timeLeft !== parsedData.timeLeft) {
+          // Atualiza apenas o tempo se for diferente
+          if (timeLeft !== parsedData.timeLeft) {
             setTimeLeft(parsedData.timeLeft);
           }
         } catch (error) {
-          console.error("Erro ao verificar atualizações:", error);
+          console.error("Erro ao verificar atualizações de tempo:", error);
         }
       }
     }, 200);
@@ -82,7 +90,7 @@ const Scoreboard = () => {
       window.removeEventListener("storage", handleStorageUpdate);
       clearInterval(checkInterval);
     };
-  }, [scoreboardData]);
+  }, [timeLeft, kataScore, kumiteScore]);
   
   const formatTime = (seconds: number): string => {
     const mins = Math.floor(seconds / 60);
@@ -129,7 +137,14 @@ const Scoreboard = () => {
   
   // Renderiza o placar de Kata
   if (scoreboardData.match.type === "kata") {
-    return <KataScoreboard scoreboardData={scoreboardData} formatTime={formatTime} calculateKataTotal={calculateKataTotal} timeLeft={timeLeft} id={id} />;
+    return <KataScoreboard 
+      scoreboardData={scoreboardData} 
+      formatTime={formatTime} 
+      calculateKataTotal={calculateKataTotal} 
+      timeLeft={timeLeft} 
+      id={id}
+      kataScore={kataScore || scoreboardData.kataScore}
+    />;
   }
   
   // Renderiza o placar de Kumite
@@ -140,6 +155,7 @@ const Scoreboard = () => {
     determineWinner={determineWinner}
     timeLeft={timeLeft}
     id={id}
+    kumiteScore={kumiteScore || scoreboardData.kumiteScore}
   />;
 };
 
@@ -149,13 +165,15 @@ const KataScoreboard = ({
   formatTime, 
   calculateKataTotal, 
   timeLeft,
-  id 
+  id,
+  kataScore
 }: { 
   scoreboardData: ScoreboardData, 
   formatTime: (seconds: number) => string,
   calculateKataTotal: (kataScore: KataScore) => number,
   timeLeft: number,
-  id: string | undefined
+  id: string | undefined,
+  kataScore: KataScore | null
 }) => (
   <div className="flex flex-col h-screen bg-black text-white p-4">
     <header className="border-b border-white/20 pb-4 mb-6">
@@ -172,13 +190,13 @@ const KataScoreboard = ({
         <h2 className="text-5xl font-bold mb-2">{scoreboardData.match.athlete1}</h2>
       </div>
       
-      {scoreboardData.kataScore && (
+      {kataScore && (
         <div className="bg-white/10 rounded-xl p-8 w-full max-w-2xl">
           <div className="grid grid-cols-3 gap-8 mb-8">
             {[
-              { label: "Jurado 1", score: scoreboardData.kataScore.judge1 },
-              { label: "Jurado 2", score: scoreboardData.kataScore.judge2 },
-              { label: "Jurado 3", score: scoreboardData.kataScore.judge3 },
+              { label: "Jurado 1", score: kataScore.judge1 },
+              { label: "Jurado 2", score: kataScore.judge2 },
+              { label: "Jurado 3", score: kataScore.judge3 },
             ].map((judge, index) => (
               <div key={index} className="text-center">
                 <p className="text-xl mb-2">{judge.label}</p>
@@ -193,7 +211,7 @@ const KataScoreboard = ({
             <p className="text-2xl mb-2">Pontuação Total</p>
             <div className="bg-primary/20 rounded-lg py-4">
               <p className="text-6xl font-bold text-primary">
-                {calculateKataTotal(scoreboardData.kataScore).toFixed(1)}
+                {calculateKataTotal(kataScore).toFixed(1)}
               </p>
             </div>
           </div>
@@ -225,14 +243,16 @@ const KumiteScoreboard = ({
   calculateKumitePoints, 
   determineWinner,
   timeLeft,
-  id
+  id,
+  kumiteScore
 }: { 
   scoreboardData: ScoreboardData, 
   formatTime: (seconds: number) => string,
   calculateKumitePoints: (athlete: "athlete1" | "athlete2", kumiteScore: KumiteScore) => number,
   determineWinner: (match: MatchData, kumiteScore: KumiteScore) => string | null,
   timeLeft: number,
-  id: string | undefined
+  id: string | undefined,
+  kumiteScore: KumiteScore | null
 }) => (
   <div className="flex flex-col h-screen bg-black text-white p-4">
     <header className="border-b border-white/20 pb-4 mb-6">
@@ -242,15 +262,15 @@ const KumiteScoreboard = ({
     </header>
     
     <div className="flex-grow grid grid-cols-2 gap-8">
-      {scoreboardData.kumiteScore && scoreboardData.match.athlete2 && (
+      {kumiteScore && scoreboardData.match.athlete2 && (
         <>
           <div className="flex flex-col">
-            <div className={`text-center mb-8 p-6 rounded-xl ${determineWinner(scoreboardData.match, scoreboardData.kumiteScore) === scoreboardData.match.athlete1 ? "bg-green-900/40" : ""}`}>
+            <div className={`text-center mb-8 p-6 rounded-xl ${determineWinner(scoreboardData.match, kumiteScore) === scoreboardData.match.athlete1 ? "bg-green-900/40" : ""}`}>
               <div className="w-28 h-28 bg-primary/30 rounded-full mx-auto flex items-center justify-center mb-4">
                 <User className="h-14 w-14 text-primary" />
               </div>
               <h2 className="text-4xl font-bold mb-2">{scoreboardData.match.athlete1}</h2>
-              {determineWinner(scoreboardData.match, scoreboardData.kumiteScore) === scoreboardData.match.athlete1 && (
+              {determineWinner(scoreboardData.match, kumiteScore) === scoreboardData.match.athlete1 && (
                 <div className="flex items-center justify-center gap-2 mt-2">
                   <Crown className="h-6 w-6 text-yellow-500" />
                   <span className="text-xl font-bold text-yellow-500">Vencedor</span>
@@ -263,7 +283,7 @@ const KumiteScoreboard = ({
                 <p className="text-xl mb-2">Pontuação</p>
                 <div className="bg-primary/20 rounded-lg py-3 px-10">
                   <p className="text-6xl font-bold text-primary">
-                    {calculateKumitePoints("athlete1", scoreboardData.kumiteScore)}
+                    {calculateKumitePoints("athlete1", kumiteScore)}
                   </p>
                 </div>
               </div>
@@ -272,27 +292,27 @@ const KumiteScoreboard = ({
                 <div className="text-center">
                   <p className="text-lg mb-1">Yuko</p>
                   <div className="bg-white/10 rounded-lg py-2">
-                    <p className="text-3xl font-bold">{scoreboardData.kumiteScore.athlete1.yuko}</p>
+                    <p className="text-3xl font-bold">{kumiteScore.athlete1.yuko}</p>
                   </div>
                 </div>
                 <div className="text-center">
                   <p className="text-lg mb-1">Waza-ari</p>
                   <div className="bg-white/10 rounded-lg py-2">
-                    <p className="text-3xl font-bold">{scoreboardData.kumiteScore.athlete1.wazari}</p>
+                    <p className="text-3xl font-bold">{kumiteScore.athlete1.wazari}</p>
                   </div>
                 </div>
                 <div className="text-center">
                   <p className="text-lg mb-1">Ippon</p>
                   <div className="bg-white/10 rounded-lg py-2">
-                    <p className="text-3xl font-bold">{scoreboardData.kumiteScore.athlete1.ippon}</p>
+                    <p className="text-3xl font-bold">{kumiteScore.athlete1.ippon}</p>
                   </div>
                 </div>
               </div>
               
-              {(scoreboardData.kumiteScore.athlete1.hansoku > 0 || scoreboardData.kumiteScore.athlete1.shikkaku > 0) && (
+              {(kumiteScore.athlete1.hansoku > 0 || kumiteScore.athlete1.shikkaku > 0) && (
                 <div className="mt-4 bg-red-900/40 w-full text-center rounded-lg p-2">
                   <p className="text-xl font-bold text-red-400">
-                    {scoreboardData.kumiteScore.athlete1.hansoku > 0 ? "HANSOKU" : "SHIKKAKU"}
+                    {kumiteScore.athlete1.hansoku > 0 ? "HANSOKU" : "SHIKKAKU"}
                   </p>
                 </div>
               )}
@@ -300,12 +320,12 @@ const KumiteScoreboard = ({
           </div>
           
           <div className="flex flex-col">
-            <div className={`text-center mb-8 p-6 rounded-xl ${determineWinner(scoreboardData.match, scoreboardData.kumiteScore) === scoreboardData.match.athlete2 ? "bg-green-900/40" : ""}`}>
+            <div className={`text-center mb-8 p-6 rounded-xl ${determineWinner(scoreboardData.match, kumiteScore) === scoreboardData.match.athlete2 ? "bg-green-900/40" : ""}`}>
               <div className="w-28 h-28 bg-primary/30 rounded-full mx-auto flex items-center justify-center mb-4">
                 <User className="h-14 w-14 text-primary" />
               </div>
               <h2 className="text-4xl font-bold mb-2">{scoreboardData.match.athlete2}</h2>
-              {determineWinner(scoreboardData.match, scoreboardData.kumiteScore) === scoreboardData.match.athlete2 && (
+              {determineWinner(scoreboardData.match, kumiteScore) === scoreboardData.match.athlete2 && (
                 <div className="flex items-center justify-center gap-2 mt-2">
                   <Crown className="h-6 w-6 text-yellow-500" />
                   <span className="text-xl font-bold text-yellow-500">Vencedor</span>
@@ -318,7 +338,7 @@ const KumiteScoreboard = ({
                 <p className="text-xl mb-2">Pontuação</p>
                 <div className="bg-primary/20 rounded-lg py-3 px-10">
                   <p className="text-6xl font-bold text-primary">
-                    {calculateKumitePoints("athlete2", scoreboardData.kumiteScore)}
+                    {calculateKumitePoints("athlete2", kumiteScore)}
                   </p>
                 </div>
               </div>
@@ -327,27 +347,27 @@ const KumiteScoreboard = ({
                 <div className="text-center">
                   <p className="text-lg mb-1">Yuko</p>
                   <div className="bg-white/10 rounded-lg py-2">
-                    <p className="text-3xl font-bold">{scoreboardData.kumiteScore.athlete2.yuko}</p>
+                    <p className="text-3xl font-bold">{kumiteScore.athlete2.yuko}</p>
                   </div>
                 </div>
                 <div className="text-center">
                   <p className="text-lg mb-1">Waza-ari</p>
                   <div className="bg-white/10 rounded-lg py-2">
-                    <p className="text-3xl font-bold">{scoreboardData.kumiteScore.athlete2.wazari}</p>
+                    <p className="text-3xl font-bold">{kumiteScore.athlete2.wazari}</p>
                   </div>
                 </div>
                 <div className="text-center">
                   <p className="text-lg mb-1">Ippon</p>
                   <div className="bg-white/10 rounded-lg py-2">
-                    <p className="text-3xl font-bold">{scoreboardData.kumiteScore.athlete2.ippon}</p>
+                    <p className="text-3xl font-bold">{kumiteScore.athlete2.ippon}</p>
                   </div>
                 </div>
               </div>
               
-              {(scoreboardData.kumiteScore.athlete2.hansoku > 0 || scoreboardData.kumiteScore.athlete2.shikkaku > 0) && (
+              {(kumiteScore.athlete2.hansoku > 0 || kumiteScore.athlete2.shikkaku > 0) && (
                 <div className="mt-4 bg-red-900/40 w-full text-center rounded-lg p-2">
                   <p className="text-xl font-bold text-red-400">
-                    {scoreboardData.kumiteScore.athlete2.hansoku > 0 ? "HANSOKU" : "SHIKKAKU"}
+                    {kumiteScore.athlete2.hansoku > 0 ? "HANSOKU" : "SHIKKAKU"}
                   </p>
                 </div>
               )}

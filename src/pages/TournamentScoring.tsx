@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { TournamentSidebar } from "@/components/TournamentSidebar";
@@ -170,6 +169,7 @@ const TournamentScoring = () => {
   const updateTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const scoreUpdatePendingRef = useRef(false);
   const shouldUpdateScoreRef = useRef(false);
+  const scoreChangedRef = useRef(false);
 
   const saveScoreboardData = useCallback((
     match: MatchData,
@@ -286,6 +286,7 @@ const TournamentScoring = () => {
       timerRef.current = null;
     }
     setScoringMode(true);
+    scoreChangedRef.current = true;
     
     setTimeout(() => {
       updateScoreboard();
@@ -307,12 +308,14 @@ const TournamentScoring = () => {
         }
         
         // Atualizar apenas o tempo no placar, sem atualizar as pontuações
-        if (currentMatch && shouldUpdateScoreRef.current) {
+        if (currentMatch) {
           const storedData = localStorage.getItem("scoreboardData");
           if (storedData) {
             const parsedData = JSON.parse(storedData) as ScoreboardData;
             parsedData.timeLeft = newTime;
             parsedData.isRunning = newTime > 0;
+            
+            // Não atualiza os scores, mantém os que já estão
             localStorage.setItem("scoreboardData", JSON.stringify(parsedData));
             window.dispatchEvent(new CustomEvent("scoreboardUpdate"));
           }
@@ -321,9 +324,6 @@ const TournamentScoring = () => {
         return newTime;
       });
     }, 1000);
-    
-    // Ativar atualizações de tempo após o primeiro timer
-    shouldUpdateScoreRef.current = true;
   };
 
   const pauseTimer = () => {
@@ -334,14 +334,12 @@ const TournamentScoring = () => {
       clearInterval(timerRef.current);
       timerRef.current = null;
     }
-    shouldUpdateScoreRef.current = false;
     updateScoreboard();
   };
 
   const resetTimer = () => {
     pauseTimer();
     setTimeLeft(180);
-    shouldUpdateScoreRef.current = false;
     updateScoreboard();
   };
 
@@ -395,6 +393,7 @@ const TournamentScoring = () => {
     window.dispatchEvent(new CustomEvent("scoreboardUpdate"));
     
     scoreUpdatePendingRef.current = false;
+    scoreChangedRef.current = false;
   }, [currentMatch, timeLeft, isRunning, kataScore, kumiteScore]);
 
   useEffect(() => {
@@ -410,14 +409,13 @@ const TournamentScoring = () => {
       if (scoreboardWindowRef.current && !scoreboardWindowRef.current.closed) {
         scoreboardWindowRef.current.close();
       }
-      
-      shouldUpdateScoreRef.current = false;
     };
   }, []);
 
   useEffect(() => {
     if (currentMatch && !scoreUpdatePendingRef.current) {
       scoreUpdatePendingRef.current = true;
+      scoreChangedRef.current = true;
       updateTimeoutRef.current = setTimeout(() => {
         updateScoreboard();
       }, 50);
@@ -449,6 +447,7 @@ const TournamentScoring = () => {
   
     const newScore = { ...kataScore, [judge]: numValue };
     setKataScore(newScore);
+    scoreChangedRef.current = true;
   };
 
   const calculateKataTotal = (): number => {
@@ -469,6 +468,7 @@ const TournamentScoring = () => {
     const currentValue = newScore[athlete][scoreType];
     newScore[athlete][scoreType] = Math.max(0, currentValue + change);
     setKumiteScore(newScore);
+    scoreChangedRef.current = true;
   };
 
   const handleSaveScore = () => {
