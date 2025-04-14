@@ -21,7 +21,7 @@ const Scoreboard = () => {
           if (parsedData && parsedData.match) {
             setScoreboardData(parsedData);
             
-            // Atualiza o timer com os dados mais recentes
+            // Atualiza apenas o tempo, mantém as pontuações estáveis
             if (parsedData.timeLeft !== undefined) {
               setTimeLeft(parsedData.timeLeft);
             }
@@ -42,7 +42,7 @@ const Scoreboard = () => {
 
     window.addEventListener("scoreboardUpdate", handleUpdate);
     
-    // Configura listener para mensagens de storage para sincronização entre janelas
+    // Configura listener para sincronização entre janelas
     const handleStorageUpdate = (event: StorageEvent) => {
       if (event.key === "scoreboardData") {
         loadScoreboardData();
@@ -51,12 +51,29 @@ const Scoreboard = () => {
     
     window.addEventListener("storage", handleStorageUpdate);
 
-    // Verifica constantemente por atualizações (mais responsivo)
+    // Verifica constantemente por atualizações de forma mais eficiente
     const checkInterval = setInterval(() => {
-      loadScoreboardData();
-    }, 200); // Verifica com mais frequência para ser mais responsivo
+      const data = localStorage.getItem("scoreboardData");
+      if (data) {
+        try {
+          const parsedData = JSON.parse(data) as ScoreboardData;
+          
+          // Se as pontuações forem diferentes, atualiza tudo
+          // Se só o tempo for diferente, atualiza só o tempo
+          if (!scoreboardData || 
+              JSON.stringify(scoreboardData.kataScore) !== JSON.stringify(parsedData.kataScore) ||
+              JSON.stringify(scoreboardData.kumiteScore) !== JSON.stringify(parsedData.kumiteScore)) {
+            setScoreboardData(parsedData);
+            setTimeLeft(parsedData.timeLeft);
+          } else if (scoreboardData.timeLeft !== parsedData.timeLeft) {
+            setTimeLeft(parsedData.timeLeft);
+          }
+        } catch (error) {
+          console.error("Erro ao verificar atualizações:", error);
+        }
+      }
+    }, 200);
 
-    // Define o título da janela para facilitar a identificação
     document.title = "Placar - Karate Tournament";
 
     // Cleanup
@@ -65,7 +82,7 @@ const Scoreboard = () => {
       window.removeEventListener("storage", handleStorageUpdate);
       clearInterval(checkInterval);
     };
-  }, []);
+  }, [scoreboardData]);
   
   const formatTime = (seconds: number): string => {
     const mins = Math.floor(seconds / 60);
