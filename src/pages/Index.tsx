@@ -23,7 +23,12 @@ const Index = () => {
     <div className="h-screen flex flex-col overflow-hidden">
       <BackgroundImage />
       
-      <header className="pt-6 px-6 lg:px-10">
+      {/* Banner de desenvolvimento */}
+      <div className="absolute top-0 left-0 w-full bg-gradient-to-r from-yellow-500 to-red-500 text-white text-center py-2 font-bold z-50">
+        Página em Desenvolvimento
+      </div>
+      
+      <header className="pt-6 px-6 lg:px-10 mt-10">
         <Logo className={`opacity-0 ${mounted ? 'animate-fade-in' : ''}`} />
       </header>
       

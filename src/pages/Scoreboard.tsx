@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { Trophy, User, Crown, Clock, Star } from "lucide-react";
@@ -128,7 +129,7 @@ const Scoreboard = () => {
   }, [kumiteScore, senshu]);
 
   const determineWinner = (): string | null => {
-    if (!scoreboardData || scoreboardData.match.type !== "kumite") return null;
+    if (!scoreboardData || scoreboardData.match.type.toString() !== "kumite") return null;
 
     const athlete1 = kumiteScore?.athlete1;
     const athlete2 = kumiteScore?.athlete2;
@@ -170,7 +171,7 @@ const Scoreboard = () => {
   };
   
   const determineWinnerOriginal = (match: MatchData, kumiteScore: KumiteScore): string | null => {
-    if (!match || match.type !== "kumite") return null;
+    if (!match || match.type.toString() !== "kumite") return null;
 
     const athlete1 = kumiteScore.athlete1;
     const athlete2 = kumiteScore.athlete2;
@@ -233,10 +234,12 @@ const Scoreboard = () => {
                 <div className="relative">
                   <div className={`rounded-2xl p-8 h-full flex flex-col items-center justify-center bg-gradient-to-br ${
                     senshu === "athlete1" ? 'from-blue-900/40 to-blue-800/40' : 'from-blue-900/20 to-blue-800/20'
-                  } border-2 ${senshu === "athlete1" ? 'border-blue-500' : 'border-blue-500/20'}`}>
-                    {(senshu === "athlete1" || (false && determineWinner() === scoreboardData.match.athlete1)) && (
-                      <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 animate-bounce">
-                        <Crown className="h-8 w-8 text-amber-400 drop-shadow-[0_0_10px_rgba(251,191,36,0.5)]" />
+                  } border-2 ${senshu === "athlete1" ? 'border-blue-500' : 'border-blue-500/20'} ${
+                    calculateKumitePoints("athlete1") > calculateKumitePoints("athlete2") ? 'ring-2 ring-blue-400' : ''
+                  }`}>
+                    {(senshu === "athlete1" || calculateKumitePoints("athlete1") > calculateKumitePoints("athlete2")) && (
+                      <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 animate-bounce">
+                        <Crown className="h-14 w-14 text-amber-400 drop-shadow-[0_0_10px_rgba(251,191,36,0.5)]" />
                       </div>
                     )}
                     
@@ -255,9 +258,9 @@ const Scoreboard = () => {
                       </div>
                     )}
                     
-                    {false && determineWinner() === scoreboardData.match.athlete1 && (
+                    {calculateKumitePoints("athlete1") > calculateKumitePoints("athlete2") && (
                       <div className="bg-green-500/20 text-green-400 px-4 py-2 rounded-full text-sm font-bold mb-4">
-                        Vencedor
+                        Vencendo
                       </div>
                     )}
 
@@ -274,10 +277,12 @@ const Scoreboard = () => {
                 <div className="relative">
                   <div className={`rounded-2xl p-8 h-full flex flex-col items-center justify-center bg-gradient-to-br ${
                     senshu === "athlete2" ? 'from-red-900/40 to-red-800/40' : 'from-red-900/20 to-red-800/20'
-                  } border-2 ${senshu === "athlete2" ? 'border-red-500' : 'border-red-500/20'}`}>
-                    {(senshu === "athlete2" || (false && determineWinner() === scoreboardData.match.athlete2)) && (
-                      <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 animate-bounce">
-                        <Crown className="h-8 w-8 text-amber-400 drop-shadow-[0_0_10px_rgba(251,191,36,0.5)]" />
+                  } border-2 ${senshu === "athlete2" ? 'border-red-500' : 'border-red-500/20'} ${
+                    calculateKumitePoints("athlete2") > calculateKumitePoints("athlete1") ? 'ring-2 ring-red-400' : ''
+                  }`}>
+                    {(senshu === "athlete2" || calculateKumitePoints("athlete2") > calculateKumitePoints("athlete1")) && (
+                      <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 animate-bounce">
+                        <Crown className="h-14 w-14 text-amber-400 drop-shadow-[0_0_10px_rgba(251,191,36,0.5)]" />
                       </div>
                     )}
                     
@@ -296,9 +301,9 @@ const Scoreboard = () => {
                       </div>
                     )}
                     
-                    {false && determineWinner() === scoreboardData.match.athlete2 && (
+                    {calculateKumitePoints("athlete2") > calculateKumitePoints("athlete1") && (
                       <div className="bg-green-500/20 text-green-400 px-4 py-2 rounded-full text-sm font-bold mb-4">
-                        Vencedor
+                        Vencendo
                       </div>
                     )}
 
