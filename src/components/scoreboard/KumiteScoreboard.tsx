@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Clock, Trophy, User, Crown } from "lucide-react";
+import { Clock, Trophy, User } from "lucide-react";
 import { KumiteScore, ScoreboardData } from "@/types";
 import { formatTime, calculateKumitePoints } from "@/utils/scoreboardUtils";
 
@@ -9,15 +9,13 @@ interface KumiteScoreboardProps {
   kumiteScore: KumiteScore | null;
   timeLeft: number;
   id: string | undefined;
-  senshu: "athlete1" | "athlete2" | null;
 }
 
 export const KumiteScoreboard = ({
   scoreboardData,
   kumiteScore,
   timeLeft,
-  id,
-  senshu
+  id
 }: KumiteScoreboardProps) => {
   if (!kumiteScore) return null;
 
@@ -54,11 +52,7 @@ export const KumiteScoreboard = ({
           <div className="grid grid-cols-[1fr_auto_1fr] gap-8 w-full max-w-7xl">
             {/* Athlete 1 */}
             <div className={`relative transform transition-all duration-500 ${showCrownAthlete1 ? 'scale-105' : ''}`}>
-              <div className={`rounded-3xl p-8 backdrop-blur-xl ${
-                senshu === "athlete1" 
-                  ? 'bg-blue-950/40 border-2 border-blue-500/50' 
-                  : 'bg-blue-950/40 border border-white/10'
-              }`}>
+              <div className="rounded-3xl p-8 backdrop-blur-xl bg-blue-950/40 border border-white/10">
                 <div className="space-y-6">
                   {/* Crown for winning athlete */}
                   {showCrownAthlete1 && (
@@ -67,16 +61,9 @@ export const KumiteScoreboard = ({
                     </div>
                   )}
 
-                  {/* Senshu text for athlete 1 */}
-                  {senshu === "athlete1" && (
-                    <div className="text-center text-blue-400 font-semibold text-sm mb-2">
-                      SENSHU
-                    </div>
-                  )}
-
                   <div className="flex justify-center">
                     <div className="w-32 h-32 rounded-full bg-gradient-to-br from-blue-500/20 to-slate-900/20 border-2 border-blue-500/20 flex items-center justify-center">
-                      <User className={`h-16 w-16 ${senshu === "athlete1" ? 'text-blue-400' : 'text-slate-400'}`} />
+                      <User className="h-16 w-16 text-slate-400" />
                     </div>
                   </div>
                   
@@ -120,11 +107,7 @@ export const KumiteScoreboard = ({
 
             {/* Athlete 2 */}
             <div className={`relative transform transition-all duration-500 ${showCrownAthlete2 ? 'scale-105' : ''}`}>
-              <div className={`rounded-3xl p-8 backdrop-blur-xl ${
-                senshu === "athlete2"
-                  ? 'bg-red-950/40 border-2 border-red-500/50'
-                  : 'bg-red-950/40 border border-white/10'
-              }`}>
+              <div className="rounded-3xl p-8 backdrop-blur-xl bg-red-950/40 border border-white/10">
                 <div className="space-y-6">
                   {/* Crown for winning athlete */}
                   {showCrownAthlete2 && (
@@ -133,16 +116,9 @@ export const KumiteScoreboard = ({
                     </div>
                   )}
 
-                  {/* Senshu text for athlete 2 */}
-                  {senshu === "athlete2" && (
-                    <div className="text-center text-red-400 font-semibold text-sm mb-2">
-                      SENSHU
-                    </div>
-                  )}
-
                   <div className="flex justify-center">
                     <div className="w-32 h-32 rounded-full bg-gradient-to-br from-red-500/20 to-slate-900/20 border-2 border-red-500/20 flex items-center justify-center">
-                      <User className={`h-16 w-16 ${senshu === "athlete2" ? 'text-red-400' : 'text-slate-400'}`} />
+                      <User className="h-16 w-16 text-slate-400" />
                     </div>
                   </div>
                   

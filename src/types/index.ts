@@ -1,4 +1,3 @@
-
 // Define tipos para os dados do Karate
 
 // Tipo de luta: kata ou kumite
@@ -52,7 +51,6 @@ export interface ScoreboardData {
   kataScore: KataScore | null;
   kumiteScore: KumiteScore | null;
   lastUpdate: number;
-  senshu?: "athlete1" | "athlete2" | null; // Propriedade senshu para controlar a vantagem
 }
 
 // Interface para Atleta

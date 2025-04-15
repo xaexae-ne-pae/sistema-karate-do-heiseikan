@@ -11,8 +11,6 @@ const Scoreboard = () => {
   const [timeLeft, setTimeLeft] = useState<number>(180);
   const [kataScore, setKataScore] = useState<KataScore | null>(null);
   const [kumiteScore, setKumiteScore] = useState<KumiteScore | null>(null);
-  const [senshu, setSenshu] = useState<"athlete1" | "athlete2" | null>(null);
-  const [firstPointScored, setFirstPointScored] = useState(false);
 
   useEffect(() => {
     const loadScoreboardData = () => {
@@ -76,15 +74,6 @@ const Scoreboard = () => {
 
     document.title = "Placar - Karate Tournament";
 
-    const data = localStorage.getItem("scoreboardData");
-    if (data) {
-      const parsedData = JSON.parse(data) as ScoreboardData;
-      if (parsedData.senshu) {
-        setSenshu(parsedData.senshu);
-        setFirstPointScored(true);
-      }
-    }
-
     return () => {
       window.removeEventListener("scoreboardUpdate", handleUpdate);
       window.removeEventListener("storage", handleStorageUpdate);
@@ -117,7 +106,6 @@ const Scoreboard = () => {
       kumiteScore={kumiteScore || scoreboardData.kumiteScore}
       timeLeft={timeLeft}
       id={id}
-      senshu={senshu}
     />
   );
 };
