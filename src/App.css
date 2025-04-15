@@ -1,4 +1,3 @@
-
 #root {
   max-width: 1280px;
   margin: 0 auto;
@@ -11,8 +10,9 @@
   max-width: none;
   padding: 0;
   margin: 0;
-  width: 100%;
+  width: 100vw;
   height: 100vh;
+  overflow: hidden;
 }
 
 /* Estilo específico para a página de pontuação em tela cheia */
@@ -69,4 +69,21 @@ input:focus-visible {
 
 .read-the-docs {
   color: #888;
+}
+
+/* Nova regra para background do placar */
+.fullscreen-scoring #root {
+  max-width: none;
+  padding: 0;
+  margin: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* Regra para garantir que o background cubra toda a tela */
+.min-h-screen.bg-[#0A1128] {
+  min-height: 100vh;
+  width: 100vw;
+  overflow: hidden;
 }
