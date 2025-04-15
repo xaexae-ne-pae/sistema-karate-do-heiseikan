@@ -95,7 +95,7 @@ const Scoreboard = () => {
   if (!scoreboardData) {
     return (
       <div className="flex h-screen items-center justify-center bg-black text-white">
-        <p className="text-xl">Carregando dados do placar...</p>
+        <p className="text-xl">Carregando dados do placar....</p>
       </div>
     );
   }
