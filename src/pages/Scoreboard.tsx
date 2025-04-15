@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { Trophy, User, Crown, Clock, Star } from "lucide-react";
-import { MatchData, KataScore, KumiteScore, ScoreboardData } from "@/types";
+import { MatchData, KataScore, KumiteScore, ScoreboardData, MatchType } from "@/types";
 
 const Scoreboard = () => {
   const { id } = useParams<{ id: string }>();
@@ -76,12 +76,6 @@ const Scoreboard = () => {
 
     document.title = "Placar - Karate Tournament";
 
-    return () => {
-      window.removeEventListener("scoreboardUpdate", handleUpdate);
-      window.removeEventListener("storage", handleStorageUpdate);
-      clearInterval(checkInterval);
-    };
-
     // Adicionar lógica para carregar o estado do Senshu
     const data = localStorage.getItem("scoreboardData");
     if (data) {
@@ -91,10 +85,17 @@ const Scoreboard = () => {
         setFirstPointScored(true);
       }
     }
+
+    return () => {
+      window.removeEventListener("scoreboardUpdate", handleUpdate);
+      window.removeEventListener("storage", handleStorageUpdate);
+      clearInterval(checkInterval);
+    };
   }, [timeLeft, kataScore, kumiteScore]);
 
   // Atualizar a função calculateKumitePoints para considerar o Senshu
   const calculateKumitePoints = (athlete: "athlete1" | "athlete2"): number => {
+    if (!kumiteScore) return 0;
     const scores = kumiteScore[athlete];
     return scores.yuko + scores.wazari * 2 + scores.ippon * 3 - scores.penalties;
   };
@@ -239,7 +240,7 @@ const Scoreboard = () => {
                   } border-2 ${senshu === "athlete1" ? 'border-blue-500' : 'border-blue-500/20'}`}>
                     {(senshu === "athlete1" || (false && determineWinner() === scoreboardData.match.athlete1)) && (
                       <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 animate-bounce">
-                        <Crown className="h-10 w-10 text-amber-400 drop-shadow-[0_0_10px_rgba(251,191,36,0.5)]" />
+                        <Crown className="h-8 w-8 text-amber-400 drop-shadow-[0_0_10px_rgba(251,191,36,0.5)]" />
                       </div>
                     )}
                     
@@ -280,7 +281,7 @@ const Scoreboard = () => {
                   } border-2 ${senshu === "athlete2" ? 'border-red-500' : 'border-red-500/20'}`}>
                     {(senshu === "athlete2" || (false && determineWinner() === scoreboardData.match.athlete2)) && (
                       <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 animate-bounce">
-                        <Crown className="h-10 w-10 text-amber-400 drop-shadow-[0_0_10px_rgba(251,191,36,0.5)]" />
+                        <Crown className="h-8 w-8 text-amber-400 drop-shadow-[0_0_10px_rgba(251,191,36,0.5)]" />
                       </div>
                     )}
                     
