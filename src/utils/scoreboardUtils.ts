@@ -20,44 +20,46 @@ export const updateSenshu = (kumiteScore: KumiteScore): KumiteScore => {
   const athlete1Points = calculateKumitePoints("athlete1", kumiteScore);
   const athlete2Points = calculateKumitePoints("athlete2", kumiteScore);
   
-  const newKumiteScore = { ...kumiteScore };
+  // Criamos uma cópia para não modificar o objeto original
+  const newKumiteScore = { 
+    athlete1: { ...kumiteScore.athlete1 },
+    athlete2: { ...kumiteScore.athlete2 },
+    senshuTime: kumiteScore.senshuTime
+  };
   
-  // Se ambos os pontos forem 0, nenhum atleta tem senshu ainda
+  // Se ambos os atletas têm 0 pontos, ninguém tem senshu
   if (athlete1Points === 0 && athlete2Points === 0) {
     newKumiteScore.athlete1.senshu = false;
     newKumiteScore.athlete2.senshu = false;
     newKumiteScore.senshuTime = undefined;
     return newKumiteScore;
   }
-
-  // Se um atleta estiver na frente, ele recebe o senshu (se ninguém tiver ainda)
+  
+  // Se o atleta 1 está na frente, ele ganha senshu (se ninguém tiver)
   if (athlete1Points > athlete2Points) {
     // Se o atleta 2 tinha senshu antes, ele perde porque o atleta 1 virou o placar
     if (newKumiteScore.athlete2.senshu) {
       newKumiteScore.athlete2.senshu = false;
-      newKumiteScore.athlete1.senshu = false;
-    }
-    
-    // Se ninguém tem senshu, o atleta 1 ganha
-    if (!newKumiteScore.athlete1.senshu && !newKumiteScore.athlete2.senshu) {
+      // Importante: não dá senshu para o atleta 1 imediatamente, apenas remove do atleta 2
+    } else if (!newKumiteScore.athlete1.senshu && !newKumiteScore.athlete2.senshu) {
+      // Se ninguém tem senshu, o atleta 1 ganha
       newKumiteScore.athlete1.senshu = true;
       newKumiteScore.senshuTime = Date.now();
     }
-  } else if (athlete2Points > athlete1Points) {
+  } 
+  // Se o atleta 2 está na frente, ele ganha senshu (se ninguém tiver)
+  else if (athlete2Points > athlete1Points) {
     // Se o atleta 1 tinha senshu antes, ele perde porque o atleta 2 virou o placar
     if (newKumiteScore.athlete1.senshu) {
       newKumiteScore.athlete1.senshu = false;
-      newKumiteScore.athlete2.senshu = false;
-    }
-    
-    // Se ninguém tem senshu, o atleta 2 ganha
-    if (!newKumiteScore.athlete1.senshu && !newKumiteScore.athlete2.senshu) {
+      // Importante: não dá senshu para o atleta 2 imediatamente, apenas remove do atleta 1
+    } else if (!newKumiteScore.athlete1.senshu && !newKumiteScore.athlete2.senshu) {
+      // Se ninguém tem senshu, o atleta 2 ganha
       newKumiteScore.athlete2.senshu = true;
       newKumiteScore.senshuTime = Date.now();
     }
   }
-  // Se for empate, mantém o senshu com quem já tinha - não precisamos mudar nada aqui
-  // porque estamos apenas clonando o objeto kumiteScore para newKumiteScore
+  // Se for empate, não alteramos o senshu - quem já tinha mantém
   
   return newKumiteScore;
 };
