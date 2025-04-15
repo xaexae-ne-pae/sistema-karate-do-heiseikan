@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { Trophy, User, Crown, Clock, Star } from "lucide-react";
@@ -94,14 +93,12 @@ const Scoreboard = () => {
     };
   }, [timeLeft, kataScore, kumiteScore]);
 
-  // Atualizar a função calculateKumitePoints para considerar o Senshu
   const calculateKumitePoints = (athlete: "athlete1" | "athlete2"): number => {
     if (!kumiteScore) return 0;
     const scores = kumiteScore[athlete];
     return scores.yuko + scores.wazari * 2 + scores.ippon * 3 - scores.penalties;
   };
 
-  // Lógica do Senshu
   useEffect(() => {
     if (!kumiteScore || firstPointScored) return;
 
@@ -117,7 +114,6 @@ const Scoreboard = () => {
     }
   }, [kumiteScore, firstPointScored, senshu]);
 
-  // Atualizar a lógica de perda do Senshu
   useEffect(() => {
     if (!kumiteScore || !senshu) return;
 
@@ -150,7 +146,6 @@ const Scoreboard = () => {
     if (athlete1Points > athlete2Points) return scoreboardData.match.athlete1;
     if (athlete2Points > athlete1Points) return scoreboardData.match.athlete2;
     
-    // Se empatar e tiver Senshu, o atleta com Senshu vence
     if (athlete1Points === athlete2Points) {
       if (senshu === "athlete1") return scoreboardData.match.athlete1;
       if (senshu === "athlete2") return scoreboardData.match.athlete2;
@@ -202,8 +197,7 @@ const Scoreboard = () => {
     );
   }
   
-  // Fixing type comparison error by checking match type as string
-  if (scoreboardData.match.type === "kata") {
+  if (scoreboardData.match.type.toString() === "kata") {
     return <KataScoreboard 
       scoreboardData={scoreboardData} 
       formatTime={formatTime} 
@@ -218,13 +212,12 @@ const Scoreboard = () => {
     <div className="flex flex-col h-screen bg-gradient-to-b from-slate-900 to-slate-800 text-white">
       <header className="border-b border-slate-700/50 pb-4 mb-6 p-6">
         <h1 className="text-4xl font-bold text-center bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text text-transparent">
-          {scoreboardData.match.category} - {scoreboardData.match.type === "kata" ? "Kata" : "Kumite"}
+          {scoreboardData.match.category} - {scoreboardData.match.type.toString() === "kata" ? "Kata" : "Kumite"}
         </h1>
       </header>
 
       <main className="flex-1 px-8">
-        {/* Fix the type comparison by using string comparison */}
-        {scoreboardData.match.type === "kata" ? (
+        {scoreboardData.match.type.toString() === "kata" ? (
           <KataScoreboard 
             scoreboardData={scoreboardData} 
             formatTime={formatTime} 
