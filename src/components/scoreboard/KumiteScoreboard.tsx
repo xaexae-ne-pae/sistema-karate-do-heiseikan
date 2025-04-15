@@ -1,5 +1,5 @@
 
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Clock, Trophy, User, Crown } from "lucide-react";
 import { KumiteScore, ScoreboardData } from "@/types";
 import { formatTime, calculateKumitePoints, updateSenshu } from "@/utils/scoreboardUtils";
@@ -50,8 +50,9 @@ export const KumiteScoreboard = ({
               <div className="rounded-3xl p-8 backdrop-blur-xl bg-blue-950/40 border border-white/10">
                 <div className="space-y-6">
                   {showCrownAthlete1 && (
-                    <div className="absolute -top-4 left-1/2 -translate-x-1/2 animate-bounce">
+                    <div className="absolute -top-6 left-1/2 -translate-x-1/2 flex flex-col items-center animate-bounce">
                       <Crown className="h-8 w-8 text-yellow-400" />
+                      <span className="text-xs font-bold text-yellow-400 mt-1 bg-blue-900/80 px-2 py-0.5 rounded-full">SENSHU</span>
                     </div>
                   )}
 
@@ -102,8 +103,9 @@ export const KumiteScoreboard = ({
               <div className="rounded-3xl p-8 backdrop-blur-xl bg-red-950/40 border border-white/10">
                 <div className="space-y-6">
                   {showCrownAthlete2 && (
-                    <div className="absolute -top-4 left-1/2 -translate-x-1/2 animate-bounce">
+                    <div className="absolute -top-6 left-1/2 -translate-x-1/2 flex flex-col items-center animate-bounce">
                       <Crown className="h-8 w-8 text-yellow-400" />
+                      <span className="text-xs font-bold text-yellow-400 mt-1 bg-red-900/80 px-2 py-0.5 rounded-full">SENSHU</span>
                     </div>
                   )}
 
