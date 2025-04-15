@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Clock, Trophy, User } from "lucide-react";
+import { Clock, Trophy, User, Crown } from "lucide-react";
 import { KumiteScore, ScoreboardData } from "@/types";
 import { formatTime, calculateKumitePoints } from "@/utils/scoreboardUtils";
 
