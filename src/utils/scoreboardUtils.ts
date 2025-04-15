@@ -16,6 +16,43 @@ export const calculateKumitePoints = (athlete: "athlete1" | "athlete2", kumiteSc
   return scores.yuko + scores.wazari * 2 + scores.ippon * 3 - scores.penalties;
 };
 
+export const updateSenshu = (kumiteScore: KumiteScore): KumiteScore => {
+  const athlete1Points = calculateKumitePoints("athlete1", kumiteScore);
+  const athlete2Points = calculateKumitePoints("athlete2", kumiteScore);
+  
+  const newKumiteScore = { ...kumiteScore };
+  
+  // Reset senshu if both scores are 0
+  if (athlete1Points === 0 && athlete2Points === 0) {
+    newKumiteScore.athlete1.senshu = false;
+    newKumiteScore.athlete2.senshu = false;
+    newKumiteScore.senshuTime = undefined;
+    return newKumiteScore;
+  }
+
+  // Se houver uma virada, remove o senshu anterior
+  if (athlete1Points > athlete2Points && kumiteScore.athlete2.senshu) {
+    newKumiteScore.athlete2.senshu = false;
+    newKumiteScore.athlete1.senshu = false;
+  } else if (athlete2Points > athlete1Points && kumiteScore.athlete1.senshu) {
+    newKumiteScore.athlete1.senshu = false;
+    newKumiteScore.athlete2.senshu = false;
+  }
+
+  // Atribui o senshu ao primeiro que pontuar
+  if (!kumiteScore.athlete1.senshu && !kumiteScore.athlete2.senshu) {
+    if (athlete1Points > 0 && athlete1Points > athlete2Points) {
+      newKumiteScore.athlete1.senshu = true;
+      newKumiteScore.senshuTime = Date.now();
+    } else if (athlete2Points > 0 && athlete2Points > athlete1Points) {
+      newKumiteScore.athlete2.senshu = true;
+      newKumiteScore.senshuTime = Date.now();
+    }
+  }
+
+  return newKumiteScore;
+};
+
 export const determineKumiteWinner = (match: MatchData, kumiteScore: KumiteScore): string | null => {
   if (!match || match.type.toString() !== "kumite") return null;
 

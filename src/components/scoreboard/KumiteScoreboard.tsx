@@ -1,8 +1,7 @@
-
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Clock, Trophy, User, Crown } from "lucide-react";
 import { KumiteScore, ScoreboardData } from "@/types";
-import { formatTime, calculateKumitePoints } from "@/utils/scoreboardUtils";
+import { formatTime, calculateKumitePoints, updateSenshu } from "@/utils/scoreboardUtils";
 
 interface KumiteScoreboardProps {
   scoreboardData: ScoreboardData;
@@ -13,20 +12,20 @@ interface KumiteScoreboardProps {
 
 export const KumiteScoreboard = ({
   scoreboardData,
-  kumiteScore,
+  kumiteScore: initialKumiteScore,
   timeLeft,
   id
 }: KumiteScoreboardProps) => {
-  if (!kumiteScore) return null;
+  if (!initialKumiteScore) return null;
 
+  const kumiteScore = updateSenshu(initialKumiteScore);
   const athlete1Points = calculateKumitePoints("athlete1", kumiteScore);
   const athlete2Points = calculateKumitePoints("athlete2", kumiteScore);
-  const showCrownAthlete1 = athlete1Points > athlete2Points;
-  const showCrownAthlete2 = athlete2Points > athlete1Points;
+  const showCrownAthlete1 = kumiteScore.athlete1.senshu;
+  const showCrownAthlete2 = kumiteScore.athlete2.senshu;
 
   return (
     <div className="min-h-screen bg-[#0A0A0A] relative overflow-hidden">
-      {/* Background with overlay */}
       <div 
         className="absolute inset-0 bg-cover bg-center opacity-30"
         style={{
@@ -35,26 +34,20 @@ export const KumiteScoreboard = ({
         }}
       />
       
-      {/* Diagonal gradient overlay */}
       <div className="absolute inset-0 bg-gradient-to-br from-[#0A0A0A]/90 via-transparent to-red-900/30" />
 
-      {/* Content */}
       <div className="relative z-10 min-h-screen flex flex-col">
-        {/* Header */}
         <header className="py-8 px-4">
           <h1 className="text-5xl font-bold text-center bg-gradient-to-r from-red-500 to-red-300 bg-clip-text text-transparent animate-pulse-gentle">
             {scoreboardData.match.category}
           </h1>
         </header>
 
-        {/* Main content */}
         <main className="flex-1 flex items-center justify-center px-8 py-12">
           <div className="grid grid-cols-[1fr_auto_1fr] gap-8 w-full max-w-7xl">
-            {/* Athlete 1 */}
             <div className={`relative transform transition-all duration-500 ${showCrownAthlete1 ? 'scale-105' : ''}`}>
               <div className="rounded-3xl p-8 backdrop-blur-xl bg-blue-950/40 border border-white/10">
                 <div className="space-y-6">
-                  {/* Crown for winning athlete */}
                   {showCrownAthlete1 && (
                     <div className="absolute -top-4 left-1/2 -translate-x-1/2 animate-bounce">
                       <Crown className="h-8 w-8 text-yellow-400" />
@@ -89,7 +82,6 @@ export const KumiteScoreboard = ({
               </div>
             </div>
 
-            {/* Center divider with timer */}
             <div className="flex flex-col items-center justify-center space-y-8">
               <div className="w-px h-32 bg-gradient-to-b from-transparent via-red-500/50 to-transparent" />
               <div className="backdrop-blur-lg bg-black/30 px-8 py-4 rounded-full border border-red-500/20">
@@ -105,11 +97,9 @@ export const KumiteScoreboard = ({
               <div className="w-px h-32 bg-gradient-to-b from-red-500/50 via-transparent to-transparent" />
             </div>
 
-            {/* Athlete 2 */}
             <div className={`relative transform transition-all duration-500 ${showCrownAthlete2 ? 'scale-105' : ''}`}>
               <div className="rounded-3xl p-8 backdrop-blur-xl bg-red-950/40 border border-white/10">
                 <div className="space-y-6">
-                  {/* Crown for winning athlete */}
                   {showCrownAthlete2 && (
                     <div className="absolute -top-4 left-1/2 -translate-x-1/2 animate-bounce">
                       <Crown className="h-8 w-8 text-yellow-400" />
@@ -146,7 +136,6 @@ export const KumiteScoreboard = ({
           </div>
         </main>
 
-        {/* Footer */}
         <footer className="py-6 px-8">
           <div className="flex justify-between items-center max-w-7xl mx-auto">
             <div className="flex items-center space-x-3">

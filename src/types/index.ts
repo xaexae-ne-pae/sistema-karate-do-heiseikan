@@ -35,12 +35,14 @@ export interface KumiteAthleteScore {
   jogai: number;
   mubobi: number;
   hansokuChui: number;
+  senshu?: boolean;
 }
 
 // Pontuação para kumite (dois atletas)
 export interface KumiteScore {
   athlete1: KumiteAthleteScore;
   athlete2: KumiteAthleteScore;
+  senshuTime?: number;
 }
 
 // Dados completos do placar
