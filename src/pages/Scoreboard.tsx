@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { Trophy, User, Crown, Clock } from "lucide-react";
@@ -259,10 +258,14 @@ const KumiteScoreboard = ({
         {kumiteScore && (
           <>
             <div className="relative">
-              <div className={`rounded-2xl p-8 h-full flex flex-col items-center justify-center ${showCrownAthlete1 || (showWinnerBadge && winner === scoreboardData.match.athlete1) ? 'bg-blue-500/10 border-2 border-blue-500/30' : 'bg-[#111A2F]/80 border border-white/10'}`}>
+              <div className={`rounded-2xl p-8 h-full flex flex-col items-center justify-center ${
+                showCrownAthlete1 || (showWinnerBadge && winner === scoreboardData.match.athlete1) 
+                ? 'bg-blue-500/10 border-2 border-blue-500/30' 
+                : 'bg-blue-900/20 border border-blue-500/20'
+              }`}>
                 {(showCrownAthlete1 || (showWinnerBadge && winner === scoreboardData.match.athlete1)) && (
-                  <div className="absolute -top-2 left-1/2 transform -translate-x-1/2 animate-bounce">
-                    <Crown className="h-12 w-12 text-amber-400 drop-shadow-lg" />
+                  <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 animate-bounce">
+                    <Crown className="h-16 w-16 text-amber-400 drop-shadow-[0_0_10px_rgba(251,191,36,0.5)]" />
                   </div>
                 )}
                 
@@ -310,18 +313,22 @@ const KumiteScoreboard = ({
             </div>
 
             <div className="relative">
-              <div className={`rounded-2xl p-8 h-full flex flex-col items-center justify-center ${showCrownAthlete2 || (showWinnerBadge && winner === scoreboardData.match.athlete2) ? 'bg-blue-500/10 border-2 border-blue-500/30' : 'bg-[#111A2F]/80 border border-white/10'}`}>
+              <div className={`rounded-2xl p-8 h-full flex flex-col items-center justify-center ${
+                showCrownAthlete2 || (showWinnerBadge && winner === scoreboardData.match.athlete2) 
+                ? 'bg-red-500/10 border-2 border-red-500/30' 
+                : 'bg-red-900/20 border border-red-500/20'
+              }`}>
                 {(showCrownAthlete2 || (showWinnerBadge && winner === scoreboardData.match.athlete2)) && (
-                  <div className="absolute -top-2 left-1/2 transform -translate-x-1/2 animate-bounce">
-                    <Crown className="h-12 w-12 text-amber-400 drop-shadow-lg" />
+                  <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 animate-bounce">
+                    <Crown className="h-16 w-16 text-amber-400 drop-shadow-[0_0_10px_rgba(251,191,36,0.5)]" />
                   </div>
                 )}
                 
-                <div className="w-32 h-32 bg-blue-500/20 rounded-full flex items-center justify-center mb-4 border border-blue-500/30">
-                  <User className="h-16 w-16 text-blue-400" />
+                <div className="w-32 h-32 bg-red-500/20 rounded-full flex items-center justify-center mb-4 border border-red-500/30">
+                  <User className="h-16 w-16 text-red-400" />
                 </div>
                 
-                <h2 className="text-3xl font-bold mb-6 text-blue-100">{scoreboardData.match.athlete2}</h2>
+                <h2 className="text-3xl font-bold mb-6 text-red-100">{scoreboardData.match.athlete2}</h2>
                 
                 {showWinnerBadge && winner === scoreboardData.match.athlete2 && (
                   <div className="bg-green-500/20 text-green-400 px-4 py-2 rounded-full text-sm font-bold mb-4">
@@ -329,7 +336,7 @@ const KumiteScoreboard = ({
                   </div>
                 )}
 
-                <div className="bg-blue-500/10 rounded-xl p-6 w-full border border-blue-500/20">
+                <div className="bg-red-500/10 rounded-xl p-6 w-full border border-red-500/20">
                   <div className="text-center mb-6">
                     <span className="text-6xl font-bold bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text text-transparent">
                       {calculateKumitePoints("athlete2", kumiteScore)}
