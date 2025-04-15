@@ -56,27 +56,27 @@ export const KumiteScoreboard = ({
             <div className={`relative transform transition-all duration-500 ${showCrownAthlete1 ? 'scale-105' : ''}`}>
               <div className={`rounded-3xl p-8 backdrop-blur-xl ${
                 senshu === "athlete1" 
-                  ? 'bg-red-950/40 border-2 border-red-500/50' 
-                  : 'bg-slate-950/40 border border-white/10'
+                  ? 'bg-blue-950/40 border-2 border-blue-500/50' 
+                  : 'bg-blue-950/40 border border-white/10'
               }`}>
                 <div className="space-y-6">
                   {/* Crown for winning athlete */}
                   {showCrownAthlete1 && (
-                    <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 animate-bounce">
+                    <div className="absolute -top-4 left-1/2 -translate-x-1/2 animate-bounce">
                       <Crown className="h-8 w-8 text-yellow-400" />
                     </div>
                   )}
-                  
-                  {/* Senshu indicator */}
+
+                  {/* Senshu text for athlete 1 */}
                   {senshu === "athlete1" && (
-                    <div className="absolute -top-2 -left-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full animate-pulse">
-                      Senshu
+                    <div className="text-center text-blue-400 font-semibold text-sm mb-2">
+                      SENSHU
                     </div>
                   )}
 
                   <div className="flex justify-center">
-                    <div className="w-32 h-32 rounded-full bg-gradient-to-br from-red-500/20 to-slate-900/20 border-2 border-red-500/20 flex items-center justify-center">
-                      <User className={`h-16 w-16 ${senshu === "athlete1" ? 'text-red-400' : 'text-slate-400'}`} />
+                    <div className="w-32 h-32 rounded-full bg-gradient-to-br from-blue-500/20 to-slate-900/20 border-2 border-blue-500/20 flex items-center justify-center">
+                      <User className={`h-16 w-16 ${senshu === "athlete1" ? 'text-blue-400' : 'text-slate-400'}`} />
                     </div>
                   </div>
                   
@@ -85,12 +85,12 @@ export const KumiteScoreboard = ({
                   </h2>
 
                   <div className="relative">
-                    <div className="absolute inset-0 bg-gradient-to-r from-red-500/10 to-transparent blur-xl" />
-                    <div className="relative bg-black/30 rounded-2xl p-6 border border-red-500/20">
+                    <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-transparent blur-xl" />
+                    <div className="relative bg-black/30 rounded-2xl p-6 border border-blue-500/20">
                       <div className="text-center">
                         <span className={`text-8xl font-bold ${
                           showCrownAthlete1 
-                            ? 'bg-gradient-to-r from-red-400 to-orange-300'
+                            ? 'bg-gradient-to-r from-blue-400 to-blue-300'
                             : 'text-white'
                         } bg-clip-text text-transparent`}>
                           {athlete1Points}
@@ -123,20 +123,20 @@ export const KumiteScoreboard = ({
               <div className={`rounded-3xl p-8 backdrop-blur-xl ${
                 senshu === "athlete2"
                   ? 'bg-red-950/40 border-2 border-red-500/50'
-                  : 'bg-slate-950/40 border border-white/10'
+                  : 'bg-red-950/40 border border-white/10'
               }`}>
                 <div className="space-y-6">
                   {/* Crown for winning athlete */}
                   {showCrownAthlete2 && (
-                    <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 animate-bounce">
+                    <div className="absolute -top-4 left-1/2 -translate-x-1/2 animate-bounce">
                       <Crown className="h-8 w-8 text-yellow-400" />
                     </div>
                   )}
-                  
-                  {/* Senshu indicator */}
+
+                  {/* Senshu text for athlete 2 */}
                   {senshu === "athlete2" && (
-                    <div className="absolute -top-2 -right-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full animate-pulse">
-                      Senshu
+                    <div className="text-center text-red-400 font-semibold text-sm mb-2">
+                      SENSHU
                     </div>
                   )}
 
@@ -156,7 +156,7 @@ export const KumiteScoreboard = ({
                       <div className="text-center">
                         <span className={`text-8xl font-bold ${
                           showCrownAthlete2
-                            ? 'bg-gradient-to-r from-red-400 to-orange-300'
+                            ? 'bg-gradient-to-r from-red-400 to-red-300'
                             : 'text-white'
                         } bg-clip-text text-transparent`}>
                           {athlete2Points}
