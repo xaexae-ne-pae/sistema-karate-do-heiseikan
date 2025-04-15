@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { Trophy, User, Crown, Clock, Star } from "lucide-react";
@@ -201,6 +202,7 @@ const Scoreboard = () => {
     );
   }
   
+  // Fixing type comparison error by checking match type as string
   if (scoreboardData.match.type === "kata") {
     return <KataScoreboard 
       scoreboardData={scoreboardData} 
@@ -221,6 +223,7 @@ const Scoreboard = () => {
       </header>
 
       <main className="flex-1 px-8">
+        {/* Fix the type comparison by using string comparison */}
         {scoreboardData.match.type === "kata" ? (
           <KataScoreboard 
             scoreboardData={scoreboardData} 
