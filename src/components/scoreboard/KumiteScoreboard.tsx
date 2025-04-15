@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Clock, Trophy, User } from "lucide-react";
+import { Clock, Trophy, User, Crown } from "lucide-react";
 import { KumiteScore, ScoreboardData } from "@/types";
 import { formatTime, calculateKumitePoints } from "@/utils/scoreboardUtils";
 
@@ -60,6 +60,20 @@ export const KumiteScoreboard = ({
                   : 'bg-slate-950/40 border border-white/10'
               }`}>
                 <div className="space-y-6">
+                  {/* Crown for winning athlete */}
+                  {showCrownAthlete1 && (
+                    <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 animate-bounce">
+                      <Crown className="h-8 w-8 text-yellow-400" />
+                    </div>
+                  )}
+                  
+                  {/* Senshu indicator */}
+                  {senshu === "athlete1" && (
+                    <div className="absolute -top-2 -left-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full animate-pulse">
+                      Senshu
+                    </div>
+                  )}
+
                   <div className="flex justify-center">
                     <div className="w-32 h-32 rounded-full bg-gradient-to-br from-red-500/20 to-slate-900/20 border-2 border-red-500/20 flex items-center justify-center">
                       <User className={`h-16 w-16 ${senshu === "athlete1" ? 'text-red-400' : 'text-slate-400'}`} />
@@ -112,6 +126,20 @@ export const KumiteScoreboard = ({
                   : 'bg-slate-950/40 border border-white/10'
               }`}>
                 <div className="space-y-6">
+                  {/* Crown for winning athlete */}
+                  {showCrownAthlete2 && (
+                    <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 animate-bounce">
+                      <Crown className="h-8 w-8 text-yellow-400" />
+                    </div>
+                  )}
+                  
+                  {/* Senshu indicator */}
+                  {senshu === "athlete2" && (
+                    <div className="absolute -top-2 -right-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full animate-pulse">
+                      Senshu
+                    </div>
+                  )}
+
                   <div className="flex justify-center">
                     <div className="w-32 h-32 rounded-full bg-gradient-to-br from-red-500/20 to-slate-900/20 border-2 border-red-500/20 flex items-center justify-center">
                       <User className={`h-16 w-16 ${senshu === "athlete2" ? 'text-red-400' : 'text-slate-400'}`} />
