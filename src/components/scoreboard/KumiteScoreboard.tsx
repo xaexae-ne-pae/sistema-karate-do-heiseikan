@@ -1,3 +1,4 @@
+
 import React, { useEffect } from 'react';
 import { Clock, Trophy, User, Crown } from "lucide-react";
 import { KumiteScore, ScoreboardData } from "@/types";
