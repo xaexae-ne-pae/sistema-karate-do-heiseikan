@@ -52,7 +52,7 @@ export interface ScoreboardData {
   kataScore: KataScore | null;
   kumiteScore: KumiteScore | null;
   lastUpdate: number;
-  senshu?: "athlete1" | "athlete2" | null; // Adicionando a propriedade senshu
+  senshu?: "athlete1" | "athlete2" | null; // Propriedade senshu
 }
 
 // Interface para Atleta

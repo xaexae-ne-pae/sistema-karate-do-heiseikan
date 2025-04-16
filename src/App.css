@@ -28,6 +28,27 @@ body:has(.min-h-screen.w-full.bg-black) #root {
   height: 100vh;
 }
 
+/* Scoreboard specific styles */
+.scoreboard-container {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* Senshu badge styling */
+.senshu-badge {
+  background-color: rgba(245, 158, 11, 0.2);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  color: rgb(252, 211, 77);
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
 /* Adding new CSS for focused inputs */
 input:focus-visible {
   border-color: var(--primary) !important;
