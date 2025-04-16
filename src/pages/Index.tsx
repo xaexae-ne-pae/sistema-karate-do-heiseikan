@@ -22,7 +22,7 @@ const Index = () => {
   return (
     <div className="h-screen flex flex-col overflow-hidden">
       <BackgroundImage />
-    
+      
       <header className="pt-6 px-6 lg:px-10">
         <Logo className={`opacity-0 ${mounted ? 'animate-fade-in' : ''}`} />
       </header>

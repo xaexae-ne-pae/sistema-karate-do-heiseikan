@@ -1,3 +1,4 @@
+
 // Define tipos para os dados do Karate
 
 // Tipo de luta: kata ou kumite
@@ -35,14 +36,12 @@ export interface KumiteAthleteScore {
   jogai: number;
   mubobi: number;
   hansokuChui: number;
-  senshu?: boolean;
 }
 
 // Pontuação para kumite (dois atletas)
 export interface KumiteScore {
   athlete1: KumiteAthleteScore;
   athlete2: KumiteAthleteScore;
-  senshuTime?: number;
 }
 
 // Dados completos do placar
@@ -53,6 +52,7 @@ export interface ScoreboardData {
   kataScore: KataScore | null;
   kumiteScore: KumiteScore | null;
   lastUpdate: number;
+  senshu?: "athlete1" | "athlete2" | null; // Adicionando a propriedade senshu
 }
 
 // Interface para Atleta
