@@ -2,7 +2,7 @@
 import React from 'react';
 import { Clock, Trophy } from "lucide-react";
 import { KumiteScore, ScoreboardData } from "@/types";
-import { formatTime } from "@/utils/scoreboardUtils";
+import { formatTime, calculateKumitePoints } from "@/utils/scoreboardUtils";
 import KumiteAthleteDisplay from "./KumiteAthleteDisplay";
 
 interface KumiteScoreboardProps {
@@ -28,6 +28,12 @@ const KumiteScoreboard = ({
     );
   }
 
+  // Calculate points to determine who is leading
+  const athlete1Points = calculateKumitePoints("athlete1", kumiteScore);
+  const athlete2Points = calculateKumitePoints("athlete2", kumiteScore);
+  const isAthlete1Leading = athlete1Points > athlete2Points;
+  const isAthlete2Leading = athlete2Points > athlete1Points;
+
   return (
     <div className="flex flex-col h-screen bg-gradient-to-b from-slate-900 to-slate-800 text-white">
       <header className="border-b border-slate-700/50 pb-4 mb-6 p-6">
@@ -43,6 +49,7 @@ const KumiteScoreboard = ({
             athleteName={scoreboardData.match.athlete1}
             kumiteScore={kumiteScore}
             hasSenshu={senshu === "athlete1"}
+            isLeading={isAthlete1Leading}
             colorScheme="blue"
           />
           
@@ -51,6 +58,7 @@ const KumiteScoreboard = ({
             athleteName={scoreboardData.match.athlete2 || ""}
             kumiteScore={kumiteScore}
             hasSenshu={senshu === "athlete2"}
+            isLeading={isAthlete2Leading}
             colorScheme="red"
           />
         </div>

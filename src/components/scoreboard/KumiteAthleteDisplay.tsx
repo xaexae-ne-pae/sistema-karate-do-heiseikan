@@ -9,6 +9,7 @@ interface KumiteAthleteDisplayProps {
   athleteName: string;
   kumiteScore: KumiteScore;
   hasSenshu: boolean;
+  isLeading: boolean;
   colorScheme: "blue" | "red";
 }
 
@@ -17,6 +18,7 @@ const KumiteAthleteDisplay = ({
   athleteName,
   kumiteScore,
   hasSenshu,
+  isLeading,
   colorScheme
 }: KumiteAthleteDisplayProps) => {
   const baseColor = colorScheme === "blue" ? "blue" : "red";
@@ -25,12 +27,12 @@ const KumiteAthleteDisplay = ({
   return (
     <div className="relative">
       <div className={`rounded-2xl p-8 h-full flex flex-col items-center justify-center bg-gradient-to-br ${
-        hasSenshu 
+        hasSenshu || isLeading
           ? `from-${baseColor}-900/40 to-${baseColor}-800/40` 
           : `from-${baseColor}-900/20 to-${baseColor}-800/20`
-      } border-2 ${hasSenshu ? `border-${baseColor}-500` : `border-${baseColor}-500/20`}`}>
+      } border-2 ${hasSenshu || isLeading ? `border-${baseColor}-500` : `border-${baseColor}-500/20`}`}>
         
-        {hasSenshu && (
+        {isLeading && (
           <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 animate-bounce">
             <Crown className="h-8 w-8 text-amber-400 drop-shadow-[0_0_10px_rgba(251,191,36,0.5)]" />
           </div>

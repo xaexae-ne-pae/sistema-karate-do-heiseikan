@@ -1,4 +1,3 @@
-
 import { KataScore, KumiteScore, MatchData, ScoreboardData } from "@/types";
 
 // Format time in MM:SS format
@@ -60,7 +59,11 @@ export const isTie = (kumiteScore: KumiteScore): boolean => {
   return athlete1Points === athlete2Points;
 };
 
-// Update Senshu based on score changes - FIXED to maintain Senshu once assigned
+// Update Senshu based on score changes with the new rules:
+// 1. First athlete to score gets Senshu
+// 2. Senshu remains if opponent equalizes
+// 3. Senshu is removed if opponent takes the lead
+// 4. No new Senshu is assigned after lead changes
 export const updateSenshu = (
   kumiteScore: KumiteScore,
   currentSenshu: "athlete1" | "athlete2" | null,
@@ -79,7 +82,19 @@ export const updateSenshu = (
     }
   }
   
-  // Once Senshu is assigned, it should be maintained even if the score changes
-  // Unless explicitly removed by a referee decision (handled elsewhere)
+  // Once Senshu is assigned, check if lead has changed
+  if (currentSenshu === "athlete1") {
+    // Remove Senshu if athlete2 is now leading
+    if (athlete2Points > athlete1Points) {
+      return null;
+    }
+  } else if (currentSenshu === "athlete2") {
+    // Remove Senshu if athlete1 is now leading
+    if (athlete1Points > athlete2Points) {
+      return null;
+    }
+  }
+  
+  // Keep current Senshu in all other cases
   return currentSenshu;
 };
