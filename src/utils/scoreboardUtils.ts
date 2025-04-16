@@ -1,3 +1,4 @@
+
 import { KataScore, KumiteScore, MatchData, ScoreboardData } from "@/types";
 
 // Format time in MM:SS format
@@ -59,7 +60,7 @@ export const isTie = (kumiteScore: KumiteScore): boolean => {
   return athlete1Points === athlete2Points;
 };
 
-// Update Senshu based on score changes
+// Update Senshu based on score changes - FIXED to maintain Senshu once assigned
 export const updateSenshu = (
   kumiteScore: KumiteScore,
   currentSenshu: "athlete1" | "athlete2" | null,
@@ -68,12 +69,7 @@ export const updateSenshu = (
   const athlete1Points = calculateKumitePoints("athlete1", kumiteScore);
   const athlete2Points = calculateKumitePoints("athlete2", kumiteScore);
   
-  // If it's a tie, keep current Senshu
-  if (athlete1Points === athlete2Points) {
-    return currentSenshu;
-  }
-  
-  // If first point hasn't been scored yet
+  // If first point hasn't been scored yet and one athlete scores
   if (!firstPointScored) {
     if (athlete1Points > 0 && athlete2Points === 0) {
       return "athlete1";
@@ -83,6 +79,7 @@ export const updateSenshu = (
     }
   }
   
-  // If one athlete is ahead, maintain current Senshu
+  // Once Senshu is assigned, it should be maintained even if the score changes
+  // Unless explicitly removed by a referee decision (handled elsewhere)
   return currentSenshu;
 };
