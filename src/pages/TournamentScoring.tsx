@@ -160,8 +160,7 @@ const TournamentScoring = () => {
       hansokuChui: 0,
     },
   });
-
-  const [timeLeft, setTimeLeft] = useState(180); // 3 minutos em segundos
+  const [timeLeft, setTimeLeft] = useState(180);
   const [isRunning, setIsRunning] = useState(false);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const scoreboardWindowRef = useRef<Window | null>(null);
@@ -170,6 +169,8 @@ const TournamentScoring = () => {
   const scoreUpdatePendingRef = useRef(false);
   const shouldUpdateScoreRef = useRef(false);
   const scoreChangedRef = useRef(false);
+  const [senshu, setSenshu] = useState<"athlete1" | "athlete2" | null>(null);
+  const [firstPointScored, setFirstPointScored] = useState(false);
 
   const saveScoreboardData = useCallback((
     match: MatchData,
@@ -307,7 +308,6 @@ const TournamentScoring = () => {
           setIsRunning(false);
         }
         
-        // Atualizar apenas o tempo no placar, sem atualizar as pontuações
         if (currentMatch) {
           const storedData = localStorage.getItem("scoreboardData");
           if (storedData) {
@@ -315,7 +315,6 @@ const TournamentScoring = () => {
             parsedData.timeLeft = newTime;
             parsedData.isRunning = newTime > 0;
             
-            // Não atualiza os scores, mantém os que já estão
             localStorage.setItem("scoreboardData", JSON.stringify(parsedData));
             window.dispatchEvent(new CustomEvent("scoreboardUpdate"));
           }
@@ -510,6 +509,36 @@ const TournamentScoring = () => {
     return null;
   };
 
+  const isTied = (): boolean => {
+    if (!currentMatch || currentMatch.type !== "kumite") return false;
+    const athlete1Score = calculateKumitePoints("athlete1");
+    const athlete2Score = calculateKumitePoints("athlete2");
+    return athlete1Score === athlete2Score && athlete1Score > 0;
+  };
+
+  useEffect(() => {
+    if (!currentMatch || currentMatch.type !== "kumite") return;
+    
+    const athlete1Points = calculateKumitePoints("athlete1");
+    const athlete2Points = calculateKumitePoints("athlete2");
+    
+    if (!firstPointScored && (athlete1Points > 0 || athlete2Points > 0)) {
+      if (athlete1Points > 0 && athlete2Points === 0) {
+        setSenshu("athlete1");
+        setFirstPointScored(true);
+      } else if (athlete2Points > 0 && athlete1Points === 0) {
+        setSenshu("athlete2");
+        setFirstPointScored(true);
+      }
+    }
+    
+    if (senshu === "athlete1" && athlete2Points > athlete1Points) {
+      setSenshu(null);
+    } else if (senshu === "athlete2" && athlete1Points > athlete2Points) {
+      setSenshu(null);
+    }
+  }, [kumiteScore, firstPointScored, senshu, currentMatch]);
+
   if (scoringMode && currentMatch) {
     return (
       <div className="flex h-screen bg-background overflow-hidden">
@@ -703,6 +732,12 @@ const TournamentScoring = () => {
                           <h3 className="font-semibold text-lg text-left">
                             {currentMatch.athlete1}
                           </h3>
+                          {senshu === "athlete1" && (
+                            <div className="flex items-center gap-1 mt-1 text-sm font-bold text-amber-500">
+                              <Star className="h-4 w-4" />
+                              <span>Senshu</span>
+                            </div>
+                          )}
                           {determineWinner() === currentMatch.athlete1 && (
                             <div className="flex items-center gap-1 mt-1 text-sm font-bold text-primary">
                               <Crown className="h-4 w-4 text-amber-500" />
@@ -727,6 +762,12 @@ const TournamentScoring = () => {
                           <h3 className="font-semibold text-lg text-left">
                             {currentMatch.athlete2}
                           </h3>
+                          {senshu === "athlete2" && (
+                            <div className="flex items-center gap-1 mt-1 text-sm font-bold text-amber-500">
+                              <Star className="h-4 w-4" />
+                              <span>Senshu</span>
+                            </div>
+                          )}
                           {determineWinner() === currentMatch.athlete2 && (
                             <div className="flex items-center gap-1 mt-1 text-sm font-bold text-primary">
                               <Crown className="h-4 w-4 text-amber-500" />
@@ -741,6 +782,13 @@ const TournamentScoring = () => {
                         </span>
                       </div>
                     </div>
+                    
+                    {isTied() && (
+                      <div className="absolute top-full left-1/2 transform -translate-x-1/2 -translate-y-0 bg-amber-500/20 text-amber-500 rounded-full px-4 py-1 border border-amber-500/30 flex items-center gap-2 mt-2">
+                        <CircleEqual className="h-4 w-4" />
+                        <span className="font-semibold text-sm">Empatado</span>
+                      </div>
+                    )}
                   </div>
 
                   <div className="grid grid-cols-2 gap-4 flex-grow overflow-hidden">

@@ -1,8 +1,8 @@
 
 import React from 'react';
-import { Clock, Trophy } from "lucide-react";
+import { Clock, Trophy, CircleEqual } from "lucide-react";
 import { KumiteScore, ScoreboardData } from "@/types";
-import { formatTime, calculateKumitePoints } from "@/utils/scoreboardUtils";
+import { formatTime, calculateKumitePoints, isTie } from "@/utils/scoreboardUtils";
 import KumiteAthleteDisplay from "./KumiteAthleteDisplay";
 
 interface KumiteScoreboardProps {
@@ -33,6 +33,7 @@ const KumiteScoreboard = ({
   const athlete2Points = calculateKumitePoints("athlete2", kumiteScore);
   const isAthlete1Leading = athlete1Points > athlete2Points;
   const isAthlete2Leading = athlete2Points > athlete1Points;
+  const isTied = athlete1Points === athlete2Points && athlete1Points > 0;
 
   return (
     <div className="flex flex-col h-screen bg-gradient-to-b from-slate-900 to-slate-800 text-white">
@@ -43,7 +44,7 @@ const KumiteScoreboard = ({
       </header>
 
       <main className="flex-1 px-8">
-        <div className="grid grid-cols-2 gap-8 h-full">
+        <div className="grid grid-cols-2 gap-8 h-full relative">
           <KumiteAthleteDisplay 
             athlete="athlete1"
             athleteName={scoreboardData.match.athlete1}
@@ -61,6 +62,14 @@ const KumiteScoreboard = ({
             isLeading={isAthlete2Leading}
             colorScheme="red"
           />
+          
+          {/* Indicador de empate */}
+          {isTied && (
+            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-amber-500/20 text-amber-300 rounded-full px-6 py-2 border border-amber-500/30 flex items-center gap-2 z-10">
+              <CircleEqual className="h-5 w-5" />
+              <span className="font-bold text-base">Empatado</span>
+            </div>
+          )}
         </div>
       </main>
 

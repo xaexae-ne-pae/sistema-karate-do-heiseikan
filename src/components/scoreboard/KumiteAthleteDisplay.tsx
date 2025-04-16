@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Crown, Star, User } from "lucide-react";
+import { Crown, Star, User, CircleEqual } from "lucide-react";
 import { KumiteScore } from "@/types";
 import { calculateKumitePoints } from "@/utils/scoreboardUtils";
 
